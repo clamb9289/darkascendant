@@ -636,6 +636,20 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
       <div class="setting-row" style="cursor:pointer;" onclick="promptImportSave()"><div class="setting-label"><div class="setting-name">Import save</div><div class="setting-desc">Paste a save code to restore</div></div><div style="font-size:18px;">📥</div></div>
     </div>
     <div id="settings-save-msg" style="display:none;margin-top:8px;" class="save-status saved"></div>
+    <div class="section-label" style="color:#6a2020;margin-top:8px;">Danger zone</div>
+    <div class="settings-group" style="border-color:#3a1010;">
+      <div class="setting-row"><div class="setting-label"><div class="setting-name" style="color:#c04040;">Full reset</div><div class="setting-desc">Permanently erases all progress, purchases and your wizard name. Cannot be undone.</div></div></div>
+      <div style="padding:4px 0 10px;">
+        <div id="settings-reset-btn"
+          style="margin:0 4px;padding:14px;border-radius:8px;background:#1a0000;border:1px solid #4a1010;color:#c04040;font-size:14px;font-weight:600;text-align:center;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;"
+          onpointerdown="settingsResetHoldStart(this)"
+          onpointerup="settingsResetHoldEnd(this)"
+          onpointerleave="settingsResetHoldEnd(this)"
+          onpointercancel="settingsResetHoldEnd(this)">
+          ⚠️ Hold to reset everything
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -4428,6 +4442,37 @@ function devToggleHoldSpeed10() {
 var devKOEnabled = false;
 
 var _devResetHoldTimer = null;
+var _settingsResetHoldTimer = null;
+
+function settingsResetHoldStart(btn) {
+  if (_settingsResetHoldTimer) return;
+  var orig = btn.textContent;
+  var start = Date.now();
+  var iv = setInterval(function() {
+    var elapsed = Date.now() - start;
+    var remaining = Math.ceil((3000 - elapsed) / 1000);
+    var pct = Math.min(100, elapsed / 3000 * 100).toFixed(0);
+    btn.textContent = '\u26a0\ufe0f Erasing in ' + remaining + 's\u2026';
+    btn.style.background = 'linear-gradient(to right, #550000 ' + pct + '%, #1a0000 ' + pct + '%)';
+  }, 100);
+  _settingsResetHoldTimer = setTimeout(function() {
+    clearInterval(iv);
+    _settingsResetHoldTimer = null;
+    btn.textContent = orig;
+    btn.style.background = '#1a0000';
+    _execFullReset();
+  }, 3000);
+  btn._iv = iv;
+}
+
+function settingsResetHoldEnd(btn) {
+  if (!_settingsResetHoldTimer) return;
+  clearTimeout(_settingsResetHoldTimer);
+  clearInterval(btn._iv);
+  _settingsResetHoldTimer = null;
+  btn.textContent = '\u26a0\ufe0f Hold to reset everything';
+  btn.style.background = '#1a0000';
+}
 function devFullReset() { /* onclick stub — hold handled via devResetHoldStart/End */ }
 function devResetHoldStart(btn) {
   if (_devResetHoldTimer) return;
