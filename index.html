@@ -573,6 +573,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:
     <div class="home-btn" id="ascend-home-btn" onclick="handleHomeAscend()" style="display:none;border-color:#9a6a00;"><div class="home-btn-icon" style="color:#ffcc44;">🌀</div><div style="flex:1"><div class="home-btn-title" style="color:#ffcc44;">Ascend</div><div class="home-btn-sub">Choose your prestige form</div></div><div class="home-btn-arrow" style="color:#ffcc44;">→</div></div>
     <div class="home-btn btn-resume" id="resume-btn" onclick="handleResume()"><div class="home-btn-icon">🌑</div><div style="flex:1"><div class="home-btn-title">Resume game</div><div class="home-btn-sub" id="resume-sub">No save found</div></div><div class="home-btn-arrow">→</div></div>
     <div class="home-btn" onclick="showScreen('scores-screen')"><div class="home-btn-icon">🏆</div><div style="flex:1"><div class="home-btn-title">Records</div><div class="home-btn-sub">Tap stats, achievements &amp; history</div></div><div class="home-btn-arrow">→</div></div>
+    <div class="home-btn" onclick="openLeaderboard()" style="border-color:#3a1060;"><div class="home-btn-icon">🌑</div><div style="flex:1"><div class="home-btn-title" style="color:#c080ff;">Leaderboard</div><div class="home-btn-sub">Global rankings</div></div><div class="home-btn-arrow" style="color:#7030c0;">→</div></div>
     <div class="home-btn" onclick="showScreen('settings-screen')"><div class="home-btn-icon">⚙️</div><div style="flex:1"><div class="home-btn-title">Settings</div><div class="home-btn-sub">Accessibility, text size &amp; sound</div></div><div class="home-btn-arrow">→</div></div>
   </div>
   <div id="home-version" onclick="devTap()">Dark Ascendant v1.1 · Auto-saves every 30 seconds</div>
@@ -821,6 +822,406 @@ function checkPendingPurchase() {
     saveGame();
   }
 }
+
+var SUPABASE_URL = 'https://kzuefykdkhsvgjdawrbe.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6dWVmeWtka2hzdmdqZGF3cmJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMzU0MDgsImV4cCI6MjA5NjcxMTQwOH0.ZTSrg9RGvvDS9NYaQisj8DxPupfvwAyuThZmrI5ZOlo';
+var SUPABASE_TABLE = 'Leaderboard';
+
+var _devAccess = false; // set true if Supabase flags this device for dev access
+
+var DARK_TITLES = [
+  'Dread Phantom','Shadow Lich','Void Wraith','Bone Tyrant','Soul Reaper',
+  'Crypt Walker','Dark Oracle','Night Blade','Doom Caller','Ash Revenant',
+  'Plague Sage','Rune Breaker','Death Knell','Hollow King','Grave Warden',
+  'Cursed Flame','Veil Stalker','Abyss Spawn','Blood Pact','Fell Watcher',
+  'Iron Specter','Storm Wraith','Ember Lich','Frost Reaper','Void Herald',
+  'Null Walker','Chaos Binder','Soul Flayer','Dark Warden','Hex Bringer'
+];
+
+// ── Device ID ────────────────────────────────────────────────────────
+function getDeviceId() {
+  var id = localStorage.getItem('da_device_id');
+  if (!id) {
+    id = 'dev_' + Math.random().toString(36).slice(2,10) + Math.random().toString(36).slice(2,10);
+    localStorage.setItem('da_device_id', id);
+  }
+  return id;
+}
+
+// ── Wizard Name ──────────────────────────────────────────────────────
+function getWizardName() { return localStorage.getItem('da_wizard_name') || null; }
+function setWizardName(n) { localStorage.setItem('da_wizard_name', n); }
+
+function genGenericName() {
+  var title = DARK_TITLES[Math.floor(Math.random() * DARK_TITLES.length)];
+  var num = Math.floor(1000 + Math.random() * 9000);
+  return title + ' #' + num;
+}
+
+// Client-side profanity pre-check (same list as server, faster feedback)
+var _badWords = ['fuck','shit','cunt','bitch','asshole','nigger','nigga','faggot','retard',
+  'cock','pussy','dick','whore','slut','bastard','twat','wanker','piss','arse','kike','spic','chink','gook'];
+function _hasProfanity(str) {
+  var lower = str.toLowerCase().replace(/[^a-z0-9]/g,'');
+  return _badWords.some(function(w){ return lower.indexOf(w) >= 0; });
+}
+
+// ── Name Picker Overlay ──────────────────────────────────────────────
+function checkWizardNamePrompt() {
+  if (getWizardName()) {
+    document.body.classList.add('screens-ready'); // name already set, reveal immediately
+    return;
+  }
+  document.body.classList.add('name-pending');
+  setTimeout(showWizardNamePicker, 100);
+}
+
+function showWizardNamePicker() {
+  if (document.getElementById('wizard-name-overlay')) return;
+
+  var _caps = true; // start uppercase
+  var _nums = false;
+
+  var ALPHA_UPPER = [
+    ['Q','W','E','R','T','Y','U','I','O','P'],
+    ['A','S','D','F','G','H','J','K','L'],
+    ['CAPS','Z','X','C','V','B','N','M','DEL'],
+    ['123','SPACE','ENTER']
+  ];
+  var ALPHA_LOWER = [
+    ['q','w','e','r','t','y','u','i','o','p'],
+    ['a','s','d','f','g','h','j','k','l'],
+    ['CAPS','z','x','c','v','b','n','m','DEL'],
+    ['123','SPACE','ENTER']
+  ];
+  var NUM_ROWS = [
+    ['1','2','3','4','5','6','7','8','9','0'],
+    ['DEL'],
+    ['ABC','SPACE','ENTER']
+  ];
+
+  function renderKb() {
+    var rows = _nums ? NUM_ROWS : (_caps ? ALPHA_UPPER : ALPHA_LOWER);
+    var html = rows.map(function(keys) {
+      return '<div style="display:flex;gap:5px;margin-bottom:5px;">' + keys.map(function(k) {
+        var label = k === 'DEL' ? '⌫'
+          : k === 'ENTER' ? '↵ Done'
+          : k === 'SPACE' ? 'SPACE'
+          : k === 'CAPS'  ? (_caps ? '⬆ ABC' : '⬆ abc')
+          : k === '123'   ? '123'
+          : k === 'ABC'   ? 'ABC'
+          : k;
+        var flex = (k === 'SPACE') ? '4' : (k === 'ENTER') ? '3' : (k === 'CAPS' || k === '123' || k === 'ABC') ? '2' : '1';
+        var bg   = (k === 'CAPS' && _caps) ? '#2a0a50' : '#150828';
+        var col  = (k === 'CAPS' || k === '123' || k === 'ABC') ? '#e0a0ff' : '#c0a0e0';
+        return '<div data-wkb="' + k + '" style="flex:' + flex + ';padding:11px 2px;border-radius:7px;background:' + bg + ';border:1px solid #2a1050;color:' + col + ';font-size:14px;font-weight:600;text-align:center;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent;">' + label + '</div>';
+      }).join('') + '</div>';
+    }).join('');
+    var kbEl = document.getElementById('wkb-keys');
+    if (kbEl) kbEl.innerHTML = html;
+  }
+
+  var el = document.createElement('div');
+  el.id = 'wizard-name-overlay';
+  el.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#04010c;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;z-index:8000;padding:28px 20px 16px;box-sizing:border-box;overflow:hidden;pointer-events:all;';
+
+  el.innerHTML = '<div style="font-size:26px;margin-bottom:6px;">&#127761;</div>'
+    + '<div style="font-size:17px;font-weight:700;color:#c080ff;margin-bottom:4px;">Choose Your Wizard Name</div>'
+    + '<div style="font-size:11px;color:#5030a0;margin-bottom:16px;text-align:center;">Appears on the global leaderboard &middot; 2&ndash;24 characters</div>'
+    + '<div id="wkb-display" style="width:100%;max-width:320px;padding:11px 14px;border-radius:8px;border:1px solid #5030a0;background:#0a0018;color:#e0c0ff;font-size:16px;text-align:center;box-sizing:border-box;margin-bottom:6px;min-height:44px;letter-spacing:0.5px;">'
+    + '<span id="wkb-text"></span><span id="wkb-cursor" style="display:inline-block;width:2px;height:16px;background:#c080ff;vertical-align:middle;margin-left:2px;animation:wkbBlink 1s step-end infinite;"></span>'
+    + '</div>'
+    + '<div id="wizard-name-error" style="font-size:11px;color:#ff5050;min-height:16px;margin-bottom:8px;text-align:center;"></div>'
+    + '<div id="wizard-name-confirm-btn" style="width:100%;max-width:320px;padding:11px;border-radius:8px;background:#3a0070;border:1px solid #7030c0;color:#e0a0ff;font-size:14px;font-weight:600;text-align:center;cursor:pointer;margin-bottom:14px;touch-action:manipulation;">Claim this name &#8594;</div>'
+    + '<div id="wkb-keys" style="width:100%;max-width:360px;"></div>'
+    + '<div id="wkb-random" style="margin-top:14px;font-size:11px;color:#4a2870;text-decoration:underline;cursor:pointer;touch-action:manipulation;">Generate a random dark fantasy name for me</div>'
+    + '<div id="wkb-import" style="margin-top:10px;font-size:11px;color:#3a2060;text-decoration:underline;cursor:pointer;touch-action:manipulation;">Already played? Import a save file →</div>';
+
+  if (!document.getElementById('wkb-style')) {
+    var s = document.createElement('style');
+    s.id = 'wkb-style';
+    s.textContent = '@keyframes wkbBlink{0%,100%{opacity:1}50%{opacity:0}}';
+    document.head.appendChild(s);
+  }
+
+  document.body.appendChild(el);
+  renderKb();
+
+  el.addEventListener('pointerdown', function(e) {
+    var btn = e.target.closest('[data-wkb]');
+    if (btn) {
+      e.preventDefault();
+      var k = btn.getAttribute('data-wkb');
+      if (k === 'CAPS') { _caps = !_caps; renderKb(); return; }
+      if (k === '123')  { _nums = true;  _caps = false; renderKb(); return; }
+      if (k === 'ABC')  { _nums = false; _caps = true;  renderKb(); return; }
+      // After typing a letter, switch to lowercase (like a real keyboard)
+      if (k !== 'DEL' && k !== 'SPACE' && k !== 'ENTER' && _caps && !_nums) {
+        _wkbTap(k);
+        _caps = false; renderKb(); return;
+      }
+      _wkbTap(k); return;
+    }
+    if (e.target.closest('#wizard-name-confirm-btn')) { e.preventDefault(); confirmWizardName(); return; }
+    if (e.target.closest('#wkb-random')) { e.preventDefault(); useGenericName(); return; }
+    if (e.target.closest('#wkb-import')) { e.preventDefault(); closeWizardNamePicker(); promptImportSave(); return; }
+  });
+}
+
+var _wkbValue = '';
+function _wkbTap(k) {
+  var err = document.getElementById('wizard-name-error');
+  if (err) err.textContent = '';
+  if (k === 'DEL') {
+    _wkbValue = _wkbValue.slice(0, -1);
+  } else if (k === 'ENTER') {
+    confirmWizardName(); return;
+  } else if (k === 'SPACE') {
+    if (_wkbValue.length < 24 && _wkbValue.slice(-1) !== ' ') _wkbValue += ' ';
+  } else {
+    if (_wkbValue.length < 24) _wkbValue += k;
+  }
+  var t = document.getElementById('wkb-text');
+  if (t) t.textContent = _wkbValue;
+}
+
+function confirmWizardName() {
+  var err = document.getElementById('wizard-name-error');
+  var name = _wkbValue.trim();
+  if (name.length < 2) { if (err) err.textContent = 'Name must be at least 2 characters.'; return; }
+  if (name.length > 24) { if (err) err.textContent = 'Name must be 24 characters or fewer.'; return; }
+  if (!/^[a-zA-Z0-9 '#\-\.]+$/.test(name)) { if (err) err.textContent = "Letters, numbers, spaces and # - . ' only."; return; }
+  if (_hasProfanity(name)) { if (err) err.textContent = 'Please choose a different name.'; return; }
+  if (err) err.textContent = '';
+  var btn = document.getElementById('wizard-name-confirm-btn');
+  if (btn) { btn.textContent = 'Checking…'; btn.style.opacity = '.6'; btn.style.pointerEvents = 'none'; }
+  var myDevice = getDeviceId();
+  fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE
+    + '?select=device_id&wizard_name=eq.' + encodeURIComponent(name) + '&limit=1', {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(rows) {
+    if (rows && rows.length > 0 && rows[0].device_id !== myDevice) {
+      if (err) err.textContent = 'Name already taken — please choose another.';
+      if (btn) { btn.textContent = 'Claim this name →'; btn.style.opacity = '1'; btn.style.pointerEvents = ''; }
+    } else {
+      setWizardName(name);
+      _wkbValue = '';
+      setTimeout(closeWizardNamePicker, 300);
+    }
+  })
+  .catch(function() {
+    // Offline — skip check and allow
+    setWizardName(name);
+    _wkbValue = '';
+    setTimeout(closeWizardNamePicker, 300);
+  });
+}
+
+function useGenericName() {
+  var name = genGenericName();
+  // Show the generated name on screen briefly before closing
+  _wkbValue = name;
+  var t = document.getElementById('wkb-text');
+  if (t) t.textContent = name;
+  var btn = document.getElementById('wizard-name-confirm-btn');
+  if (btn) { btn.textContent = 'Using: ' + name + ' →'; btn.style.opacity = '.8'; }
+  setWizardName(name);
+  _wkbValue = '';
+  setTimeout(closeWizardNamePicker, 1400);
+}
+
+function closeWizardNamePicker() {
+  var el = document.getElementById('wizard-name-overlay');
+  if (el && el.parentNode) el.parentNode.removeChild(el);
+  document.body.classList.remove('name-pending');
+  document.body.classList.add('screens-ready');
+  refreshHomeBtns(); // show wizard name on home screen immediately
+}
+
+// ── Score Submission ─────────────────────────────────────────────────
+function checkDevAccess() {
+  var device_id = getDeviceId();
+  fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE
+    + '?select=dev_access&device_id=eq.' + encodeURIComponent(device_id) + '&limit=1', {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(rows) {
+    if (rows && rows.length > 0 && rows[0].dev_access === true) {
+      _devAccess = true;
+      applyDevAccess();
+    }
+  })
+  .catch(function() {}); // silent fail
+}
+
+function applyDevAccess() {
+  // Show playtest button on home screen
+  var btn = document.getElementById('home-dev-btn');
+  if (btn) btn.style.display = '';
+  // Refresh shop if open
+  if (document.getElementById('shopoverlay') && document.getElementById('shopoverlay').classList.contains('show')) {
+    buildShop();
+  }
+}
+
+function openDevPanel() {
+  document.getElementById('devoverlay').classList.add('show');
+}
+
+function hasAdsFree() {
+  return _devAccess || (gameState && gameState.removeAds);
+}
+
+function _sbH() {
+  return {
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_KEY,
+    'Content-Type': 'application/json'
+  };
+}
+
+function submitLeaderboardScore(silent) {
+  if (!getWizardName()) return;
+  var name = getWizardName();
+  var prestige = (gameState && gameState.prestigeCount) || 0;
+  var best_time_ms = (gameState && gameState.stats && gameState.stats.bestTime100) || 0;
+  var device_id = getDeviceId();
+  var timeFmt = best_time_ms > 0
+    ? Math.floor(best_time_ms/60000) + 'm ' + Math.floor((best_time_ms%60000)/1000) + 's'
+    : null;
+  fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE, {
+    method: 'POST',
+    headers: Object.assign(_sbH(), {'Prefer': 'resolution=merge-duplicates,return=minimal'}),
+    body: JSON.stringify({
+      device_id: device_id,
+      wizard_name: name,
+      prestige: prestige,
+      best_time_ms: best_time_ms,
+      best_time_fmt: timeFmt,
+      level: (gameState && gameState.level) || 1,
+      updated_at: new Date().toISOString()
+    })
+  })
+  .then(function(r) {
+    console.log('[LB] submit status:', r.status);
+  })
+  .catch(function(e) { console.log('[LB] submit error:', e); });
+}
+
+
+function openLeaderboard() {
+  var existing = document.getElementById('leaderboard-overlay');
+  if (existing) { existing.style.display = 'flex'; fetchLeaderboard(); return; }
+
+  var el = document.createElement('div');
+  el.id = 'leaderboard-overlay';
+  el.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#04010c;display:flex;flex-direction:column;align-items:center;z-index:7000;padding:0;box-sizing:border-box;overflow:hidden;pointer-events:all;';
+
+  el.innerHTML = [
+    // Header
+    '<div style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 4% 12px;border-bottom:1px solid #1a0a2a;flex-shrink:0;">',
+      '<div style="font-size:18px;font-weight:700;color:#c080ff;">🏆 Leaderboard</div>',
+      '<div id="lb-close-btn" style="font-size:14px;color:#a060e0;cursor:pointer;padding:8px 16px;border:1px solid #4a1080;border-radius:8px;touch-action:manipulation;font-weight:600;">✕ Close</div>',
+    '</div>',
+    // My name bar
+    '<div id="lb-my-name" style="width:100%;padding:10px 4%;font-size:13px;color:#6040a0;flex-shrink:0;border-bottom:1px solid #0e0520;box-sizing:border-box;"></div>',
+    // Column headers
+    '<div style="width:100%;display:grid;grid-template-columns:10% 1fr 12% 12% 18%;padding:8px 4%;border-bottom:1px solid #1a0a2a;flex-shrink:0;">',
+      '<div style="font-size:11px;color:#4a2070;font-weight:700;letter-spacing:0.5px;">#</div>',
+      '<div style="font-size:11px;color:#4a2070;font-weight:700;letter-spacing:0.5px;">WIZARD</div>',
+      '<div style="font-size:11px;color:#4a2070;font-weight:700;text-align:center;letter-spacing:0.5px;">LVL</div>',
+      '<div style="font-size:11px;color:#4a2070;font-weight:700;text-align:center;letter-spacing:0.5px;">ASC</div>',
+      '<div style="font-size:11px;color:#4a2070;font-weight:700;text-align:right;letter-spacing:0.5px;">BEST RUN</div>',
+    '</div>',
+    // List
+    '<div id="lb-list" style="width:100%;flex:1;overflow-y:auto;"></div>',
+    // Status
+    '<div id="lb-status" style="padding:40px;color:#4a2070;font-size:14px;text-align:center;flex-shrink:0;"></div>',
+  ].join('');
+
+  document.body.appendChild(el);
+
+  el.addEventListener('pointerdown', function(e) {
+    if (e.target.closest('#lb-close-btn')) { e.preventDefault(); closeLeaderboard(); }
+  });
+
+  var myName = getWizardName();
+  var nameEl = document.getElementById('lb-my-name');
+  if (nameEl) nameEl.textContent = myName ? ('Playing as: ' + myName) : 'No wizard name set yet.';
+
+  fetchLeaderboard();
+}
+
+function closeLeaderboard() {
+  var el = document.getElementById('leaderboard-overlay');
+  if (el && el.parentNode) el.parentNode.removeChild(el);
+}
+
+function fetchLeaderboard() {
+  var list = document.getElementById('lb-list');
+  var status = document.getElementById('lb-status');
+  if (!list) return;
+  if (status) { status.textContent = 'Loading...'; status.style.display = 'block'; }
+  list.innerHTML = '';
+
+  fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE
+    + '?select=device_id,wizard_name,prestige,best_time_ms,best_time_fmt,level'
+    + '&limit=50', {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+  })
+  .then(function(r) {
+    if (!r.ok) return r.text().then(function(t) { throw new Error('HTTP ' + r.status + ': ' + t); });
+    return r.json();
+  })
+  .then(function(rows) {
+    console.log('[LB] fetch got', rows.length, 'rows');
+    if (status) status.style.display = 'none';
+    if (!rows || rows.length === 0) {
+      list.innerHTML = '<div style="padding:40px;text-align:center;color:#3a1060;font-size:13px;">No entries yet -- be the first!</div>';
+      return;
+    }
+    var myDevice = getDeviceId();
+    rows.sort(function(a, b) {
+      if (b.prestige !== a.prestige) return b.prestige - a.prestige;
+      if ((b.level || 0) !== (a.level || 0)) return (b.level || 0) - (a.level || 0);
+      if (!a.best_time_ms) return 1;
+      if (!b.best_time_ms) return -1;
+      return a.best_time_ms - b.best_time_ms;
+    });
+    var html = '';
+    rows.forEach(function(e, i) {
+      var rank = i + 1;
+      var isMe = e.device_id === myDevice;
+      var rankColor = rank === 1 ? '#ffd700' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : '#6040a0';
+      var rankSize = rank <= 3 ? '16px' : '14px';
+      var rowBg = isMe ? 'background:rgba(120,60,200,0.18);border-left:3px solid #8040d0;' : 'border-left:3px solid transparent;';
+      var lvl = e.level || 1;
+      var lvlColor = lvl >= 100 ? '#ffd700' : lvl >= 50 ? '#c080ff' : '#8060c0';
+      var bc = e.prestige > 0 ? (BADGE_COLORS[Math.min(e.prestige, BADGE_COLORS.length)-1] || BADGE_COLORS[0]) : null;
+      var ascended = e.prestige > 0
+        ? '<span style="background:rgba(80,20,120,0.3);border-radius:12px;padding:2px 8px;font-size:12px;color:' + bc.color + ';font-weight:700;border:1px solid ' + bc.border + ';text-shadow:0 0 6px ' + bc.border + ';">' + e.prestige + 'x</span>'
+        : '<span style="color:#3a1060;font-size:12px;">—</span>';
+      html += '<div style="display:grid;grid-template-columns:10% 1fr 12% 12% 18%;padding:13px 4%;' + rowBg + 'border-bottom:1px solid #0e0520;align-items:center;">'
+        + '<div style="font-size:' + rankSize + ';font-weight:700;color:' + rankColor + ';">' + rank + '</div>'
+        + '<div style="font-size:14px;color:' + (isMe ? '#e8b0ff' : '#c080ff') + ';font-weight:' + (isMe ? '700' : '500') + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + e.wizard_name + '</div>'
+        + '<div style="text-align:center;font-size:13px;font-weight:700;color:' + lvlColor + ';">' + lvl + '</div>'
+        + '<div style="text-align:center;">' + ascended + '</div>'
+        + '<div style="text-align:right;font-size:11px;color:#6040a0;">' + (e.best_time_fmt || '<span style="color:#2a1050;">—</span>') + '</div>'
+        + '</div>';
+    });
+    list.innerHTML = html;
+  })
+  .catch(function(e) {
+    console.log('[LB] fetch error:', e);
+    if (status) { status.textContent = 'Error: ' + e.message; status.style.display = 'block'; status.style.color = '#ff5050'; status.style.fontSize = '10px'; }
+  });
+}
+
+
+
 
 
 // ── SOUND SYSTEM ─────────────────────────────────────────────────────
@@ -4771,7 +5172,12 @@ function updateHomeWizard() {
       setTimeout(function(){
         ls.style.transition = 'opacity .4s';
         ls.style.opacity = '0';
-        setTimeout(function(){ ls.style.display = 'none'; }, 400);
+        setTimeout(function(){
+          ls.style.display = 'none';
+          if (typeof checkDevAccess === 'function') checkDevAccess();
+          if (typeof checkWizardNamePrompt === 'function') checkWizardNamePrompt();
+          refreshHomeBtns();
+        }, 400);
       }, 200);
     }
   }, 80);
