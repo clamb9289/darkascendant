@@ -4093,14 +4093,74 @@ function manualSave() {
   else { var msg=document.getElementById('settings-save-msg'); if(msg){msg.textContent='No active game.';msg.style.display='block';msg.className='save-status unsaved';setTimeout(function(){msg.style.display='none';},2000);} }
 }
 function exportSave() {
-  var raw = localStorage.getItem(SAVE_KEY); if (!raw) { alert('No save data.'); return; }
-  try { navigator.clipboard.writeText(btoa(raw)).then(function(){ var msg=document.getElementById('settings-save-msg');if(msg){msg.textContent='✓ Save code copied!';msg.style.display='block';msg.className='save-status saved';setTimeout(function(){msg.style.display='none';},2500);} }); }
-  catch(e) { alert('Save code: ' + btoa(raw).slice(0,120)); }
+  var raw = localStorage.getItem(SAVE_KEY);
+  if (!raw) { alert('No save data to export.'); return; }
+  try {
+    var compressed = compressSave(raw);
+    var code = btoa(compressed);
+    navigator.clipboard.writeText(code).then(function() {
+      var msg = document.getElementById('settings-save-msg');
+      if (msg) { msg.textContent = '✓ Save code copied to clipboard!'; msg.style.display = 'block'; msg.className = 'save-status saved'; setTimeout(function(){ msg.style.display = 'none'; }, 2500); }
+    });
+  } catch(e) {
+    var msg = document.getElementById('settings-save-msg');
+    if (msg) { msg.textContent = '✗ Could not copy — try a different browser.'; msg.style.display = 'block'; msg.className = 'save-status'; setTimeout(function(){ msg.style.display = 'none'; }, 3000); }
+  }
 }
 function promptImportSave() {
-  var code = prompt('Paste your save code:'); if (!code) return;
-  try { var decoded=atob(code.trim()); var parsed=JSON.parse(decoded); localStorage.setItem(SAVE_KEY,JSON.stringify(parsed)); var msg=document.getElementById('settings-save-msg');if(msg){msg.textContent='✓ Imported! Use Resume to continue.';msg.style.display='block';msg.className='save-status saved';setTimeout(function(){msg.style.display='none';},3000);} }
-  catch(e) { alert('Invalid save code.'); }
+  if (document.getElementById('import-save-overlay')) return;
+
+  var el = document.createElement('div');
+  el.id = 'import-save-overlay';
+  el.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(4,1,12,0.97);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:8000;padding:24px;box-sizing:border-box;pointer-events:all;';
+
+  el.innerHTML = '<div style="font-size:18px;font-weight:700;color:#c080ff;margin-bottom:10px;">Import Save</div>'
+    + '<div style="font-size:12px;color:#8050a0;margin-bottom:6px;text-align:center;max-width:300px;line-height:1.6;">'
+    + '<span style="color:#ff6060;font-weight:600;">Warning:</span> This will completely overwrite all progress on this device, including your current level, gems, and upgrades.'
+    + '</div>'
+    + '<div style="font-size:11px;color:#4a2060;margin-bottom:16px;text-align:center;">Export your current save first if you want to be able to return to it.</div>'
+    + '<textarea id="import-save-input" style="width:100%;max-width:320px;height:100px;padding:10px;border-radius:8px;border:1px solid #5030a0;background:#0a0018;color:#e0c0ff;font-size:11px;font-family:monospace;resize:none;box-sizing:border-box;margin-bottom:8px;" placeholder="Paste save code here…"></textarea>'
+    + '<div id="import-save-error" style="font-size:11px;color:#ff5050;min-height:16px;margin-bottom:12px;text-align:center;"></div>'
+    + '<div style="display:flex;gap:10px;width:100%;max-width:320px;">'
+    + '<div id="import-cancel-btn" style="flex:1;padding:13px;border-radius:8px;background:#0a0018;border:1px solid #2a1050;color:#6040a0;font-size:14px;font-weight:600;text-align:center;cursor:pointer;touch-action:manipulation;">Cancel</div>'
+    + '<div id="import-confirm-btn" style="flex:2;padding:13px;border-radius:8px;background:#3a0010;border:1px solid #8a1030;color:#ff8080;font-size:14px;font-weight:600;text-align:center;cursor:pointer;touch-action:manipulation;">⚠️ Overwrite &amp; Load</div>'
+    + '</div>';
+
+  document.body.appendChild(el);
+  setTimeout(function(){ var inp = document.getElementById('import-save-input'); if (inp) inp.focus(); }, 100);
+
+  el.addEventListener('pointerdown', function(e) {
+    if (e.target.closest('#import-cancel-btn')) {
+      e.preventDefault();
+      el.remove();
+      return;
+    }
+    if (e.target.closest('#import-confirm-btn')) {
+      e.preventDefault();
+      var inp = document.getElementById('import-save-input');
+      var code = inp ? inp.value.trim() : '';
+      var err = document.getElementById('import-save-error');
+      if (!code) { if (err) err.textContent = 'Please paste a save code first.'; return; }
+      try {
+        var decoded = atob(code);
+        var decompressed = decompressSave(decoded);
+        var parsed = JSON.parse(decompressed);
+        // Fully wipe and replace save
+        localStorage.setItem(SAVE_KEY, JSON.stringify(parsed));
+        el.remove();
+        // Reload the game state completely
+        gameState = parsed;
+        recalc();
+        saveGame();
+        refreshHomeBtns();
+        showScreen('home-screen');
+        var msg = document.getElementById('settings-save-msg');
+        if (msg) { msg.textContent = '✓ Save loaded! Your progress has been restored.'; msg.style.display = 'block'; msg.className = 'save-status saved'; setTimeout(function(){ msg.style.display = 'none'; }, 3000); }
+      } catch(e2) {
+        if (err) err.textContent = 'Invalid save code — please check and try again.';
+      }
+    }
+  });
 }
 
 
