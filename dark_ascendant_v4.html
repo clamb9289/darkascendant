@@ -1554,14 +1554,14 @@ function showIntro() {
   var useWhite = hasAscended || trueEnded;
   overlay.style.background = useWhite ? '#fff' : '#000';
   var textColor = useWhite ? '#2a1a3a' : '#c0a0e0';
-  var faintColor = useWhite ? '#6a4a8a' : '#8a60b0';
-  var borderColor = useWhite ? '#b0a0c0' : '#3a2a5a';
+  var faintColor = useWhite ? '#4a1080' : '#8a60b0';
+  var borderColor = useWhite ? '#6a20a0' : '#3a2a5a';
   ['intro-line1','intro-line2','intro-line3','intro-credit'].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.style.color = textColor;
   });
   var skipEl = document.getElementById('intro-skip');
-  if (skipEl) { skipEl.style.color = faintColor; skipEl.style.borderColor = borderColor; }
+  if (skipEl) { skipEl.style.color = faintColor; skipEl.style.borderColor = borderColor; skipEl.style.fontWeight = useWhite ? '700' : '600'; }
   overlay.style.display = 'flex';
   // Reset lines
   ['intro-line1','intro-line2','intro-line3','intro-credit','intro-skip'].forEach(function(id){
@@ -4980,7 +4980,8 @@ function showWizardNamePicker() {
     + '<div id="wizard-name-error" style="font-size:11px;color:#ff5050;min-height:16px;margin-bottom:8px;text-align:center;"></div>'
     + '<div id="wizard-name-confirm-btn" style="width:100%;max-width:320px;padding:11px;border-radius:8px;background:#3a0070;border:1px solid #7030c0;color:#e0a0ff;font-size:14px;font-weight:600;text-align:center;cursor:pointer;margin-bottom:14px;touch-action:manipulation;">Claim this name &#8594;</div>'
     + '<div id="wkb-keys" style="width:100%;max-width:360px;"></div>'
-    + '<div id="wkb-random" style="margin-top:14px;font-size:11px;color:#4a2870;text-decoration:underline;cursor:pointer;touch-action:manipulation;">Generate a random dark fantasy name for me</div>';
+    + '<div id="wkb-random" style="margin-top:14px;font-size:11px;color:#4a2870;text-decoration:underline;cursor:pointer;touch-action:manipulation;">Generate a random dark fantasy name for me</div>'
+    + '<div id="wkb-import" style="margin-top:10px;font-size:11px;color:#3a2060;text-decoration:underline;cursor:pointer;touch-action:manipulation;">Already played? Import a save file →</div>';
 
   if (!document.getElementById('wkb-style')) {
     var s = document.createElement('style');
@@ -5009,6 +5010,7 @@ function showWizardNamePicker() {
     }
     if (e.target.closest('#wizard-name-confirm-btn')) { e.preventDefault(); confirmWizardName(); return; }
     if (e.target.closest('#wkb-random')) { e.preventDefault(); useGenericName(); return; }
+    if (e.target.closest('#wkb-import')) { e.preventDefault(); closeWizardNamePicker(); promptImportSave(); return; }
   });
 }
 
@@ -5210,8 +5212,9 @@ function fetchLeaderboard() {
       var rowBg = isMe ? 'background:rgba(120,60,200,0.18);border-left:3px solid #8040d0;' : 'border-left:3px solid transparent;';
       var lvl = e.level || 1;
       var lvlColor = lvl >= 100 ? '#ffd700' : lvl >= 50 ? '#c080ff' : '#8060c0';
+      var bc = e.prestige > 0 ? (BADGE_COLORS[Math.min(e.prestige, BADGE_COLORS.length)-1] || BADGE_COLORS[0]) : null;
       var ascended = e.prestige > 0
-        ? '<span style="background:#2a1040;border-radius:12px;padding:2px 8px;font-size:12px;color:#c080ff;font-weight:600;">' + e.prestige + 'x</span>'
+        ? '<span style="background:rgba(80,20,120,0.3);border-radius:12px;padding:2px 8px;font-size:12px;color:' + bc.color + ';font-weight:700;border:1px solid ' + bc.border + ';text-shadow:0 0 6px ' + bc.border + ';">' + e.prestige + 'x</span>'
         : '<span style="color:#3a1060;font-size:12px;">—</span>';
       html += '<div style="display:grid;grid-template-columns:10% 1fr 12% 12% 18%;padding:13px 4%;' + rowBg + 'border-bottom:1px solid #0e0520;align-items:center;">'
         + '<div style="font-size:' + rankSize + ';font-weight:700;color:' + rankColor + ';">' + rank + '</div>'
