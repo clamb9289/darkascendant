@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>Dark Ascendant</title>
+<script src="https://js.stripe.com/v3/"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;margin:0;padding:0;background:#000;}
@@ -754,16 +755,16 @@ const SPRITES={
 
 var PAYMENT_PLATFORM = 'web';
 
-var STRIPE_PUBLISHABLE_KEY = 'pk_live_REPLACE_WITH_YOUR_KEY';
+var STRIPE_PUBLISHABLE_KEY = 'pk_test_51ThHIKCsE8svyJJ4XyQfxPGkPiCSbkZ4TTsGp8jlbLosKAcbQyzB5bTFA9mUS36VC023sy7tyttrCR2JVCJQy7Gp00XDyahVzL';
 
 // Map gem pack sizes to Stripe Price IDs
 // Create these in your Stripe dashboard: Products → Add Product
 var STRIPE_PRICE_IDS = {
-  gems_50:   'price_REPLACE_50_GEM_PRICE_ID',
-  gems_150:  'price_REPLACE_150_GEM_PRICE_ID',
-  gems_500:  'price_REPLACE_500_GEM_PRICE_ID',
-  gems_1500: 'price_REPLACE_1500_GEM_PRICE_ID',
-  remove_ads:'price_REPLACE_REMOVE_ADS_PRICE_ID'
+  gems_50:   'price_1ThHW8CsE8svyJJ4dtBGmHdu',
+  gems_150:  'price_1ThHWbCsE8svyJJ4JhC1hYba',
+  gems_500:  'price_1ThHXECsE8svyJJ4dBfife4U',
+  gems_1500: 'price_1ThHXYCsE8svyJJ4KithH00z',
+  remove_ads:'price_1ThHY0CsE8svyJJ47fKfzgAH'
 };
 
 // ── Purchase gem pack ────────────────────────────────────────────────
