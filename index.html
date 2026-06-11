@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>Dark Ascendant</title>
-<script src="https://js.stripe.com/v3/"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;margin:0;padding:0;background:#000;}
@@ -740,91 +739,44 @@ const SPRITES={
 };
 
 // ══════════════════════════════════════════════════════════════════════
-// DARK ASCENDANT — Payment Config: WEB (Stripe)
-// ══════════════════════════════════════════════════════════════════════
-// Active platform: Web (GitHub Pages)
-// Payment processor: Stripe Checkout
-//
-// SETUP STEPS:
-// 1. Create a Stripe account at stripe.com
-// 2. Create a Product + Price for each item in the Stripe dashboard
-// 3. Replace the STRIPE_PRICE_IDS values below with your real Price IDs
-// 4. Replace STRIPE_PUBLISHABLE_KEY with your real publishable key
-// 5. Set up a success URL handler (see onPageLoad below)
+// DARK ASCENDANT — Payment Config: WEB (Stripe Payment Links)
 // ══════════════════════════════════════════════════════════════════════
 
 var PAYMENT_PLATFORM = 'web';
 
-var STRIPE_PUBLISHABLE_KEY = 'pk_test_51ThHIKCsE8svyJJ4XyQfxPGkPiCSbkZ4TTsGp8jlbLosKAcbQyzB5bTFA9mUS36VC023sy7tyttrCR2JVCJQy7Gp00XDyahVzL';
-
-// Map gem pack sizes to Stripe Price IDs
-// Create these in your Stripe dashboard: Products → Add Product
-var STRIPE_PRICE_IDS = {
-  gems_50:   'price_1ThHW8CsE8svyJJ4dtBGmHdu',
-  gems_150:  'price_1ThHWbCsE8svyJJ4JhC1hYba',
-  gems_500:  'price_1ThHXECsE8svyJJ4dBfife4U',
-  gems_1200: 'price_1ThHXYCsE8svyJJ4KithH00z',
-  remove_ads:'price_1ThHY0CsE8svyJJ47fKfzgAH'
+var STRIPE_PAYMENT_LINKS = {
+  gems_50:    'https://buy.stripe.com/test_eVq6oG5bW6mOc4HaxBgUM04',
+  gems_150:   'https://buy.stripe.com/test_28E7sK0VGcLcecPbBFgUM03',
+  gems_500:   'https://buy.stripe.com/test_bJeeVc1ZKcLcd8LaxBgUM02',
+  gems_1200:  'https://buy.stripe.com/test_00w8wO5bW3aCb0DaxBgUM01',
+  remove_ads: 'https://buy.stripe.com/test_8x2bJ06g026y3yb49dgUM00'
 };
 
 // ── Purchase gem pack ────────────────────────────────────────────────
 function processPurchase(gems, priceKey) {
-  var priceId = STRIPE_PRICE_IDS[priceKey];
-  if (!priceId || priceId.indexOf('REPLACE') >= 0) {
-    // Stripe not yet configured — simulate for testing
-    _grantGems(gems);
-    return;
-  }
-  var stripe = window.Stripe ? Stripe(STRIPE_PUBLISHABLE_KEY) : null;
-  if (!stripe) {
-    alert('Payment system not loaded. Please refresh and try again.');
-    return;
-  }
-  var successUrl = window.location.origin + window.location.pathname
-    + '?gems=' + gems + '&session={CHECKOUT_SESSION_ID}';
-  var cancelUrl = window.location.origin + window.location.pathname;
-  stripe.redirectToCheckout({
-    lineItems: [{ price: priceId, quantity: 1 }],
-    mode: 'payment',
-    successUrl: successUrl,
-    cancelUrl: cancelUrl
-  }).then(function(result) {
-    if (result.error) alert(result.error.message);
-  });
+  var link = STRIPE_PAYMENT_LINKS[priceKey];
+  if (!link) { _grantGems(gems); return; } // fallback for dev
+  var returnUrl = window.location.origin + window.location.pathname
+    + '?gems=' + gems;
+  window.location.href = link + '?client_reference_id=' + gems
+    + '&success_url=' + encodeURIComponent(returnUrl);
 }
 
 // ── Purchase Remove Ads ──────────────────────────────────────────────
 function processPurchaseRemoveAds() {
-  var priceId = STRIPE_PRICE_IDS['remove_ads'];
-  if (!priceId || priceId.indexOf('REPLACE') >= 0) {
-    _grantRemoveAds();
-    return;
-  }
-  var stripe = window.Stripe ? Stripe(STRIPE_PUBLISHABLE_KEY) : null;
-  if (!stripe) {
-    alert('Payment system not loaded. Please refresh and try again.');
-    return;
-  }
-  var successUrl = window.location.origin + window.location.pathname
-    + '?remove_ads=1&session={CHECKOUT_SESSION_ID}';
-  var cancelUrl = window.location.origin + window.location.pathname;
-  stripe.redirectToCheckout({
-    lineItems: [{ price: priceId, quantity: 1 }],
-    mode: 'payment',
-    successUrl: successUrl,
-    cancelUrl: cancelUrl
-  }).then(function(result) {
-    if (result.error) alert(result.error.message);
-  });
+  var link = STRIPE_PAYMENT_LINKS['remove_ads'];
+  if (!link) { _grantRemoveAds(); return; }
+  var returnUrl = window.location.origin + window.location.pathname
+    + '?remove_ads=1';
+  window.location.href = link + '?success_url=' + encodeURIComponent(returnUrl);
 }
 
-// ── Restore purchases (web — not applicable, but stubbed for parity) ─
+// ── Restore purchases (web — not applicable, stubbed for parity) ─────
 function restorePurchases() {
   showBoostExtendedToast('Use Export/Import save to restore on a new device.');
 }
 
-// ── Handle return from Stripe Checkout ──────────────────────────────
-// Call this on page load to credit gems after a successful payment
+// ── Handle return from Stripe Payment Link ───────────────────────────
 function checkPendingPurchase() {
   var params = new URLSearchParams(window.location.search);
   var pendingGems = parseInt(params.get('gems'));
@@ -837,8 +789,7 @@ function checkPendingPurchase() {
     _grantRemoveAds();
     showBoostExtendedToast('\uD83D\uDD15 Ads removed! Thank you! \uD83C\uDF11');
   }
-  if (pendingGems > 0 || removeAds) {
-    // Clean the URL so refresh doesn't re-grant
+  if (pendingGems > 0 || removeAds === '1') {
     window.history.replaceState({}, '', window.location.pathname);
     saveGame();
   }
