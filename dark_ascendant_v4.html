@@ -621,14 +621,10 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
       <div class="setting-row"><div class="setting-label"><div class="setting-name">Large tap target</div><div class="setting-desc">Increases tap button size</div></div><div class="toggle" id="toggle-bigtap" onclick="toggleSetting('bigtap')"><div class="toggle-knob"></div></div></div>
     </div>
     <div class="section-label">Notifications</div>
-    <div class="settings-group">
-      <div class="setting-row"><div class="setting-label"><div class="setting-name">Story screens</div><div class="setting-desc">Show story popups between levels</div></div><div class="toggle on" id="toggle-story" onclick="toggleSetting('story')"><div class="toggle-knob"></div></div></div>
-      <div class="setting-row"><div class="setting-label"><div class="setting-name">Level-up screens</div><div class="setting-desc">Show popup every 5 levels</div></div><div class="toggle on" id="toggle-lvlup" onclick="toggleSetting('lvlup')"><div class="toggle-knob"></div></div></div>
-      <div class="setting-row"><div class="setting-label"><div class="setting-name">Ad break offers</div><div class="setting-desc">Offer ad boost at level-ups</div></div><div class="toggle on" id="toggle-ads" onclick="toggleSetting('ads')"><div class="toggle-knob"></div></div></div>
-    </div>
-    <div class="section-label">Audio</div>
-    <div class="settings-group">
-      <div class="setting-row"><div class="setting-label"><div class="setting-name">Music volume</div><div class="setting-desc">Adjust background music level</div></div><div style="display:flex;align-items:center;gap:8px;width:120px;"><input type="range" min="0" max="100" value="70" step="1" class="dark-slider" oninput="setMusicVol(this.value)"><span class="slider-val" id="music-vol">70%</span></div></div>
+    <div class="settings-group" id="settings-notifications-group">
+      <div id="settings-story-row" class="setting-row" style="display:none;"><div class="setting-label"><div class="setting-name">Story screens</div><div class="setting-desc">Show story popups between levels</div></div><div class="toggle on" id="toggle-story" onclick="toggleSetting('story')"><div class="toggle-knob"></div></div></div>
+      <div id="settings-lvlup-row" class="setting-row" style="display:none;"><div class="setting-label"><div class="setting-name">Level-up screens</div><div class="setting-desc">Show popup every 5 levels</div></div><div class="toggle on" id="toggle-lvlup" onclick="toggleSetting('lvlup')"><div class="toggle-knob"></div></div></div>
+      <div id="settings-notifications-locked" style="padding:10px 4px;font-size:12px;color:#3a1060;font-style:italic;">Story and level-up screen options unlock after your first ascension.</div>
     </div>
     <div class="section-label">Save data</div>
     <div class="settings-group">
@@ -1259,11 +1255,19 @@ function applySettings() {
   var fv = document.getElementById('fs-val'); if (fv) fv.textContent = FONT_SIZES[idx];
   var tap = _elTapBtn || document.getElementById('tapbtn');
   if (tap) { tap.style.width = settings.bigtap ? '130px' : '110px'; tap.style.height = settings.bigtap ? '130px' : '110px'; }
-  var mv = document.getElementById('music-vol'); if (mv) mv.textContent = (settings.musicVol || 70) + '%';
   // Tap position
   var tz = document.getElementById('tapzone');
   if (tz) { tz.classList.remove('tap-left','tap-center','tap-right'); tz.classList.add('tap-' + (settings.tapPos||'center')); }
   ['left','center','right'].forEach(function(p){ var el=document.getElementById('tappos-'+p); if(el){el.style.background=settings.tapPos===p?'var(--t-acc)':'var(--t-bg2)';} });
+  // Show story/lvlup toggles only after first ascension
+  var save = (typeof loadGame === 'function') ? loadGame() : null;
+  var hasAscended = save && (save.prestigeCount || 0) >= 1;
+  var storyRow = document.getElementById('settings-story-row');
+  var lvlupRow = document.getElementById('settings-lvlup-row');
+  var lockedMsg = document.getElementById('settings-notifications-locked');
+  if (storyRow) storyRow.style.display = hasAscended ? '' : 'none';
+  if (lvlupRow) lvlupRow.style.display = hasAscended ? '' : 'none';
+  if (lockedMsg) lockedMsg.style.display = hasAscended ? 'none' : '';
 }
 function applyTheme(t) {
   currentTheme = t.id;
