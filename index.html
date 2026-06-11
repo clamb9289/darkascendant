@@ -578,6 +578,7 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
     <div class="home-btn" onclick="handleStartGame()"><div class="home-btn-icon">✨</div><div style="flex:1"><div class="home-btn-title">New game</div><div class="home-btn-sub">Begin your dark ascent from level 1</div></div><div class="home-btn-arrow">→</div></div>
     <div class="home-btn" id="ascend-home-btn" onclick="handleHomeAscend()" style="display:none;border-color:#9a6a00;"><div class="home-btn-icon" style="color:#ffcc44;">🌀</div><div style="flex:1"><div class="home-btn-title" style="color:#ffcc44;">Ascend</div><div class="home-btn-sub">Choose your prestige form</div></div><div class="home-btn-arrow" style="color:#ffcc44;">→</div></div>
     <div class="home-btn btn-resume" id="resume-btn" onclick="handleResume()"><div class="home-btn-icon">🌑</div><div style="flex:1"><div class="home-btn-title">Resume game</div><div class="home-btn-sub" id="resume-sub">No save found</div></div><div class="home-btn-arrow">→</div></div>
+    <div id="home-dev-btn" class="home-btn" onclick="openDevPanel()" style="display:none;border-color:#806000;background:rgba(80,60,0,0.3);"><div class="home-btn-icon">🔧</div><div style="flex:1"><div class="home-btn-title" style="color:#ffd700;">Playtest Mode</div><div class="home-btn-sub" style="color:#a08000;">Developer tools active</div></div><div class="home-btn-arrow" style="color:#ffd700;">→</div></div>
     <div class="home-btn" onclick="showScreen('scores-screen')"><div class="home-btn-icon">🏆</div><div style="flex:1"><div class="home-btn-title">Records</div><div class="home-btn-sub">Tap stats, achievements &amp; history</div></div><div class="home-btn-arrow">→</div></div>
     <div class="home-btn" onclick="openLeaderboard()" style="border-color:#3a1060;"><div class="home-btn-icon">🌑</div><div style="flex:1"><div class="home-btn-title" style="color:#c080ff;">Leaderboard</div><div class="home-btn-sub">Global rankings</div></div><div class="home-btn-arrow" style="color:#7030c0;">→</div></div>
     <div class="home-btn" onclick="showScreen('settings-screen')"><div class="home-btn-icon">⚙️</div><div style="flex:1"><div class="home-btn-title">Settings</div><div class="home-btn-sub">Accessibility, text size &amp; sound</div></div><div class="home-btn-arrow">→</div></div>
@@ -1024,6 +1025,7 @@ var GEM_PACKS = [
   {gems:150, price:'$2.99', label:"Adept's satchel",  desc:'150 Soul gems'},
   {gems:500, price:'$7.99', label:"Lich's hoard",     desc:'500 Soul gems'},
   {gems:1500,price:'$17.99',label:'Void treasury',    desc:'1500 Soul gems'},
+  {gems:0,   price:'$4.99', label:'Remove Ads',       desc:'Replace all ad breaks with a short thank-you screen. Forever.', removeAds:true},
 ];
 var GEM_BOOSTS = [
   {id:'tap2x5', icon:'⚡',name:'2× tap power',  desc:'5 min',gems:20,type:'tap', mult:2,dur:300},
@@ -3075,15 +3077,39 @@ function watchAdFromLvlUp() {
 }
 function startAd(fromLvlUp) {
   adFromLvlUp = fromLvlUp;
-  document.getElementById('ad-closebtn').style.display = 'none';
-  document.getElementById('adprogfill').style.width = '0%';
   document.getElementById('adoverlay').classList.add('show');
-  var pct = 0;
-  var iv = setInterval(function(){
-    pct += 100/50;
-    document.getElementById('adprogfill').style.width = Math.min(100, pct) + '%';
-    if (pct >= 100) { clearInterval(iv); document.getElementById('ad-closebtn').style.display='block'; }
-  }, 100);
+
+  if (hasAdsFree()) {
+    // Short 1-second thank-you screen for dev/remove-ads players
+    document.getElementById('ad-closebtn').style.display = 'none';
+    document.getElementById('adprogfill').style.width = '0%';
+    var titleEl = document.querySelector('#adoverlay .otitle');
+    var bodyEl = document.querySelector('#adoverlay .obody');
+    if (titleEl) titleEl.textContent = '🌑 Thanks for playtesting!';
+    if (bodyEl) bodyEl.textContent = "If this game ever actually launches — thanks for paying to remove ads! It's much appreciated by your humble developer!";
+    var pct = 0;
+    var iv = setInterval(function(){
+      pct += 10;
+      document.getElementById('adprogfill').style.width = Math.min(100, pct) + '%';
+      if (pct >= 100) {
+        clearInterval(iv);
+        // Reset text back to normal for next time
+        if (titleEl) titleEl.textContent = 'Watching ad...';
+        if (bodyEl) bodyEl.textContent = 'A merchant of dark arts has a message for you.';
+        closeAd();
+      }
+    }, 100);
+  } else {
+    // Normal full-length ad
+    document.getElementById('ad-closebtn').style.display = 'none';
+    document.getElementById('adprogfill').style.width = '0%';
+    var pct = 0;
+    var iv = setInterval(function(){
+      pct += 100/50;
+      document.getElementById('adprogfill').style.width = Math.min(100, pct) + '%';
+      if (pct >= 100) { clearInterval(iv); document.getElementById('ad-closebtn').style.display='block'; }
+    }, 100);
+  }
 }
 function closeAd() {
   document.getElementById('adoverlay').classList.remove('show');
@@ -3519,7 +3545,15 @@ function buildShop() {
   var bg = document.getElementById('gembuygrid'); bg.innerHTML = '';
   GEM_PACKS.forEach(function(p){
     var d = document.createElement('div'); d.className = 'shopitem';
-    d.innerHTML = '<div class="shopitem-icon">' + gemHtml() + '</div><div style="flex:1"><div class="shopitem-name">' + p.label + '</div><div class="shopitem-desc">' + p.desc + '</div></div><div class="shopitem-price" onclick="buyGems(' + p.gems + ')">' + p.price + '</div>';
+    if (p.removeAds) {
+      var owned = gameState && gameState.removeAds;
+      var price = _devAccess ? '<span style="color:#ffd700;">DEV: Free</span>' : p.price;
+      d.innerHTML = '<div class="shopitem-icon">🔕</div><div style="flex:1"><div class="shopitem-name">' + p.label + '</div><div class="shopitem-desc">' + (owned ? 'Already purchased ✓' : p.desc) + '</div></div><div class="shopitem-price" style="' + (owned ? 'opacity:.4;cursor:default;' : '') + '" onclick="buyRemoveAds()">' + (owned ? 'Owned' : price) + '</div>';
+    } else {
+      var devPrice = _devAccess ? (gemHtml() + ' 1') : p.price;
+      var buyFn = _devAccess ? 'devBuyGems(' + p.gems + ')' : 'buyGems(' + p.gems + ')';
+      d.innerHTML = '<div class="shopitem-icon">' + gemHtml() + '</div><div style="flex:1"><div class="shopitem-name">' + p.label + '</div><div class="shopitem-desc">' + p.desc + '</div></div><div class="shopitem-price" onclick="' + buyFn + '">' + devPrice + '</div>';
+    }
     bg.appendChild(d);
   });
   var sg = document.getElementById('gemspendgrid'); sg.innerHTML = '';
@@ -3527,14 +3561,14 @@ function buildShop() {
   var holdOwned = gameState && gameState.holdForever;
   var holdAfford = gameState && gameState.gems >= 200;
   var hd = document.createElement('div'); hd.className = 'shopitem';
-  hd.innerHTML = '<div class="shopitem-icon">👆</div><div style="flex:1"><div class="shopitem-name">Permanent Hold-to-Tap</div><div class="shopitem-desc">' + (holdOwned ? 'Already unlocked ✓' : 'Hold main button forever — no ad needed') + '</div></div><div class="shopitem-price" id="sbtn-holdforever" style="' + (holdOwned ? 'opacity:.4;cursor:default;' : holdAfford ? '' : 'opacity:.4;cursor:default;') + '" onclick="buyHoldForever()">' + (holdOwned ? 'Owned' : gemHtml() + ' 200') + '</div>';
+  hd.innerHTML = '<div class="shopitem-icon">👆</div><div style="flex:1"><div class="shopitem-name">Permanent Hold-to-Tap</div><div class="shopitem-desc">' + (holdOwned ? 'Already unlocked ✓' : 'Hold main button forever — no ad needed') + '</div></div><div class="shopitem-price" id="sbtn-holdforever" style="' + (holdOwned ? 'opacity:.4;cursor:default;' : holdAfford ? '' : 'opacity:.4;cursor:default;') + '" onclick="buyHoldForever()">' + (holdOwned ? 'Owned' : (_devAccess ? gemHtml() + ' 1' : gemHtml() + ' 200')) + '</div>';
   sg.appendChild(hd);
   // Offline passive boost
   var offlineOwned = gameState && gameState.offlineBoostUntil && Date.now() < gameState.offlineBoostUntil;
   var offlineAfford = gameState && gameState.gems >= 50;
   var od = document.createElement('div'); od.className = 'shopitem';
   var offlineLeft = offlineOwned ? Math.ceil((gameState.offlineBoostUntil - Date.now()) / 3600000) + 'h left' : '';
-  od.innerHTML = '<div class="shopitem-icon">💤</div><div style="flex:1"><div class="shopitem-name">Full Offline Income</div><div class="shopitem-desc">' + (offlineOwned ? '100% passive rate while away — ' + offlineLeft : '100% passive rate while away (8hrs) — normally 10%') + '</div></div><div class="shopitem-price" id="sbtn-offlineboost" style="' + (offlineOwned ? 'opacity:.4;cursor:default;' : offlineAfford ? '' : 'opacity:.4;cursor:default;') + '" onclick="buyOfflineBoost()">' + (offlineOwned ? 'Active' : gemHtml() + ' 50') + '</div>';
+  od.innerHTML = '<div class="shopitem-icon">💤</div><div style="flex:1"><div class="shopitem-name">Full Offline Income</div><div class="shopitem-desc">' + (offlineOwned ? '100% passive rate while away — ' + offlineLeft : '100% passive rate while away (8hrs) — normally 10%') + '</div></div><div class="shopitem-price" id="sbtn-offlineboost" style="' + (offlineOwned ? 'opacity:.4;cursor:default;' : offlineAfford ? '' : 'opacity:.4;cursor:default;') + '" onclick="buyOfflineBoost()">' + (offlineOwned ? 'Active' : (_devAccess ? gemHtml() + ' 1' : gemHtml() + ' 50')) + '</div>';
   sg.appendChild(od);
   GEM_BOOSTS.forEach(function(b){
     var ok = gameState && gameState.gems >= b.gems && canAddBoost();
@@ -3544,8 +3578,9 @@ function buildShop() {
   });
 }
 function buyHoldForever() {
-  if (!gameState || gameState.holdForever || gameState.gems < 200) return;
-  gameState.gems -= 200;
+  var cost = _devAccess ? 1 : 200;
+  if (!gameState || gameState.holdForever || gameState.gems < cost) return;
+  gameState.gems -= cost;
   gameState.holdForever = true;
   gameState.holdEverUsed = true;
   var hb = document.getElementById('hold-btn');
@@ -3564,6 +3599,31 @@ function buyOfflineBoost() {
   spawnGemFloat('-50 💎', btn);
   saveGame(); updateGameUI(); buildShop();
 }
+function buyRemoveAds() {
+  if (!gameState || gameState.removeAds) return;
+  if (_devAccess) {
+    // Dev mode — free
+    gameState.removeAds = true;
+    saveGame(); buildShop();
+    showBoostExtendedToast('🔕 Ads removed (dev mode)!');
+    return;
+  }
+  // Real IAP — simulate for now
+  if (confirm('Purchase "Remove Ads" for $4.99?\n(This would trigger a real payment when launched)')) {
+    gameState.removeAds = true;
+    saveGame(); buildShop();
+    showBoostExtendedToast('🔕 Ads removed! Thank you! 🌑');
+  }
+}
+
+function devBuyGems(n) {
+  // Dev mode — buy gems for 1 gem
+  if (!gameState || gameState.gems < 1) return;
+  gameState.gems += n - 1; // net effect: costs 1 gem, gains n
+  saveGame(); updateGameUI(); buildShop();
+  showBoostExtendedToast('+' + n + ' 💎 (dev price)');
+}
+
 function buyGems(n) {
   if (!gameState) return;
   gameState.gems += n;
@@ -3584,12 +3644,13 @@ function buyGems(n) {
 }
 function spendGems(id) {
   if (!gameState) return;
-  var b = GEM_BOOSTS.find(function(x){ return x.id===id; }); if (!b || gameState.gems < b.gems) return;
+  var b = GEM_BOOSTS.find(function(x){ return x.id===id; }); if (!b) return;
+  var cost = _devAccess ? 1 : b.gems;
+  if (gameState.gems < cost) return;
   if (!canAddBoost()) { alert('Purchased boost slots full (3/3). Watch an ad to add more!'); return; }
-  gameState.gems -= b.gems;
-  // Gem spend float
+  gameState.gems -= cost;
   var btn = document.getElementById('sbtn-' + id);
-  spawnGemFloat('-' + b.gems + ' 💎', btn);
+  spawnGemFloat('-' + cost + ' 💎', btn);
   applyBoost(b.type, b.mult, b.dur, b.name);
   updateGameUI(); buildShop();
 }
@@ -4859,6 +4920,7 @@ function updateHomeWizard() {
         ls.style.opacity = '0';
         setTimeout(function(){
           ls.style.display = 'none';
+          checkDevAccess(); // check Supabase for dev/playtest access
           refreshHomeBtns(); // ensure wizard name shows immediately on home screen
           checkWizardNamePrompt(); // first-ever boot name picker, shown before home screen
         }, 400);
@@ -4874,6 +4936,7 @@ function updateHomeWizard() {
 var SUPABASE_URL = 'https://kzuefykdkhsvgjdawrbe.supabase.co';
 var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6dWVmeWtka2hzdmdqZGF3cmJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMzU0MDgsImV4cCI6MjA5NjcxMTQwOH0.ZTSrg9RGvvDS9NYaQisj8DxPupfvwAyuThZmrI5ZOlo';
 var SUPABASE_TABLE = 'Leaderboard';
+var _devAccess = false; // set true if Supabase flags this device for dev access
 
 var DARK_TITLES = [
   'Dread Phantom','Shadow Lich','Void Wraith','Bone Tyrant','Soul Reaper',
@@ -5087,6 +5150,40 @@ function closeWizardNamePicker() {
 }
 
 // ── Score Submission ─────────────────────────────────────────────────
+function checkDevAccess() {
+  var device_id = getDeviceId();
+  fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE
+    + '?select=dev_access&device_id=eq.' + encodeURIComponent(device_id) + '&limit=1', {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(rows) {
+    if (rows && rows.length > 0 && rows[0].dev_access === true) {
+      _devAccess = true;
+      applyDevAccess();
+    }
+  })
+  .catch(function() {}); // silent fail
+}
+
+function applyDevAccess() {
+  // Show playtest button on home screen
+  var btn = document.getElementById('home-dev-btn');
+  if (btn) btn.style.display = '';
+  // Refresh shop if open
+  if (document.getElementById('shopoverlay') && document.getElementById('shopoverlay').classList.contains('show')) {
+    buildShop();
+  }
+}
+
+function openDevPanel() {
+  document.getElementById('devoverlay').classList.add('show');
+}
+
+function hasAdsFree() {
+  return _devAccess || (gameState && gameState.removeAds);
+}
+
 function _sbH() {
   return {
     'apikey': SUPABASE_KEY,
