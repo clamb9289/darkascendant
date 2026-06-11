@@ -1517,6 +1517,9 @@ function startNewGame() {
   holdUnlockEndTime = 0;
   stopHold();
   gameState = getDefaultState(); displayedTierIdx = -1; boostSlots = [];
+  // Preserve gem balance across new games — only full reset clears purchases
+  var prevSave = loadGame();
+  if (prevSave && prevSave.gems > 50) gameState.gems = prevSave.gems;
   // Reset theme to default
   var defaultTheme = THEMES.find(function(t){ return t.id === 'default'; });
   if (defaultTheme) applyTheme(defaultTheme);
