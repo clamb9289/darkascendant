@@ -145,8 +145,7 @@ body.name-pending .screen{visibility:hidden !important;}
 .uc-sm-cost.ok2{color:var(--t-acc2);border-color:var(--t-bdr2);}.uc-sm-cost.bgt{color:#4a8a4a;border-color:#2a5a2a;}
 .spell-tier-hdr{display:flex;align-items:center;gap:7px;padding:6px 2px;margin-top:5px;}
 .spell-tier-locked{display:flex;align-items:center;gap:8px;background:var(--t-bg1);border:1px solid var(--t-bdr);border-radius:8px;padding:8px 10px;opacity:.5;}
-.unlock-banner{width:100%;background:var(--t-bg2);border:1px solid var(--t-acc);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:8px;}
-.unlock-banner-txt{flex:1;font-size:var(--fs-sm);color:var(--t-acc2);line-height:1.5;}
+
 #floats{position:fixed;pointer-events:none;top:0;left:0;width:100%;height:100%;overflow:hidden;z-index:200;}
 #floats-back{position:fixed;pointer-events:none;top:0;left:0;width:100%;height:100%;overflow:hidden;z-index:10;}
 .fn{position:absolute;font-size:var(--fs-xl);font-weight:700;color:var(--t-acc2);animation:fu 3.6s ease-out forwards;pointer-events:none;z-index:201;}
@@ -195,7 +194,7 @@ body.name-pending .screen{visibility:hidden !important;}
 #boss-rage-bar{height:100%;background:#ff3010;border-radius:3px;transition:width .2s;}
 #combat-log{width:100%;background:#060108;border:1px solid #2a0a1a;border-radius:6px;padding:9px 11px;min-height:100px;max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;}
 .log-entry{font-size:13px;line-height:1.5;}
-.log-player{color:#9060d0;}.log-boss{color:#c04030;}.log-system{color:#5a4a6a;font-style:italic;}.log-rage{color:#ff2020;font-weight:500;}.log-super{color:#ffcc00;font-weight:600;}
+
 #boss-action-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;}
 .boss-action-btn{padding:16px 6px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;text-align:center;border:1px solid;transition:opacity .12s;touch-action:manipulation;min-height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;}
 .boss-action-btn:active{opacity:.75;}
@@ -259,9 +258,8 @@ body.name-pending .screen{visibility:hidden !important;}
 .fs-btn{width:28px;height:28px;border-radius:5px;border:1px solid var(--t-bdr);background:var(--t-bg2);color:var(--t-acc2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s;touch-action:manipulation;}
 .fs-btn:hover{background:var(--t-bg3);}
 .fs-val{font-size:var(--fs-sm);color:var(--t-txt3);min-width:28px;text-align:center;}
-.dark-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:var(--t-bdr);outline:none;}
+
 .dark-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--t-acc);cursor:pointer;}
-.slider-val{font-size:var(--fs-sm);color:var(--t-txt3);min-width:28px;}
 
 /* Combo display */
 #combo-display{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;text-shadow:0 1px 4px rgba(0,0,0,.6);}
@@ -277,7 +275,7 @@ body.name-pending .screen{visibility:hidden !important;}
 .float-overlay{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:20px;z-index:500;padding:28px 36px;text-align:center;min-width:240px;pointer-events:auto;cursor:pointer;}
 .float-overlay-amber{border:2px solid #ffcc33;box-shadow:0 0 40px rgba(255,200,50,0.35);}
 .float-overlay-purple{border:2px solid var(--t-bdr2);box-shadow:0 0 30px rgba(138,80,208,0.4);}
-.float-overlay-gold{border:2px solid #ffaa00;box-shadow:0 0 40px rgba(255,170,0,0.4);}
+
 @keyframes badgeFlicker{0%,100%{opacity:1;box-shadow:0 0 8px rgba(255,100,0,0.6);}50%{opacity:.85;box-shadow:0 0 16px rgba(255,60,0,0.9),0 0 4px #ff6600;}}
 @keyframes badgePulse{0%,100%{box-shadow:0 0 10px rgba(150,0,255,0.6);}50%{box-shadow:0 0 20px rgba(180,0,255,0.95),0 0 6px #9933ff;}}
 @keyframes badgeArc{0%,100%{box-shadow:0 0 12px rgba(0,150,255,0.7);}50%{box-shadow:0 0 22px rgba(0,180,255,0.95),0 0 6px #0099ff;}}
@@ -295,7 +293,7 @@ body.name-pending .screen{visibility:hidden !important;}
 
 @keyframes lvlUpPop{0%{opacity:0;transform:scale(.5) translateY(30px);}60%{transform:scale(1.08) translateY(-8px);}80%{transform:scale(.97) translateY(2px);}100%{opacity:1;transform:scale(1) translateY(0);}}
 @keyframes lvlUpGlow{0%,100%{box-shadow:0 0 0 0 rgba(138,80,208,0);}50%{box-shadow:0 0 40px 10px rgba(138,80,208,0.5);}}
-.lvlup-pop{animation:lvlUpPop .45s cubic-bezier(.2,1.4,.4,1) forwards,lvlUpGlow 1.5s ease-in-out 0.3s 2;}
+
 
 </style>
 </head>
@@ -1089,7 +1087,7 @@ var bossAdCooldown = 0;       // seconds remaining on boss ad cooldown
 var bossAdBoostEnd = 0;       // timestamp when 2x boss damage expires
 var bossAdInProgress = false; // true while ad is playing (boss attacks paused)
 var currentTheme = 'default', ownedThemes = new Set(['default']);
-var settings = {motion:false,bigtap:false,story:true,lvlup:true,ads:true,fontSize:1,musicVol:70,tapPos:'center',haptic:true,sfx:true};
+var settings = {motion:false,bigtap:false,story:true,lvlup:true,ads:true,fontSize:1,tapPos:'center',haptic:true,sfx:true};
 
 // ── BOSS TAUNTS ───────────────────────────────────────────────────────
 var BOSS_TAUNTS = {
@@ -1243,7 +1241,7 @@ function saveSettings() {
   } catch(e) {}
 }
 function applySettings() {
-  ['motion','bigtap','story','lvlup','ads','sfx'].forEach(function(k) {
+  ['motion','bigtap','sfx'].forEach(function(k) {
     var el = document.getElementById('toggle-' + k);
     if (el) { if (settings[k] !== false) el.classList.add('on'); else el.classList.remove('on'); }
   });
@@ -1276,7 +1274,6 @@ function applyTheme(t) {
   var sub = document.getElementById('theme-sub'); if (sub) sub.textContent = t.name;
   saveSettings();
 }
-function setMusicVol(v) { settings.musicVol = parseInt(v); var el = document.getElementById('music-vol'); if (el) el.textContent = v + '%'; saveSettings(); }
 
 // ── UTILS ─────────────────────────────────────────────────────────────
 function fmt(n) { if (n>=1e9) return (n/1e9).toFixed(2)+'B'; if (n>=1e6) return (n/1e6).toFixed(2)+'M'; if (n>=1e3) return (n/1e3).toFixed(1)+'k'; return Math.floor(n).toString(); }
@@ -4552,7 +4549,7 @@ function _execFullReset() {
   var ht = document.getElementById('home-title');
   if (ht) { ht.style.animation = ''; ht.style.textShadow = ''; ht.style.color = ''; }
   // Reset settings
-  settings = {motion:false,bigtap:false,story:true,lvlup:true,ads:true,fontSize:1,musicVol:70,tapPos:'center',haptic:true,sfx:true};
+  settings = {motion:false,bigtap:false,story:true,lvlup:true,ads:true,fontSize:1,tapPos:'center',haptic:true,sfx:true};
   // Close dev panel and go home
   closeDev();
   stopHold();
