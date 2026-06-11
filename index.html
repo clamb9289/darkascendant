@@ -19,8 +19,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:
 }
 .screen{display:none;flex-direction:column;align-items:center;width:100%;min-height:100vh;}
 .screen.active{display:flex;}
-body:not(.screens-ready) .screen{visibility:hidden !important;}
-body.name-pending .screen{visibility:hidden !important;}
 #game-screen{height:100vh;max-height:100vh;overflow:hidden;min-height:unset;}
 #home-screen{justify-content:flex-start;padding:0 0 24px;}
 #scores-screen,#settings-screen{padding:0 0 24px;}
@@ -145,7 +143,8 @@ body.name-pending .screen{visibility:hidden !important;}
 .uc-sm-cost.ok2{color:var(--t-acc2);border-color:var(--t-bdr2);}.uc-sm-cost.bgt{color:#4a8a4a;border-color:#2a5a2a;}
 .spell-tier-hdr{display:flex;align-items:center;gap:7px;padding:6px 2px;margin-top:5px;}
 .spell-tier-locked{display:flex;align-items:center;gap:8px;background:var(--t-bg1);border:1px solid var(--t-bdr);border-radius:8px;padding:8px 10px;opacity:.5;}
-
+.unlock-banner{width:100%;background:var(--t-bg2);border:1px solid var(--t-acc);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:8px;}
+.unlock-banner-txt{flex:1;font-size:var(--fs-sm);color:var(--t-acc2);line-height:1.5;}
 #floats{position:fixed;pointer-events:none;top:0;left:0;width:100%;height:100%;overflow:hidden;z-index:200;}
 #floats-back{position:fixed;pointer-events:none;top:0;left:0;width:100%;height:100%;overflow:hidden;z-index:10;}
 .fn{position:absolute;font-size:var(--fs-xl);font-weight:700;color:var(--t-acc2);animation:fu 3.6s ease-out forwards;pointer-events:none;z-index:201;}
@@ -194,7 +193,7 @@ body.name-pending .screen{visibility:hidden !important;}
 #boss-rage-bar{height:100%;background:#ff3010;border-radius:3px;transition:width .2s;}
 #combat-log{width:100%;background:#060108;border:1px solid #2a0a1a;border-radius:6px;padding:9px 11px;min-height:100px;max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;}
 .log-entry{font-size:13px;line-height:1.5;}
-
+.log-player{color:#9060d0;}.log-boss{color:#c04030;}.log-system{color:#5a4a6a;font-style:italic;}.log-rage{color:#ff2020;font-weight:500;}.log-super{color:#ffcc00;font-weight:600;}
 #boss-action-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;}
 .boss-action-btn{padding:16px 6px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;text-align:center;border:1px solid;transition:opacity .12s;touch-action:manipulation;min-height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;}
 .boss-action-btn:active{opacity:.75;}
@@ -258,8 +257,9 @@ body.name-pending .screen{visibility:hidden !important;}
 .fs-btn{width:28px;height:28px;border-radius:5px;border:1px solid var(--t-bdr);background:var(--t-bg2);color:var(--t-acc2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s;touch-action:manipulation;}
 .fs-btn:hover{background:var(--t-bg3);}
 .fs-val{font-size:var(--fs-sm);color:var(--t-txt3);min-width:28px;text-align:center;}
-
+.dark-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:var(--t-bdr);outline:none;}
 .dark-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--t-acc);cursor:pointer;}
+.slider-val{font-size:var(--fs-sm);color:var(--t-txt3);min-width:28px;}
 
 /* Combo display */
 #combo-display{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;text-shadow:0 1px 4px rgba(0,0,0,.6);}
@@ -275,7 +275,7 @@ body.name-pending .screen{visibility:hidden !important;}
 .float-overlay{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:20px;z-index:500;padding:28px 36px;text-align:center;min-width:240px;pointer-events:auto;cursor:pointer;}
 .float-overlay-amber{border:2px solid #ffcc33;box-shadow:0 0 40px rgba(255,200,50,0.35);}
 .float-overlay-purple{border:2px solid var(--t-bdr2);box-shadow:0 0 30px rgba(138,80,208,0.4);}
-
+.float-overlay-gold{border:2px solid #ffaa00;box-shadow:0 0 40px rgba(255,170,0,0.4);}
 @keyframes badgeFlicker{0%,100%{opacity:1;box-shadow:0 0 8px rgba(255,100,0,0.6);}50%{opacity:.85;box-shadow:0 0 16px rgba(255,60,0,0.9),0 0 4px #ff6600;}}
 @keyframes badgePulse{0%,100%{box-shadow:0 0 10px rgba(150,0,255,0.6);}50%{box-shadow:0 0 20px rgba(180,0,255,0.95),0 0 6px #9933ff;}}
 @keyframes badgeArc{0%,100%{box-shadow:0 0 12px rgba(0,150,255,0.7);}50%{box-shadow:0 0 22px rgba(0,180,255,0.95),0 0 6px #0099ff;}}
@@ -293,7 +293,7 @@ body.name-pending .screen{visibility:hidden !important;}
 
 @keyframes lvlUpPop{0%{opacity:0;transform:scale(.5) translateY(30px);}60%{transform:scale(1.08) translateY(-8px);}80%{transform:scale(.97) translateY(2px);}100%{opacity:1;transform:scale(1) translateY(0);}}
 @keyframes lvlUpGlow{0%,100%{box-shadow:0 0 0 0 rgba(138,80,208,0);}50%{box-shadow:0 0 40px 10px rgba(138,80,208,0.5);}}
-
+.lvlup-pop{animation:lvlUpPop .45s cubic-bezier(.2,1.4,.4,1) forwards,lvlUpGlow 1.5s ease-in-out 0.3s 2;}
 
 </style>
 </head>
@@ -305,10 +305,6 @@ body.name-pending .screen{visibility:hidden !important;}
   </div>
   <div id="loading-text" style="font-size:11px;color:#6040a0;margin-top:10px;">Awakening the dark arts…</div>
 </div>
-<script>
-/* runs before any other JS — mark screens ready if wizard name already chosen */
-if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens-ready');
-</script>
 <div id="app" class="fsize-1">
 <div id="floats"></div>
 <!-- LEVEL 100 FANFARE -->
@@ -570,20 +566,16 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
     <div id="home-wizard">🧙</div>
     <div id="home-title">🌑 Dark Ascendant</div>
     <div id="home-tagline">Idle · Story-driven · Dark fantasy</div>
-    <div id="home-wizard-name" style="font-size:16px;color:#8050c0;margin-top:8px;letter-spacing:0.5px;font-weight:600;min-height:20px;"></div>
   </div>
   <div id="home-buttons">
-    <div style="display:flex;justify-content:flex-end;padding:0 2px 6px;"><div id="home-gem-count" style="font-size:13px;color:#a060e0;font-weight:600;display:none;">💎 <span id="home-gem-val">0</span></div></div>
     <div id="save-status-bar" class="save-status" style="display:none;"></div>
     <div class="home-btn" onclick="handleStartGame()"><div class="home-btn-icon">✨</div><div style="flex:1"><div class="home-btn-title">New game</div><div class="home-btn-sub">Begin your dark ascent from level 1</div></div><div class="home-btn-arrow">→</div></div>
     <div class="home-btn" id="ascend-home-btn" onclick="handleHomeAscend()" style="display:none;border-color:#9a6a00;"><div class="home-btn-icon" style="color:#ffcc44;">🌀</div><div style="flex:1"><div class="home-btn-title" style="color:#ffcc44;">Ascend</div><div class="home-btn-sub">Choose your prestige form</div></div><div class="home-btn-arrow" style="color:#ffcc44;">→</div></div>
     <div class="home-btn btn-resume" id="resume-btn" onclick="handleResume()"><div class="home-btn-icon">🌑</div><div style="flex:1"><div class="home-btn-title">Resume game</div><div class="home-btn-sub" id="resume-sub">No save found</div></div><div class="home-btn-arrow">→</div></div>
-    <div id="home-dev-btn" class="home-btn" onclick="openDevPanel()" style="display:none;border-color:#806000;background:rgba(80,60,0,0.3);"><div class="home-btn-icon">🔧</div><div style="flex:1"><div class="home-btn-title" style="color:#ffd700;">Playtest Mode</div><div class="home-btn-sub" style="color:#a08000;">Developer tools active</div></div><div class="home-btn-arrow" style="color:#ffd700;">→</div></div>
     <div class="home-btn" onclick="showScreen('scores-screen')"><div class="home-btn-icon">🏆</div><div style="flex:1"><div class="home-btn-title">Records</div><div class="home-btn-sub">Tap stats, achievements &amp; history</div></div><div class="home-btn-arrow">→</div></div>
-    <div class="home-btn" onclick="openLeaderboard()" style="border-color:#3a1060;"><div class="home-btn-icon">🌑</div><div style="flex:1"><div class="home-btn-title" style="color:#c080ff;">Leaderboard</div><div class="home-btn-sub">Global rankings</div></div><div class="home-btn-arrow" style="color:#7030c0;">→</div></div>
     <div class="home-btn" onclick="showScreen('settings-screen')"><div class="home-btn-icon">⚙️</div><div style="flex:1"><div class="home-btn-title">Settings</div><div class="home-btn-sub">Accessibility, text size &amp; sound</div></div><div class="home-btn-arrow">→</div></div>
   </div>
-  <div id="home-version" onclick="devTap()">Dark Ascendant v1.1 · Auto-saves every 30 seconds · <a href="privacy_policy.html" target="_blank" style="color:#3a1060;text-decoration:underline;" onclick="event.stopPropagation()">Privacy Policy</a></div>
+  <div id="home-version" onclick="devTap()">Dark Ascendant v1.1 · Auto-saves every 30 seconds</div>
 </div>
 
 <!-- SCORES -->
@@ -620,10 +612,14 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
       <div class="setting-row"><div class="setting-label"><div class="setting-name">Large tap target</div><div class="setting-desc">Increases tap button size</div></div><div class="toggle" id="toggle-bigtap" onclick="toggleSetting('bigtap')"><div class="toggle-knob"></div></div></div>
     </div>
     <div class="section-label">Notifications</div>
-    <div class="settings-group" id="settings-notifications-group">
-      <div id="settings-story-row" class="setting-row" style="display:none;"><div class="setting-label"><div class="setting-name">Story screens</div><div class="setting-desc">Show story popups between levels</div></div><div class="toggle on" id="toggle-story" onclick="toggleSetting('story')"><div class="toggle-knob"></div></div></div>
-      <div id="settings-lvlup-row" class="setting-row" style="display:none;"><div class="setting-label"><div class="setting-name">Level-up screens</div><div class="setting-desc">Show popup every 5 levels</div></div><div class="toggle on" id="toggle-lvlup" onclick="toggleSetting('lvlup')"><div class="toggle-knob"></div></div></div>
-      <div id="settings-notifications-locked" style="padding:10px 4px;font-size:12px;color:#3a1060;font-style:italic;">Story and level-up screen options unlock after your first ascension.</div>
+    <div class="settings-group">
+      <div class="setting-row"><div class="setting-label"><div class="setting-name">Story screens</div><div class="setting-desc">Show story popups between levels</div></div><div class="toggle on" id="toggle-story" onclick="toggleSetting('story')"><div class="toggle-knob"></div></div></div>
+      <div class="setting-row"><div class="setting-label"><div class="setting-name">Level-up screens</div><div class="setting-desc">Show popup every 5 levels</div></div><div class="toggle on" id="toggle-lvlup" onclick="toggleSetting('lvlup')"><div class="toggle-knob"></div></div></div>
+      <div class="setting-row"><div class="setting-label"><div class="setting-name">Ad break offers</div><div class="setting-desc">Offer ad boost at level-ups</div></div><div class="toggle on" id="toggle-ads" onclick="toggleSetting('ads')"><div class="toggle-knob"></div></div></div>
+    </div>
+    <div class="section-label">Audio</div>
+    <div class="settings-group">
+      <div class="setting-row"><div class="setting-label"><div class="setting-name">Music volume</div><div class="setting-desc">Adjust background music level</div></div><div style="display:flex;align-items:center;gap:8px;width:120px;"><input type="range" min="0" max="100" value="70" step="1" class="dark-slider" oninput="setMusicVol(this.value)"><span class="slider-val" id="music-vol">70%</span></div></div>
     </div>
     <div class="section-label">Save data</div>
     <div class="settings-group">
@@ -632,20 +628,6 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
       <div class="setting-row" style="cursor:pointer;" onclick="promptImportSave()"><div class="setting-label"><div class="setting-name">Import save</div><div class="setting-desc">Paste a save code to restore</div></div><div style="font-size:18px;">📥</div></div>
     </div>
     <div id="settings-save-msg" style="display:none;margin-top:8px;" class="save-status saved"></div>
-    <div class="section-label" style="color:#6a2020;margin-top:8px;">Danger zone</div>
-    <div class="settings-group" style="border-color:#3a1010;">
-      <div class="setting-row"><div class="setting-label"><div class="setting-name" style="color:#c04040;">Full reset</div><div class="setting-desc">Permanently erases all progress, purchases and your wizard name. Cannot be undone.</div></div></div>
-      <div style="padding:4px 0 10px;">
-        <div id="settings-reset-btn"
-          style="margin:0 4px;padding:14px;border-radius:8px;background:#1a0000;border:1px solid #4a1010;color:#c04040;font-size:14px;font-weight:600;text-align:center;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;"
-          onpointerdown="settingsResetHoldStart(this)"
-          onpointerup="settingsResetHoldEnd(this)"
-          onpointerleave="settingsResetHoldEnd(this)"
-          onpointercancel="settingsResetHoldEnd(this)">
-          ⚠️ Hold to reset everything
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -706,7 +688,7 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
 const SPRITES={
   "boss_lv10":"data:image/png;base64,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",
   "boss_lv100":"data:image/png;base64,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",
-  "boss_lv20":"data:image/png;base64,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",
+  "boss_lv20":"data:image/png;base64,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",
   "boss_lv30":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAIYklEQVR4nO3dMYwcVxkH8HMEKDgIm8iKdM1RLIUbB+lSXCJdClOkORduTEPrnpaKhiYNBb0LmlDgAhfnBgoXOSm5gpOIGxdswTUnRRbECI4IS5j25tmZ8Wje7M7s//frVrt7O7s799f7vvfm7dYWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwlkvrPoC5ubN38OLi7fvHDwd9hjvXLjf+3unT843+Tmq/39rfR5o31n0AwPoIAAgmACCYemmgoTVoWROX5t4TqP3+1Px1GQFAMAEAwQQABFM/VVbWqH/8y0nr4z/68e6oxzN1fT8fNX9dRgAQTABAMAEAwdRTlV15c7t13ju95u/S1RN49vWZc7YiIwAIJgAgmACAYN/qesC1Nxd/bbv/+vf2nrY+//JO4/6n56fXXu/Q6jy/tif/Om59/edb543bi3fWerizU35eyy+bp9fQ83Fsqz7fu87Hp18vf9R2vxEABBMAEEwAQLDOHsBQQ2v2Vdf8Q2uqrnUADNP1+T/Z2lprj2Bu57sRAAQTABBMAECw0XsAU18HMLTm72vvk8fHF2/vL3b32h5/tDxpPP74ZzdaH79uQ9/f8idXBr2/8vsq1w2U33ftnsDUz/eSEQAEEwAQTABAMOsAyterXPOXflfUuPt/6/f4xXb9Y6pp6PurrasnUP31Zna+GwFAMAEAwQQABItfB7Bqi+2dxu1fv/+81+Onbuj7W56dVj+mVZrb+W4EAMEEAAQTABCs9x7rU9+Tra/a1wKU+wGUe9ytuqbvqqmn1mMoj7fcE7Dv7wKMPe8/NX3PVyMACCYAIJgAgGC91wH0vd56/507TxrPn/i86Kbpmmcvb0+tJzA35fl+9OX962M+f+i1K0YAEEwAQDABAMGq/9b6ps+79v1dgHIdwMnp48ZnfmfvIPp3BO4fP2x8Hrs7NxqfR991AOnnX19GABBMAEAwAQDBqu8HUNYot3d+cXjx9tjzonNT1sBdPYFVXy//0e7N1vuXZ8tef698v5um9jqAB6cf36pxXN/ECACCCQAIJgAg2MrrsU2bpy17HuU6gFLf69nnvk6gb83f9/Pb9PNpbEYAEEwAQDABAMFG/12Ach3Ag9OPe/1W26avA+jStVZ+asprHebu9n9+s2jcPhq2X8L+7o2uh7R+v1ffulT18zUCgGACAIIJAAg2uXpt7vO6z7fOF233910HUNr0HkDXOoBvb13ud/HBQLV7AKXX6Am0GtoTMAKAYAIAggkACDZ6D+AV6wB6Xd88dD+BVRu7B1Bad0+g9rz/1HsAD77788br//ZPf2j9vvtadU/ACACCCQAIJgAg2OTWAXQZuk7gf99pr9HH9oOr2+t8+cn7x1dna339N/7b7DF09QBKc+sJGAFAMAEAwQQABFvHfgCD1gH03U+g9MF7B30eXt2T5claX3/q1v39HH/2qNfjX7GHX9V1GUcnj2v+uZcYAUAwAQDBBAAEm906gC5dPYG9D26udR0A03b82aPWdQD3Lt1q/M8cfvrFpPZnuPXhu64FAF6PAIBgAgCCjb4OYNXKedmp7TFoHUC764vddR9Cq7nX/CUjAAgmACCYAIBgG9cDKL28VvvmpGq4sS1//+fW+xc/fW9FRzIPY6/tH2pozV8yAoBgAgCCCQAItnE9gMXObmvNVnsevu+89arnuT/Za7//VxOfd+9S+/vsOn9WravmP3xx9/PW51+6937b/UYAEEwAQDABAMFm3wOYWs1WWvfa//eP2+9fTPzahK7fCdi031moPc/fxQgAggkACCYAIFjvHsDQeUdWy1r/YR798JfN28X9y9OTWe+raQQAwQQABBMAEGz26wCmbup73M3dutdZzJ0RAAQTABBMAEAwPYCeynnf64vV7j+QputagL//86zxfUz92pDahq67MQKAYAIAggkACDb7HkBZk6fVgKzW3Nf+l4wAIJgAgGACAIJtVD3zKrV7AmUNeHDzrp7DGj18dG/UHtCm1fwlIwAIJgAgmACAYLNfB9Bl3esExq5RN035fb39/W2f14iMACCYAIBgAgCCbXwPoLTunsC6X39qpjbPPrXjGZsRAAQTABBMAECwqHrndezuHDRq8mdbzT3pzp+dr/R46OfylcuDnq8HAMQQABBMAECw2dc7ta/HP1s2a/6zZ8uaf54V293dH/Xvl9d6zI0RAAQTABBMAECwWdcvYyjXAegBbJZynUDavH/JCACCCQAIJgAgWO/9AA5f3P287f6hv1e+attXrkdfj59m067lGPr/aAQAwQQABBMAEGz0PQG/+veLXjX20cnjqq//YP+0cfvepVvR875wkREABBMAEEwAQLDq9fDUa/6uef/tK4vGbdcCZDl79iSqR2QEAMEEAAQTABBs8DqAqdf8wDczAoBgAgCCCQAI1rsHMLea3/X+9FGeL5u+LsAIAIIJAAgmACDY6PsBDGWeH8ZjBADBBAAEEwAQrHcP4Opblxo1+OGnX1SdZy9r/ttHO43b92q+GIQzAoBgAgCCCQAINngdwK0P3x3UE+iq+Ycq13K7NoA2m772v2QEAMEEAAQTABCs+rUAXT2BsWv+LnoCXJRW85eMACCYAIBgAgCCjb4fwLpr/i4v9wQWegIbLL3mLxkBQDABAMEEAASr3gO4++KwUUOXe/iV1/PX3k8ALlLztzMCgGACAIIJAAimPirs7hw0ehInpw9dOzAjav5+jAAgmACAYAIAgk3+twGnxn4C06LmH8YIAIIJAAgmACCYHsBAegKrpeavywgAggkACCYAIJgeQGV6AnWp+cdlBADBBAAEEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADE+z8RDt+GqkU9rwAAAABJRU5ErkJggg==",
   "boss_lv40":"data:image/png;base64,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",
   "boss_lv50":"data:image/png;base64,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",
@@ -731,10 +713,114 @@ const SPRITES={
   "upg_grimoire":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACKklEQVR4nO2bv0rDUBTG09qKdO7SpUspZKmDiEFoXsFRxC59CB/AB9C5gosOdXApiA4O6tCCxiGDWQJuLgXpUoT6J9i69pzAvdS0+aD3/LbTc5N8fJx7kpvcZuxCfmJNEY6ijGUQWbQANGIAWgCaDO8B9WIBpeVf3PQ/SNyPxjP1MOMrQAxAC0CT0w0Iht9p6JgbT7dH9LkmCEi+eXBOeoTxFSAGoAWgydl1m/xQrpVpzA7wgzflCfve6zx0pYbxFSAGoAWgyYW9kPxQDOkcH9i0C2ywHrHvPZDYHf2QuOus0bz3pRTExzeCsXJ8UoyvADEALQCNdi3A7+tlP/SmY3f460zHnQqds+uPnyS+r5JHdat4dkli192j1yuskvi0vanUO1Jm4xhfAWIAWgAabQ/gtKIVMue73TbJD5q7iQTxOc/Z2umR+Pmqnuh6xleAGIAWgGbmHsDh9+1OJdn53thagveEk0O6FvF9unaxSYfSY3wFiAFoAWgS9wDdev9lW/M+gPUQeR+QMmIAWgCamXtAu0Y943OUz+FeGHks76jylmUp7+St43cS8+eGzrXq6DjGV4AYgBaARtsDSk6VxBfsu4AV3CmP5+8P+Opdl180xleAGIAWgCbx/gDeIxrsO4LuuUGXXzTGV4AYgBaARrs/IOk+Qd2cTnvOc4yvADEALQBNbC3A998vO8ZXgBiAFoAm1gP4f25K+eyEj1kmjK8AMQAtQBAEAckfWiCQOvDYuXgAAAAASUVORK5CYII=",
   "upg_harvest":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABwklEQVR4nO2aoVLDQBCGL5RBtKIRMUTUgKjB1ICIAYHC4hEYeJZqavoExUb1CYJo3yACBIaaisQwTLDsDtz15lr+trufu94l+fvP/ptLWmMURZFMFHqComqebPO9T/MQeo11ksYR+c4HKCHbghqAFoDm0PcAnvl+257xOKKZm+RF83OcZede16/j6MU2P88LcsL2wH5+8RWgBqAFoPHuAZz0qGWd5z3jokN7Qv7ekJ5Qz60RNwM25pn3RXwFqAFoAWiCe8Dk9asMOf4m9esJrszz+76rp4ivADUALQBNcA9Iumbqs971/sB3n8Azn3TNiHxwqc8CVtQAtAA0zh6wQmYffY5fLM21z/q70w6ZH84qMuaZv4pb1vcTRUVailaAGoAWgCb4dwEXPNPj57JnW39/e/IWcj1Xj+H7FvEVoAagBaDZeA/gZP2E3IiHs4/RX2t/w7Xv8EV8BagBaAFoNt4DeOYXy5rOnx2T8Xha/mtfEl8BagBaAJq1523bM88RXwFqAFoAmuD87VrmOeIrQA1AC0DjncddzzxHfAWoAWgBaJz53LfMc8RXgBqAFoDG+f+Afcs8R3wFqAFoAYqiKEi+AaA2hgPF2OoVAAAAAElFTkSuQmCC",
   "upg_legion":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACc0lEQVR4nO2aP2gUURDGb3WVsBAW4VAOwT+IcAjXHIIgNhbGlKlsbWxCJAop1EbkqiAIsRDBLthEqxRaeEJIkUaQaw5kQSQQSI7ggizKoiSi9TcH7zHuyie++XWz793Mt8PM27dvL0onWr8aAXOALYCNJYAtgE0sL6RJC+yiHNUasG7/b94+BnsweO+cf+/Oc7CDrwBLAFsAm7E1QNuT2p72jR+Kk3cqAY3GBddgt3teXLE1ALAEsAWwif+g54ATx0fQgze2f8B4VpYqf9n3z+BvY+KkSp/s+atXbjnnB18BlgC2ADZj+wBJcjiFntTuExbXp8HuraZg358pwJ659EoV39fjPoKvAEsAWwCbeG+/dO6li33dc1wie943PpDxaz6PkARfAZYAtgA23n1AVcqlF387RCWCrwBLAFsAm6jqt8HOWff48GMV73pm56bAfvqk75wffAVYAtgC2MTFOr4K+N7X5Xj/tbvHJNp4Ejn/0RLG73bOgL1wG9cEOT/4CrAEsAWwiXp3r8M+oN3GHsqyT04H5R7aG33ssfmFWZU/X3zfGvEy6zp/L/UGXwGWALYANlH71FFYA7KVizBhLcfn6OLDZ2CXX3adAfKvP1WCeg9ugj0YYg9PXXYeYTbyPAf7WhtPGeX9BF8BlgC2ADZjZ4KyRyRbWztgNycP1ipI9rzc22vx3U/wFWAJYAtgE8vnro/iG/4HqDmZqOZrGd8HNCv5kwRfAZYAtgA2tX8bTI4cwwujTdXvl5dXwe6cOw22711AS/AVYAlgC2ATtZqp6tug7MnhB12P/2v+gq8ASwBbABv1GvC/EXwFWALYAtj8BrIJr4YNHJ3MAAAAAElFTkSuQmCC",
-  "upg_phylact":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACc0lEQVR4nO1bIUwDQRC8khYSTJuAAVFDSGoaQg2IR4AoAsSHpAaDwYDoC0hoDZYaRF+AAIPBYBAoBAggKYIazCcEUwGKhBoSCgTs3xH2cul/h+R23Gbv7+Ynu3vfvV5C9BhPV8Vvyj86c57oFRchhOjr5WL/ESwAmgAaybgXOKtnyZzXjV/0WrHWBOsjgAVAE0Aj9hqgotkMer0kCesjgAVAE0Aj8j22kmuQ+/7RgyfZK+N1o/lrwXSknK2PABYATQAN43xyBitkjjtZV7Jdd0qyN/2q6ZIkHt8vSf/z1y35jtZHAAuAJoCGtgaUS2ky58sfr49h209lxqjx9Y3Xdtj2djPpKOdX4Z+0uQZQYAHQBND4lR9nhe+9sF0LqmvUBE7DvQ3bbj6XpcbnRHqE8gei/Uz5T++DVtg+mvSm/horhBAHE439sL3YTKyHbesjgAVAE0Ajqea8miPOYEWqAeq3tyNcyZ7rHyJz/KnzKdmj/b/akuTz5bubFuVXob6P+r7WRwALgCaAhvG5wNjALOm/6LyQ+3ggpJ8C4qLzYrT+6X205wrWRwALgCaAhrYGFBb2Sf/q9s5w2PZTGXIf77Yf8Jaal779S0skPeGf0H7rI4AFQBNAo+t+gK4vjwb3AzRgAdAE0Oj6bPC/1wA+G9SABUATQMO4H+CUDiW7nJePAfztIvm8WjN0/QXd+gVlfW8rZTSf9RHAAqAJoBH7f4UrO8eaEbS/Vl02Wk+376uwPgJYADQBNCKvAddvNSUH5TtA59fyuYCKoiO3CNX5HDFsdAdJB+sjgAVAE0Aj9u8A9d6f7h5h3PcEVVgfASwAmgAaPxWRnXKx4EWmAAAAAElFTkSuQmCC",
+  "upg_phylactery":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACc0lEQVR4nO1bIUwDQRC8khYSTJuAAVFDSGoaQg2IR4AoAsSHpAaDwYDoC0hoDZYaRF+AAIPBYBAoBAggKYIazCcEUwGKhBoSCgTs3xH2cul/h+R23Gbv7+Ynu3vfvV5C9BhPV8Vvyj86c57oFRchhOjr5WL/ESwAmgAaybgXOKtnyZzXjV/0WrHWBOsjgAVAE0Aj9hqgotkMer0kCesjgAVAE0Aj8j22kmuQ+/7RgyfZK+N1o/lrwXSknK2PABYATQAN43xyBitkjjtZV7Jdd0qyN/2q6ZIkHt8vSf/z1y35jtZHAAuAJoCGtgaUS2ky58sfr49h209lxqjx9Y3Xdtj2djPpKOdX4Z+0uQZQYAHQBND4lR9nhe+9sF0LqmvUBE7DvQ3bbj6XpcbnRHqE8gei/Uz5T++DVtg+mvSm/horhBAHE439sL3YTKyHbesjgAVAE0Ajqea8miPOYEWqAeq3tyNcyZ7rHyJz/KnzKdmj/b/akuTz5bubFuVXob6P+r7WRwALgCaAhvG5wNjALOm/6LyQ+3ggpJ8C4qLzYrT+6X205wrWRwALgCaAhrYGFBb2Sf/q9s5w2PZTGXIf77Yf8Jaal779S0skPeGf0H7rI4AFQBNAo+t+gK4vjwb3AzRgAdAE0Oj6bPC/1wA+G9SABUATQMO4H+CUDiW7nJePAfztIvm8WjN0/QXd+gVlfW8rZTSf9RHAAqAJoBH7f4UrO8eaEbS/Vl02Wk+376uwPgJYADQBNCKvAddvNSUH5TtA59fyuYCKoiO3CNX5HDFsdAdJB+sjgAVAE0Aj9u8A9d6f7h5h3PcEVVgfASwAmgAaPxWRnXKx4EWmAAAAAElFTkSuQmCC",
   "upg_rift":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACBUlEQVR4nO2boVPDUAzGX7kyC6JmBjMzjenE0BOYGgwKM4FCoPgjEKiJmSl0DWJ+ghp0zQwGU8EsE8M2Kddcru2+ci8/l+ut/S6X5JK8t2A0jA+uQ9bX71nZnr1NYs3zrjk55sf6iDkALQBN2PYLm+b8sWuC9xFgDkALQBNIfcDFcEzsz6+c2OtHmrN56qKyvcmzEbF3aa2g6VlC7XG8LdvjxBVle/bcrEZ4HwHmALQANGIfoM35KHK1OZ/tF/Uf3DE7p+9zKU15rkdbE7yPAHMAWgCaSg2QenGeY3/UBA7J4Z/DN3k4CM5rBUp9wPz1zvqAJpgD0ALQhNr53NHRQOz9OTzneU24GjwRm/cVvMYsb1fWBzTBHIAWgCbkOc/nf47UB/BefZOltTVBoiic7QO6xByAFoCmMgssL1f1fYFyH8CRZoH49J7Ylb5CuQ+Q+hzvI8AcgBaAplIDpLO4pvsALdpzAe1s430EmAPQAtCo7wdozwI5be8DKrMIPcaoYH0AwxyAFoBGrAF8P/Df9gE2CwiYA9AC0HR+P4DT9T6AnxVKs433EWAOQAtAo54F+r4P0OJ9BJgD0ALQiHeFOVIf8LCdkJy/2b+Q32vvCidTmuJtnxV6HwHmALQANOoaIKHdy88/aO8unU22jfcRYA5AC0DTeg3g9O1/ghzvI8AcgBaA5hdsIQHcOrKoJAAAAABJRU5ErkJggg==",
 };
 
+// ══════════════════════════════════════════════════════════════════════
+// DARK ASCENDANT — Payment Config: WEB (Stripe)
+// ══════════════════════════════════════════════════════════════════════
+// Active platform: Web (GitHub Pages)
+// Payment processor: Stripe Checkout
+//
+// SETUP STEPS:
+// 1. Create a Stripe account at stripe.com
+// 2. Create a Product + Price for each item in the Stripe dashboard
+// 3. Replace the STRIPE_PRICE_IDS values below with your real Price IDs
+// 4. Replace STRIPE_PUBLISHABLE_KEY with your real publishable key
+// 5. Set up a success URL handler (see onPageLoad below)
+// ══════════════════════════════════════════════════════════════════════
+
+var PAYMENT_PLATFORM = 'web';
+
+var STRIPE_PUBLISHABLE_KEY = 'pk_live_REPLACE_WITH_YOUR_KEY';
+
+// Map gem pack sizes to Stripe Price IDs
+// Create these in your Stripe dashboard: Products → Add Product
+var STRIPE_PRICE_IDS = {
+  gems_50:   'price_REPLACE_50_GEM_PRICE_ID',
+  gems_150:  'price_REPLACE_150_GEM_PRICE_ID',
+  gems_500:  'price_REPLACE_500_GEM_PRICE_ID',
+  gems_1500: 'price_REPLACE_1500_GEM_PRICE_ID',
+  remove_ads:'price_REPLACE_REMOVE_ADS_PRICE_ID'
+};
+
+// ── Purchase gem pack ────────────────────────────────────────────────
+function processPurchase(gems, priceKey) {
+  var priceId = STRIPE_PRICE_IDS[priceKey];
+  if (!priceId || priceId.indexOf('REPLACE') >= 0) {
+    // Stripe not yet configured — simulate for testing
+    _grantGems(gems);
+    return;
+  }
+  var stripe = window.Stripe ? Stripe(STRIPE_PUBLISHABLE_KEY) : null;
+  if (!stripe) {
+    alert('Payment system not loaded. Please refresh and try again.');
+    return;
+  }
+  var successUrl = window.location.origin + window.location.pathname
+    + '?gems=' + gems + '&session={CHECKOUT_SESSION_ID}';
+  var cancelUrl = window.location.origin + window.location.pathname;
+  stripe.redirectToCheckout({
+    lineItems: [{ price: priceId, quantity: 1 }],
+    mode: 'payment',
+    successUrl: successUrl,
+    cancelUrl: cancelUrl
+  }).then(function(result) {
+    if (result.error) alert(result.error.message);
+  });
+}
+
+// ── Purchase Remove Ads ──────────────────────────────────────────────
+function processPurchaseRemoveAds() {
+  var priceId = STRIPE_PRICE_IDS['remove_ads'];
+  if (!priceId || priceId.indexOf('REPLACE') >= 0) {
+    _grantRemoveAds();
+    return;
+  }
+  var stripe = window.Stripe ? Stripe(STRIPE_PUBLISHABLE_KEY) : null;
+  if (!stripe) {
+    alert('Payment system not loaded. Please refresh and try again.');
+    return;
+  }
+  var successUrl = window.location.origin + window.location.pathname
+    + '?remove_ads=1&session={CHECKOUT_SESSION_ID}';
+  var cancelUrl = window.location.origin + window.location.pathname;
+  stripe.redirectToCheckout({
+    lineItems: [{ price: priceId, quantity: 1 }],
+    mode: 'payment',
+    successUrl: successUrl,
+    cancelUrl: cancelUrl
+  }).then(function(result) {
+    if (result.error) alert(result.error.message);
+  });
+}
+
+// ── Restore purchases (web — not applicable, but stubbed for parity) ─
+function restorePurchases() {
+  showBoostExtendedToast('Use Export/Import save to restore on a new device.');
+}
+
+// ── Handle return from Stripe Checkout ──────────────────────────────
+// Call this on page load to credit gems after a successful payment
+function checkPendingPurchase() {
+  var params = new URLSearchParams(window.location.search);
+  var pendingGems = parseInt(params.get('gems'));
+  var removeAds = params.get('remove_ads');
+  if (pendingGems > 0) {
+    _grantGems(pendingGems);
+    showBoostExtendedToast('+' + pendingGems + ' \uD83D\uDC8E Purchase successful!');
+  }
+  if (removeAds === '1') {
+    _grantRemoveAds();
+    showBoostExtendedToast('\uD83D\uDD15 Ads removed! Thank you! \uD83C\uDF11');
+  }
+  if (pendingGems > 0 || removeAds) {
+    // Clean the URL so refresh doesn't re-grant
+    window.history.replaceState({}, '', window.location.pathname);
+    saveGame();
+  }
+}
 
 
 // ── SOUND SYSTEM ─────────────────────────────────────────────────────
@@ -893,7 +979,7 @@ var BOSSES = [
    victory:'Caelith shatters into ten thousand motes. Each one whispers a different secret as it goes out.'},
   {level:90, emoji:'💀', name:'The First Lich',        title:'Your Predecessor. Your Mirror.',
    hp:1102550, atk:[94,149],superMove:3, gems:40, expectedTapPow:2548,
-   abilities:['Stolen Techniques — using the same move twice triggers a FULL HEAL','Phylactery Shield — absorbs 500 damage once','Soul Drain — steals 40 HP per hit'],
+   abilities:['Stolen Techniques — copies and amplifies repeated attacks','Phylactery Shield — absorbs 500 damage once','Soul Drain — steals 40 HP per hit'],
    intro:'He achieved what you are trying to achieve — two hundred years ago. He has had two centuries to prepare for this fight.',
    victory:'"I did not have the strength of will to tread the ground you now walk. All light has forsaken the path you walk."'},
   {level:100,emoji:'👑', name:'Janos The Last God',    title:'Last of the Old Pantheon',
@@ -903,7 +989,7 @@ var BOSSES = [
    victory:'The god kneels. "I prayed for a thousand years that whomever came would be worthy. Be careful with it. It is the only one we have." The door opens.'},
 ];
 
-var ENDING_TEXT = 'Your dark ascendancy is complete. Time and space are yours to wield how you see fit. Mortals and Gods alike have fallen in your immutable wake.\n\nBut now while you bathe in the afterglow of victory a choice awaits you. The only way forward is to go back…';
+var ENDING_TEXT = 'Your dark ascendancy is complete. Time and space are yours to wield how you see fit. Mortals and Gods alike have fallen in your immutable wake.\n\nBut now while you bathe in the afterglow of victory a choice awaits you…';
 
 var PRESTIGE_TIERS = [
   {id:'shadow',emoji:'🌑',name:'Shadow Ascendant',sub:'The subtle path',       color:'#8060c0',
@@ -1015,7 +1101,7 @@ var SPELL_TIERS = [
    upgrades:[
      {id:'cosmicbolt',  icon:'⚡',name:'Cosmic Bolt',    desc:'Tap +350',         baseCost:1000000,  tap:350, pass:0,   max:25},
      {id:'stormgod',    icon:'🌪️',name:'Tempest Throne',   desc:'Pass +320/sec',   baseCost:3000000,  tap:0,   pass:320, max:25},
-     {id:'godstorm',    icon:'⛈️',name:'Divine Cyclone',   desc:'Tap+300,Pass+300', baseCost:10000000, tap:300, pass:300, max:25},
+     {id:'godstorm',    icon:'⛈️',name:'Divine Tempest',   desc:'Tap+300,Pass+300', baseCost:10000000, tap:300, pass:300, max:25},
      {id:'cosmicwrath', icon:'🌩️',name:'Armageddon',       desc:'Pass +1000/sec',  baseCost:40000000, tap:0,   pass:1000,max:25},
    ]},
 ];
@@ -1024,8 +1110,7 @@ var GEM_PACKS = [
   {gems:50,  price:'$0.99', label:"Initiate's pouch", desc:'50 Soul gems'},
   {gems:150, price:'$2.99', label:"Adept's satchel",  desc:'150 Soul gems'},
   {gems:500, price:'$7.99', label:"Lich's hoard",     desc:'500 Soul gems'},
-  {gems:1500,price:'$17.99',label:'Void treasury',    desc:'1500 Soul gems'},
-  {gems:0,   price:'$4.99', label:'Remove Ads',       desc:'Replace all ad breaks with a short thank-you screen. Forever.', removeAds:true},
+  {gems:1200,price:'$17.99',label:'Void treasury',    desc:'1200 Soul gems'},
 ];
 var GEM_BOOSTS = [
   {id:'tap2x5', icon:'⚡',name:'2× tap power',  desc:'5 min',gems:20,type:'tap', mult:2,dur:300},
@@ -1089,7 +1174,7 @@ var bossAdCooldown = 0;       // seconds remaining on boss ad cooldown
 var bossAdBoostEnd = 0;       // timestamp when 2x boss damage expires
 var bossAdInProgress = false; // true while ad is playing (boss attacks paused)
 var currentTheme = 'default', ownedThemes = new Set(['default']);
-var settings = {motion:false,bigtap:false,story:true,lvlup:true,ads:true,fontSize:1,tapPos:'center',haptic:true,sfx:true};
+var settings = {motion:false,bigtap:false,story:true,lvlup:true,ads:true,fontSize:1,musicVol:70,tapPos:'center',haptic:true,sfx:true};
 
 // ── BOSS TAUNTS ───────────────────────────────────────────────────────
 var BOSS_TAUNTS = {
@@ -1243,7 +1328,7 @@ function saveSettings() {
   } catch(e) {}
 }
 function applySettings() {
-  ['motion','bigtap','sfx'].forEach(function(k) {
+  ['motion','bigtap','story','lvlup','ads','sfx'].forEach(function(k) {
     var el = document.getElementById('toggle-' + k);
     if (el) { if (settings[k] !== false) el.classList.add('on'); else el.classList.remove('on'); }
   });
@@ -1255,19 +1340,11 @@ function applySettings() {
   var fv = document.getElementById('fs-val'); if (fv) fv.textContent = FONT_SIZES[idx];
   var tap = _elTapBtn || document.getElementById('tapbtn');
   if (tap) { tap.style.width = settings.bigtap ? '130px' : '110px'; tap.style.height = settings.bigtap ? '130px' : '110px'; }
+  var mv = document.getElementById('music-vol'); if (mv) mv.textContent = (settings.musicVol || 70) + '%';
   // Tap position
   var tz = document.getElementById('tapzone');
   if (tz) { tz.classList.remove('tap-left','tap-center','tap-right'); tz.classList.add('tap-' + (settings.tapPos||'center')); }
   ['left','center','right'].forEach(function(p){ var el=document.getElementById('tappos-'+p); if(el){el.style.background=settings.tapPos===p?'var(--t-acc)':'var(--t-bg2)';} });
-  // Show story/lvlup toggles only after first ascension
-  var save = (typeof loadGame === 'function') ? loadGame() : null;
-  var hasAscended = save && (save.prestigeCount || 0) >= 1;
-  var storyRow = document.getElementById('settings-story-row');
-  var lvlupRow = document.getElementById('settings-lvlup-row');
-  var lockedMsg = document.getElementById('settings-notifications-locked');
-  if (storyRow) storyRow.style.display = hasAscended ? '' : 'none';
-  if (lvlupRow) lvlupRow.style.display = hasAscended ? '' : 'none';
-  if (lockedMsg) lockedMsg.style.display = hasAscended ? 'none' : '';
 }
 function applyTheme(t) {
   currentTheme = t.id;
@@ -1276,6 +1353,7 @@ function applyTheme(t) {
   var sub = document.getElementById('theme-sub'); if (sub) sub.textContent = t.name;
   saveSettings();
 }
+function setMusicVol(v) { settings.musicVol = parseInt(v); var el = document.getElementById('music-vol'); if (el) el.textContent = v + '%'; saveSettings(); }
 
 // ── UTILS ─────────────────────────────────────────────────────────────
 function fmt(n) { if (n>=1e9) return (n/1e9).toFixed(2)+'B'; if (n>=1e6) return (n/1e6).toFixed(2)+'M'; if (n>=1e3) return (n/1e3).toFixed(1)+'k'; return Math.floor(n).toString(); }
@@ -1448,30 +1526,13 @@ function updateBoostBar() {
 // ── SCREEN NAV ────────────────────────────────────────────────────────
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
-  var target = document.getElementById(id);
-  target.classList.add('active');
+  document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
   if (id === 'scores-screen') buildScoresScreen();
   if (id === 'home-screen') refreshHomeBtns();
 }
 function refreshHomeBtns() {
   var save = loadGame();
-  // Show wizard name under tagline
-  var wnEl = document.getElementById('home-wizard-name');
-  if (wnEl) {
-    var wn = getWizardName();
-    wnEl.textContent = wn ? ('🌑 ' + wn) : '';
-  }
-  // Show gem count
-  var gemEl = document.getElementById('home-gem-count');
-  var gemVal = document.getElementById('home-gem-val');
-  var gemSave = save || loadGame();
-  if (gemEl && gemVal && gemSave && (gemSave.gems || 0) > 0) {
-    gemVal.textContent = gemSave.gems;
-    gemEl.style.display = 'block';
-  } else if (gemEl) {
-    gemEl.style.display = 'none';
-  }
   // Fire title effect if player has ascended at least once
   var homeTitle = document.getElementById('home-title');
   if (homeTitle && save && (save.prestigeCount||0) >= 1) {
@@ -1531,9 +1592,6 @@ function startNewGame() {
   holdUnlockEndTime = 0;
   stopHold();
   gameState = getDefaultState(); displayedTierIdx = -1; boostSlots = [];
-  // Preserve gem balance across new games — only full reset clears purchases
-  var prevSave = loadGame();
-  if (prevSave && prevSave.gems > 50) gameState.gems = prevSave.gems;
   // Reset theme to default
   var defaultTheme = THEMES.find(function(t){ return t.id === 'default'; });
   if (defaultTheme) applyTheme(defaultTheme);
@@ -1556,14 +1614,14 @@ function showIntro() {
   var useWhite = hasAscended || trueEnded;
   overlay.style.background = useWhite ? '#fff' : '#000';
   var textColor = useWhite ? '#2a1a3a' : '#c0a0e0';
-  var faintColor = useWhite ? '#4a1080' : '#8a60b0';
-  var borderColor = useWhite ? '#6a20a0' : '#3a2a5a';
+  var faintColor = useWhite ? '#6a4a8a' : '#8a60b0';
+  var borderColor = useWhite ? '#b0a0c0' : '#3a2a5a';
   ['intro-line1','intro-line2','intro-line3','intro-credit'].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.style.color = textColor;
   });
   var skipEl = document.getElementById('intro-skip');
-  if (skipEl) { skipEl.style.color = faintColor; skipEl.style.borderColor = borderColor; skipEl.style.fontWeight = useWhite ? '700' : '600'; }
+  if (skipEl) { skipEl.style.color = faintColor; skipEl.style.borderColor = borderColor; }
   overlay.style.display = 'flex';
   // Reset lines
   ['intro-line1','intro-line2','intro-line3','intro-credit','intro-skip'].forEach(function(id){
@@ -1663,7 +1721,6 @@ function _doLaunchGame() {
   saveInterval = setInterval(function(){ saveGame(); }, 30000);
   lastTierShown = gameState.lastTierShown || -1;
   storyQueue = []; storyOpen = false; lvlUpQueue = []; pendingLvlUp = false;
-  setTimeout(submitLeaderboardScore, 3000, true); // submit on every session — gets player on board even before lv100
   // Restore pending boss — player cannot skip by closing the app
   if (gameState.pendingBossLevel) {
     var pendingBoss = BOSSES.find(function(b){ return b.level === gameState.pendingBossLevel; });
@@ -1683,6 +1740,13 @@ function _doLaunchGame() {
     if (adMonBtn) { adMonBtn.style.opacity = '0.45'; adMonBtn.style.filter = 'grayscale(80%)'; adMonBtn.classList.remove('ad-ready'); }
   } else {
     adCooldown = 0;
+  }
+  // Handle Stripe redirect return (web) or restore ad-free state
+  if (typeof checkPendingPurchase === 'function') checkPendingPurchase();
+  // Re-apply ads-removed state (in case payment config wasn't loaded at save time)
+  if (gameState.adsRemoved) {
+    settings.ads = false;
+    applySettings(); saveSettings();
   }
   recalc(); buildUpgradesPanel(); updateGameUI(); startGameLoop();
   // Offline income already applied in launchGame before welcome screen
@@ -2029,18 +2093,7 @@ function openBoss(boss) {
   _counterPending = false;
   bossHealedOnce = false; bossRevivedOnce = false; divineFuryActive = false;
   playerMaxHP = 200 + gameState.level * 12; playerHP = playerMaxHP;
-  // Scale boss HP to real player tap power so fight difficulty matches playtest
-  // If player's actual tap power exceeds the expectedTapPow the boss was balanced for,
-  // scale boss HP proportionally so the fight always takes a similar number of hits.
-  var _scaledBossHP = boss.hp;
-  if (!_bossPlaytestActive && boss.expectedTapPow) {
-    var _realTap = effTap();
-    if (_realTap > boss.expectedTapPow * 1.1) {
-      var _scale = Math.sqrt(_realTap / boss.expectedTapPow); // sqrt keeps scaling gentle; 2.5x tap = ~1.58x HP
-      _scaledBossHP = Math.round(boss.hp * _scale);
-    }
-  }
-  bossMaxHP = _scaledBossHP; bossHP = _scaledBossHP;
+  bossMaxHP = boss.hp; bossHP = boss.hp;
   document.getElementById('boss-title').textContent = '⚔️ Lv' + boss.level + ' — ' + boss.name;
   document.getElementById('boss-sub').textContent = boss.title;
   setBossEl(document.getElementById('boss-avatar-display'), boss, 72, 72);
@@ -2254,8 +2307,8 @@ function calcPlayerDmg(moveIdx) {
   if (moveIdx === bossData.superMove) base = Math.floor(base * 1.6);
   // 2x boss damage boost from ad
   if (bossAdBoostEnd > Date.now()) base = base * 2; // reduced from 1.8 — less swingy on super
-  // Cap so boss always takes at least 8 meaningful hits (use live bossMaxHP so scaling applies)
-  var maxSingleHit = bossMaxHP / 8;
+  // Cap so boss always takes at least 8 meaningful hits
+  var maxSingleHit = bossData.hp / 8;
   var finalDmg = Math.max(1, Math.min(Math.floor(base), Math.floor(maxSingleHit)));
   if (gameState && gameState.stats && finalDmg > (gameState.stats.maxSingleDmg||0)) gameState.stats.maxSingleDmg = finalDmg;
   return finalDmg;
@@ -2268,25 +2321,6 @@ function doPlayerAction(moveIdx, skipLock) {
   var lv = bossData.level;
   var same = (moveIdx === bossLastAction);
   bossLastAction = moveIdx;
-  // Update lv90 button warning: highlight the just-used button as dangerous to repeat
-  if (lv === 90) {
-    var _btnMap = ['btn-attack','btn-spell','btn-drain','btn-ritual'];
-    _btnMap.forEach(function(id, i) {
-      var el = document.getElementById(id);
-      if (!el) return;
-      if (i === moveIdx) {
-        el.style.boxShadow = '0 0 0 2px #ff4040, 0 0 12px #ff2020';
-        el.style.outline = '2px solid #ff4040';
-        var w = el.querySelector('.lich-warn');
-        if (!w) { w = document.createElement('div'); w.className = 'lich-warn'; w.style.cssText = 'font-size:9px;color:#ff5555;font-weight:700;margin-top:2px;letter-spacing:0.5px;'; w.textContent = '⚠ REPEAT = FULL HEAL'; el.appendChild(w); }
-      } else {
-        el.style.boxShadow = '';
-        el.style.outline = '';
-        var w2 = el.querySelector('.lich-warn');
-        if (w2) w2.remove();
-      }
-    });
-  }
   // Phase transitions
   var bp = bossHP / bossMaxHP;
   if (bp < 0.5 && bossPhase === 1) { bossPhase=2; addLog('rage', bossData.name + ' — Phase 2!'); document.getElementById('boss-phase-label').textContent='Phase 2'; }
@@ -2296,7 +2330,7 @@ function doPlayerAction(moveIdx, skipLock) {
   // Repeat penalties
   if (lv===60 && moveIdx===1 && same) { bossHP=Math.min(bossMaxHP,bossHP+80); addLog('boss','Deep Memory — heals 80!'); updateBossUI(); }
   if (lv===70 && same) { var e=rnd(bossData.atk[0],bossData.atk[1]); playerHP=Math.max(0,playerHP-e); addLog('boss','Future-Echo — ' + e + ' reflected!'); updateBossUI(); if(playerHP<=0){showBossDefeat();return false;} }
-  if (lv===90 && same) { bossHP=bossMaxHP; addLog('boss','Stolen Technique — The First Lich fully heals!'); updateBossUI(); }
+  if (lv===90 && same) { bossHP=Math.min(bossMaxHP,bossHP+Math.floor(effTap()*.4)); playerHP=Math.max(0,playerHP-30); addLog('boss','Stolen Technique — amplified back!'); updateBossUI(); if(playerHP<=0){showBossDefeat();return false;} }
   if (lv===100 && same) { bossHP=Math.min(bossMaxHP,bossHP+400); addLog('boss','Divine Memory — heals 400!'); updateBossUI(); }
   return true;
 }
@@ -2471,7 +2505,6 @@ function showBossVictory() {
       setTimeout(function(){
         document.getElementById('bossoverlay').classList.remove('show');
         ['btn-attack','btn-spell','btn-drain','btn-ritual','btn-dev-ko'].forEach(function(id){ document.getElementById(id).style.display='none'; });
-        submitLeaderboardScore(); // submit final score to global leaderboard
         showEnding();
       }, 3400);
       return;
@@ -2564,13 +2597,6 @@ function showBossDefeat() {
 function closeBoss() {
   document.getElementById('bossoverlay').classList.remove('show');
   ['btn-attack','btn-spell','btn-drain','btn-ritual','btn-dev-ko'].forEach(function(id){ document.getElementById(id).style.display='none'; });
-  // Clear any lv90 repeat-move highlights
-  ['btn-attack','btn-spell','btn-drain','btn-ritual'].forEach(function(id){
-    var el = document.getElementById(id);
-    if (!el) return;
-    el.style.boxShadow = ''; el.style.outline = '';
-    var w = el.querySelector('.lich-warn'); if (w) w.remove();
-  });
   if (gameState.level >= 100 && bossData && bossData.level === 100 && bossDefeated) { bossData = null; setTimeout(showEnding, 400); return; }
   bossData = null;
   if (pendingBossStory) { var t = pendingBossStory; pendingBossStory = null; storyQueue.push(t); if (!storyOpen) showNextStory(); }
@@ -2855,7 +2881,6 @@ function doPrestige(pt) {
   // Apply permanent stacking buffs
   gameState.prestigeCount = (gameState.prestigeCount||0) + 1;
   gameState.stats.prestigeCount = gameState.prestigeCount;
-  submitLeaderboardScore(); // update leaderboard with new prestige count
   var pp = gameState.prestigePerks;
   pp.tapMult         = parseFloat((pp.tapMult         * (pt.tapMult         || 1)).toFixed(4));
   pp.passMult        = parseFloat((pp.passMult        * (pt.passMult        || 1)).toFixed(4));
@@ -2961,43 +2986,21 @@ function openHoldAd() {
   startHoldAd();
 }
 function startHoldAd() {
-  var titleEl = document.querySelector('#adoverlay .otitle');
-  var bodyEl = document.querySelector('#adoverlay .obody');
   document.getElementById('ad-closebtn').style.display = 'none';
   document.getElementById('adprogfill').style.width = '0%';
   document.getElementById('adoverlay').classList.add('show');
-
-  if (hasAdsFree()) {
-    if (titleEl) titleEl.textContent = '🌑 Thanks for playtesting!';
-    if (bodyEl) bodyEl.textContent = "If this game ever actually launches — thanks for paying to remove ads! It's much appreciated by your humble developer!";
-    var pct = 0;
-    var iv = setInterval(function(){
-      pct += 5;
-      document.getElementById('adprogfill').style.width = Math.min(100, pct) + '%';
-      if (pct >= 100) {
-        clearInterval(iv);
-        if (titleEl) titleEl.textContent = 'Watching ad...';
-        if (bodyEl) bodyEl.textContent = 'A merchant of dark arts has a message for you.';
-        var btn = document.getElementById('ad-closebtn');
-        btn.textContent = 'Activate Hold to Tap →';
-        btn.style.display = 'block';
-        btn.onclick = closeHoldAd;
-      }
-    }, 100);
-  } else {
-    var pct = 0;
-    var iv = setInterval(function(){
-      pct += 100/50;
-      document.getElementById('adprogfill').style.width = Math.min(100,pct) + '%';
-      if (pct >= 100) {
-        clearInterval(iv);
-        var btn = document.getElementById('ad-closebtn');
-        btn.textContent = 'Activate Hold to Tap →';
-        btn.style.display = 'block';
-        btn.onclick = closeHoldAd;
-      }
-    }, 100);
-  }
+  var pct = 0;
+  var iv = setInterval(function(){
+    pct += 100/50;
+    document.getElementById('adprogfill').style.width = Math.min(100,pct) + '%';
+    if (pct >= 100) {
+      clearInterval(iv);
+      var btn = document.getElementById('ad-closebtn');
+      btn.textContent = 'Activate Hold to Tap →';
+      btn.style.display = 'block';
+      btn.onclick = closeHoldAd;
+    }
+  }, 100);
 }
 function closeHoldAd() {
   document.getElementById('adoverlay').classList.remove('show');
@@ -3099,39 +3102,15 @@ function watchAdFromLvlUp() {
 }
 function startAd(fromLvlUp) {
   adFromLvlUp = fromLvlUp;
+  document.getElementById('ad-closebtn').style.display = 'none';
+  document.getElementById('adprogfill').style.width = '0%';
   document.getElementById('adoverlay').classList.add('show');
-
-  if (hasAdsFree()) {
-    // Short 1-second thank-you screen for dev/remove-ads players
-    document.getElementById('ad-closebtn').style.display = 'none';
-    document.getElementById('adprogfill').style.width = '0%';
-    var titleEl = document.querySelector('#adoverlay .otitle');
-    var bodyEl = document.querySelector('#adoverlay .obody');
-    if (titleEl) titleEl.textContent = '🌑 Thanks for playtesting!';
-    if (bodyEl) bodyEl.textContent = "If this game ever actually launches — thanks for paying to remove ads! It's much appreciated by your humble developer!";
-    var pct = 0;
-    var iv = setInterval(function(){
-      pct += 5;
-      document.getElementById('adprogfill').style.width = Math.min(100, pct) + '%';
-      if (pct >= 100) {
-        clearInterval(iv);
-        // Reset text back to normal for next time
-        if (titleEl) titleEl.textContent = 'Watching ad...';
-        if (bodyEl) bodyEl.textContent = 'A merchant of dark arts has a message for you.';
-        closeAd();
-      }
-    }, 100);
-  } else {
-    // Normal full-length ad
-    document.getElementById('ad-closebtn').style.display = 'none';
-    document.getElementById('adprogfill').style.width = '0%';
-    var pct = 0;
-    var iv = setInterval(function(){
-      pct += 100/50;
-      document.getElementById('adprogfill').style.width = Math.min(100, pct) + '%';
-      if (pct >= 100) { clearInterval(iv); document.getElementById('ad-closebtn').style.display='block'; }
-    }, 100);
-  }
+  var pct = 0;
+  var iv = setInterval(function(){
+    pct += 100/50;
+    document.getElementById('adprogfill').style.width = Math.min(100, pct) + '%';
+    if (pct >= 100) { clearInterval(iv); document.getElementById('ad-closebtn').style.display='block'; }
+  }, 100);
 }
 function closeAd() {
   document.getElementById('adoverlay').classList.remove('show');
@@ -3184,29 +3163,15 @@ function watchBossAd() {
   ['btn-attack','btn-spell','btn-drain','btn-ritual','btn-boss-ad'].forEach(function(id){
     var el = document.getElementById(id); if (el) { el.style.opacity = '.4'; el.style.pointerEvents = 'none'; }
   });
-  // Show ad overlay — short version for dev/remove-ads players
-  var titleEl = document.querySelector('#adoverlay .otitle');
-  var bodyEl = document.querySelector('#adoverlay .obody');
+  // Show ad overlay reusing existing ad system
   document.getElementById('ad-closebtn').style.display = 'none';
   document.getElementById('adprogfill').style.width = '0%';
   document.getElementById('adoverlay').classList.add('show');
-
-  if (hasAdsFree()) {
-    if (titleEl) titleEl.textContent = '🌑 Thanks for playtesting!';
-    if (bodyEl) bodyEl.textContent = "If this game ever actually launches — thanks for paying to remove ads! It's much appreciated by your humble developer!";
-  }
-
-  var adSpeed = hasAdsFree() ? 10 : 100/50;
   var pct = 0;
   var iv = setInterval(function(){
-    pct += adSpeed;
+    pct += 100/50;
     document.getElementById('adprogfill').style.width = Math.min(100,pct) + '%';
-    if (pct >= 100) {
-      clearInterval(iv);
-      if (titleEl) titleEl.textContent = 'Watching ad...';
-      if (bodyEl) bodyEl.textContent = 'A merchant of dark arts has a message for you.';
-      document.getElementById('ad-closebtn').style.display = 'block';
-    }
+    if (pct >= 100) { clearInterval(iv); document.getElementById('ad-closebtn').style.display = 'block'; }
   }, 100);
   // Override close button for boss context
   document.getElementById('ad-closebtn').onclick = function(){
@@ -3581,30 +3546,35 @@ function buildShop() {
   var bg = document.getElementById('gembuygrid'); bg.innerHTML = '';
   GEM_PACKS.forEach(function(p){
     var d = document.createElement('div'); d.className = 'shopitem';
-    if (p.removeAds) {
-      var owned = gameState && gameState.removeAds;
-      var price = _devAccess ? '<span style="color:#ffd700;">DEV: Free</span>' : p.price;
-      d.innerHTML = '<div class="shopitem-icon">🔕</div><div style="flex:1"><div class="shopitem-name">' + p.label + '</div><div class="shopitem-desc">' + (owned ? 'Already purchased ✓' : p.desc) + '</div></div><div class="shopitem-price" style="' + (owned ? 'opacity:.4;cursor:default;' : '') + '" onclick="buyRemoveAds()">' + (owned ? 'Owned' : price) + '</div>';
-    } else {
-      var devPrice = _devAccess ? (gemHtml() + ' 1') : p.price;
-      var buyFn = _devAccess ? 'devBuyGems(' + p.gems + ')' : 'buyGems(' + p.gems + ')';
-      d.innerHTML = '<div class="shopitem-icon">' + gemHtml() + '</div><div style="flex:1"><div class="shopitem-name">' + p.label + '</div><div class="shopitem-desc">' + p.desc + '</div></div><div class="shopitem-price" onclick="' + buyFn + '">' + devPrice + '</div>';
-    }
+    d.innerHTML = '<div class="shopitem-icon">' + gemHtml() + '</div><div style="flex:1"><div class="shopitem-name">' + p.label + '</div><div class="shopitem-desc">' + p.desc + '</div></div><div class="shopitem-price" onclick="buyGems(' + p.gems + ')">' + p.price + '</div>';
     bg.appendChild(d);
   });
+  // Remove Ads item at top of buy grid
+  var adsOwned = gameState && gameState.adsRemoved;
+  var rad = document.createElement('div'); rad.className = 'shopitem';
+  rad.innerHTML = '<div class="shopitem-icon">🔕</div><div style="flex:1"><div class="shopitem-name">Remove Ads</div><div class="shopitem-desc">' + (adsOwned ? 'Already purchased ✓' : 'Remove all ads permanently — $2.99') + '</div></div><div class="shopitem-price" style="' + (adsOwned ? 'opacity:.4;cursor:default;' : '') + '" onclick="' + (adsOwned ? '' : 'buyRemoveAds()') + '">' + (adsOwned ? 'Owned' : '$2.99') + '</div>';
+  bg.appendChild(rad);
+  // Restore purchases button (required for Apple; harmless on web)
+  if (!adsOwned) {
+    var rb = document.createElement('div');
+    rb.style.cssText = 'text-align:center;padding:6px 0 2px;';
+    rb.innerHTML = '<span style="font-size:var(--fs-xs);color:var(--t-txt3);cursor:pointer;text-decoration:underline;" onclick="if(typeof restorePurchases===\'function\')restorePurchases();">Restore purchases</span>';
+    bg.appendChild(rb);
+  }
+
   var sg = document.getElementById('gemspendgrid'); sg.innerHTML = '';
   // Permanent hold-to-tap purchase
   var holdOwned = gameState && gameState.holdForever;
   var holdAfford = gameState && gameState.gems >= 200;
   var hd = document.createElement('div'); hd.className = 'shopitem';
-  hd.innerHTML = '<div class="shopitem-icon">👆</div><div style="flex:1"><div class="shopitem-name">Permanent Hold-to-Tap</div><div class="shopitem-desc">' + (holdOwned ? 'Already unlocked ✓' : 'Hold main button forever — no ad needed') + '</div></div><div class="shopitem-price" id="sbtn-holdforever" style="' + (holdOwned ? 'opacity:.4;cursor:default;' : holdAfford ? '' : 'opacity:.4;cursor:default;') + '" onclick="buyHoldForever()">' + (holdOwned ? 'Owned' : (_devAccess ? gemHtml() + ' 1' : gemHtml() + ' 200')) + '</div>';
+  hd.innerHTML = '<div class="shopitem-icon">👆</div><div style="flex:1"><div class="shopitem-name">Permanent Hold-to-Tap</div><div class="shopitem-desc">' + (holdOwned ? 'Already unlocked ✓' : 'Hold main button forever — no ad needed') + '</div></div><div class="shopitem-price" id="sbtn-holdforever" style="' + (holdOwned ? 'opacity:.4;cursor:default;' : holdAfford ? '' : 'opacity:.4;cursor:default;') + '" onclick="buyHoldForever()">' + (holdOwned ? 'Owned' : gemHtml() + ' 200') + '</div>';
   sg.appendChild(hd);
   // Offline passive boost
   var offlineOwned = gameState && gameState.offlineBoostUntil && Date.now() < gameState.offlineBoostUntil;
   var offlineAfford = gameState && gameState.gems >= 50;
   var od = document.createElement('div'); od.className = 'shopitem';
   var offlineLeft = offlineOwned ? Math.ceil((gameState.offlineBoostUntil - Date.now()) / 3600000) + 'h left' : '';
-  od.innerHTML = '<div class="shopitem-icon">💤</div><div style="flex:1"><div class="shopitem-name">Full Offline Income</div><div class="shopitem-desc">' + (offlineOwned ? '100% passive rate while away — ' + offlineLeft : '100% passive rate while away (8hrs) — normally 10%') + '</div></div><div class="shopitem-price" id="sbtn-offlineboost" style="' + (offlineOwned ? 'opacity:.4;cursor:default;' : offlineAfford ? '' : 'opacity:.4;cursor:default;') + '" onclick="buyOfflineBoost()">' + (offlineOwned ? 'Active' : (_devAccess ? gemHtml() + ' 1' : gemHtml() + ' 50')) + '</div>';
+  od.innerHTML = '<div class="shopitem-icon">💤</div><div style="flex:1"><div class="shopitem-name">Full Offline Income</div><div class="shopitem-desc">' + (offlineOwned ? '100% passive rate while away — ' + offlineLeft : '100% passive rate while away (8hrs) — normally 10%') + '</div></div><div class="shopitem-price" id="sbtn-offlineboost" style="' + (offlineOwned ? 'opacity:.4;cursor:default;' : offlineAfford ? '' : 'opacity:.4;cursor:default;') + '" onclick="buyOfflineBoost()">' + (offlineOwned ? 'Active' : gemHtml() + ' 50') + '</div>';
   sg.appendChild(od);
   GEM_BOOSTS.forEach(function(b){
     var ok = gameState && gameState.gems >= b.gems && canAddBoost();
@@ -3614,9 +3584,8 @@ function buildShop() {
   });
 }
 function buyHoldForever() {
-  var cost = _devAccess ? 1 : 200;
-  if (!gameState || gameState.holdForever || gameState.gems < cost) return;
-  gameState.gems -= cost;
+  if (!gameState || gameState.holdForever || gameState.gems < 200) return;
+  gameState.gems -= 200;
   gameState.holdForever = true;
   gameState.holdEverUsed = true;
   var hb = document.getElementById('hold-btn');
@@ -3635,58 +3604,66 @@ function buyOfflineBoost() {
   spawnGemFloat('-50 💎', btn);
   saveGame(); updateGameUI(); buildShop();
 }
-function buyRemoveAds() {
-  if (!gameState || gameState.removeAds) return;
-  if (_devAccess) {
-    // Dev mode — free
-    gameState.removeAds = true;
-    saveGame(); buildShop();
-    showBoostExtendedToast('🔕 Ads removed (dev mode)!');
-    return;
-  }
-  // Real IAP — simulate for now
-  if (confirm('Purchase "Remove Ads" for $4.99?\n(This would trigger a real payment when launched)')) {
-    gameState.removeAds = true;
-    saveGame(); buildShop();
-    showBoostExtendedToast('🔕 Ads removed! Thank you! 🌑');
-  }
-}
-
-function devBuyGems(n) {
-  // Dev mode — buy gems for 1 gem
-  if (!gameState || gameState.gems < 1) return;
-  gameState.gems += n - 1; // net effect: costs 1 gem, gains n
-  saveGame(); updateGameUI(); buildShop();
-  showBoostExtendedToast('+' + n + ' 💎 (dev price)');
-}
-
-function buyGems(n) {
+// ── PAYMENT BRIDGE ────────────────────────────────────────────────────
+// Called by payment_config.*.js after a successful purchase to credit gems
+function _grantGems(n) {
   if (!gameState) return;
   gameState.gems += n;
-  // Pop-in float showing gems received
   var fc = document.getElementById('floats');
   if (fc) {
-    var btn = document.querySelector('.shopitem-price');
-    var r = btn ? btn.getBoundingClientRect() : {left:window.innerWidth/2-30,top:window.innerHeight/2,width:60,height:0};
     var el = document.createElement('div');
     el.className = 'fn fn-gem';
     el.textContent = '+' + n + ' 💎';
-    el.style.cssText = 'position:absolute;left:' + (r.left + r.width/2 - 16) + 'px;top:' + (r.top - 4) + 'px;font-size:20px;';
+    el.style.cssText = 'position:fixed;left:50%;top:40%;transform:translateX(-50%);font-size:22px;';
     fc.appendChild(el);
     setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 3600);
   }
   sfxGemEarn();
   saveGame(); updateGameUI(); buildShop();
 }
+// Called by payment_config.*.js after a successful Remove Ads purchase
+function _grantRemoveAds() {
+  if (!gameState) return;
+  gameState.adsRemoved = true;
+  settings.ads = false;
+  applySettings(); saveSettings(); saveGame();
+  // Hide all ad buttons immediately
+  var adBtns = document.querySelectorAll('.monbtn-ad, #ad-btn-sub, .lu-watchbtn, .boss-ad-btn');
+  adBtns.forEach(function(b){ b.style.display = 'none'; });
+  updateGameUI(); buildShop();
+}
+
+// buyGems — routes through payment config (processPurchase defined in payment_config.*.js)
+// In dev/stub mode processPurchase calls _grantGems directly; in prod it goes via Stripe/IAP
+function buyGems(n) {
+  if (!gameState) return;
+  // Map gem count to price key
+  var keyMap = {50:'gems_50', 150:'gems_150', 500:'gems_500', 1200:'gems_1500'};
+  var priceKey = keyMap[n] || 'gems_50';
+  if (typeof processPurchase === 'function') {
+    processPurchase(n, priceKey);
+  } else {
+    // Fallback if payment config not loaded
+    _grantGems(n);
+  }
+}
+function buyRemoveAds() {
+  if (!gameState) return;
+  if (gameState.adsRemoved) return;
+  if (typeof processPurchaseRemoveAds === 'function') {
+    processPurchaseRemoveAds();
+  } else {
+    _grantRemoveAds();
+  }
+}
 function spendGems(id) {
   if (!gameState) return;
-  var b = GEM_BOOSTS.find(function(x){ return x.id===id; }); if (!b) return;
-  var cost = _devAccess ? 1 : b.gems;
-  if (gameState.gems < cost) return;
+  var b = GEM_BOOSTS.find(function(x){ return x.id===id; }); if (!b || gameState.gems < b.gems) return;
   if (!canAddBoost()) { alert('Purchased boost slots full (3/3). Watch an ad to add more!'); return; }
-  gameState.gems -= cost;
+  gameState.gems -= b.gems;
+  // Gem spend float
   var btn = document.getElementById('sbtn-' + id);
-  spawnGemFloat('-' + cost + ' 💎', btn);
+  spawnGemFloat('-' + b.gems + ' 💎', btn);
   applyBoost(b.type, b.mult, b.dur, b.name);
   updateGameUI(); buildShop();
 }
@@ -3957,9 +3934,7 @@ function showWelcomeScreen(dl, callback) {
     var hasPlayed = !_isNewGameSession && !!localStorage.getItem('dark_ascendant_has_played');
     _isNewGameSession = false;
     var welcomeText = hasPlayed ? 'Welcome back' : 'Welcome';
-    var wizardName = getWizardName();
-    var wizardLine = wizardName ? '<div style="font-size:18px;font-weight:700;color:var(--t-acc1);margin-bottom:8px;">' + wizardName + '</div>' : '';
-    el.innerHTML = avatarHtml + '<div style="font-size:22px;font-weight:700;color:var(--t-acc2);margin-bottom:6px;">' + welcomeText + '</div>' + wizardLine + '<div style="font-size:14px;color:var(--t-txt3);margin-bottom:4px;">' + (tier ? tier.name : '') + ' - Level ' + (gameState ? gameState.level : '') + '</div>' + offHtml + '<div style="font-size:12px;color:var(--t-txt4);margin-top:20px;">Tap to continue your dark path</div>';
+    el.innerHTML = avatarHtml + '<div style="font-size:22px;font-weight:700;color:var(--t-acc2);margin-bottom:6px;">' + welcomeText + '</div><div style="font-size:14px;color:var(--t-txt3);margin-bottom:4px;">' + (tier ? tier.name : '') + ' - Level ' + (gameState ? gameState.level : '') + '</div>' + offHtml + '<div style="font-size:12px;color:var(--t-txt4);margin-top:20px;">Tap to continue your dark path</div>';
   }
   el.onclick = function(){ if (el.parentNode) el.parentNode.removeChild(el); haptic(20); if (callback) callback(); };
   fc.appendChild(el);
@@ -4190,83 +4165,14 @@ function manualSave() {
   else { var msg=document.getElementById('settings-save-msg'); if(msg){msg.textContent='No active game.';msg.style.display='block';msg.className='save-status unsaved';setTimeout(function(){msg.style.display='none';},2000);} }
 }
 function exportSave() {
-  var raw = localStorage.getItem(SAVE_KEY);
-  if (!raw) { alert('No save data to export.'); return; }
-  try {
-    // Embed wizard name and device ID so they transfer to new device
-    var saveObj = JSON.parse(raw);
-    saveObj._wizardName = getWizardName();
-    saveObj._deviceId = getDeviceId();
-    var compressed = compressSave(JSON.stringify(saveObj));
-    var code = btoa(compressed);
-    navigator.clipboard.writeText(code).then(function() {
-      var msg = document.getElementById('settings-save-msg');
-      if (msg) { msg.textContent = '✓ Save code copied to clipboard!'; msg.style.display = 'block'; msg.className = 'save-status saved'; setTimeout(function(){ msg.style.display = 'none'; }, 2500); }
-    });
-  } catch(e) {
-    var msg = document.getElementById('settings-save-msg');
-    if (msg) { msg.textContent = '✗ Could not copy — try a different browser.'; msg.style.display = 'block'; msg.className = 'save-status'; setTimeout(function(){ msg.style.display = 'none'; }, 3000); }
-  }
+  var raw = localStorage.getItem(SAVE_KEY); if (!raw) { alert('No save data.'); return; }
+  try { navigator.clipboard.writeText(btoa(raw)).then(function(){ var msg=document.getElementById('settings-save-msg');if(msg){msg.textContent='✓ Save code copied!';msg.style.display='block';msg.className='save-status saved';setTimeout(function(){msg.style.display='none';},2500);} }); }
+  catch(e) { alert('Save code: ' + btoa(raw).slice(0,120)); }
 }
 function promptImportSave() {
-  if (document.getElementById('import-save-overlay')) return;
-
-  var el = document.createElement('div');
-  el.id = 'import-save-overlay';
-  el.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(4,1,12,0.97);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:8000;padding:24px;box-sizing:border-box;pointer-events:all;';
-
-  el.innerHTML = '<div style="font-size:18px;font-weight:700;color:#c080ff;margin-bottom:10px;">Import Save</div>'
-    + '<div style="font-size:12px;color:#8050a0;margin-bottom:6px;text-align:center;max-width:300px;line-height:1.6;">'
-    + '<span style="color:#ff6060;font-weight:600;">Warning:</span> This will completely overwrite all progress on this device, including your current level, gems, and upgrades.'
-    + '</div>'
-    + '<div style="font-size:11px;color:#4a2060;margin-bottom:16px;text-align:center;">Export your current save first if you want to be able to return to it.</div>'
-    + '<textarea id="import-save-input" style="width:100%;max-width:320px;height:100px;padding:10px;border-radius:8px;border:1px solid #5030a0;background:#0a0018;color:#e0c0ff;font-size:11px;font-family:monospace;resize:none;box-sizing:border-box;margin-bottom:8px;" placeholder="Paste save code here…"></textarea>'
-    + '<div id="import-save-error" style="font-size:11px;color:#ff5050;min-height:16px;margin-bottom:12px;text-align:center;"></div>'
-    + '<div style="display:flex;gap:10px;width:100%;max-width:320px;">'
-    + '<div id="import-cancel-btn" style="flex:1;padding:13px;border-radius:8px;background:#0a0018;border:1px solid #2a1050;color:#6040a0;font-size:14px;font-weight:600;text-align:center;cursor:pointer;touch-action:manipulation;">Cancel</div>'
-    + '<div id="import-confirm-btn" style="flex:2;padding:13px;border-radius:8px;background:#3a0010;border:1px solid #8a1030;color:#ff8080;font-size:14px;font-weight:600;text-align:center;cursor:pointer;touch-action:manipulation;">⚠️ Overwrite &amp; Load</div>'
-    + '</div>';
-
-  document.body.appendChild(el);
-  setTimeout(function(){ var inp = document.getElementById('import-save-input'); if (inp) inp.focus(); }, 100);
-
-  el.addEventListener('pointerdown', function(e) {
-    if (e.target.closest('#import-cancel-btn')) {
-      e.preventDefault();
-      el.remove();
-      return;
-    }
-    if (e.target.closest('#import-confirm-btn')) {
-      e.preventDefault();
-      var inp = document.getElementById('import-save-input');
-      var code = inp ? inp.value.trim() : '';
-      var err = document.getElementById('import-save-error');
-      if (!code) { if (err) err.textContent = 'Please paste a save code first.'; return; }
-      try {
-        var decoded = atob(code);
-        var decompressed = decompressSave(decoded);
-        var parsed = JSON.parse(decompressed);
-        // Restore wizard name and device ID if embedded in save
-        if (parsed._wizardName) { localStorage.setItem('da_wizard_name', parsed._wizardName); }
-        if (parsed._deviceId)   { localStorage.setItem('da_device_id',   parsed._deviceId);   }
-        delete parsed._wizardName;
-        delete parsed._deviceId;
-        // Fully wipe and replace save
-        localStorage.setItem(SAVE_KEY, JSON.stringify(parsed));
-        el.remove();
-        // Reload game state completely
-        gameState = parsed;
-        recalc();
-        saveGame();
-        refreshHomeBtns();
-        showScreen('home-screen');
-        var msg = document.getElementById('settings-save-msg');
-        if (msg) { msg.textContent = '✓ Save loaded! Your progress has been restored.'; msg.style.display = 'block'; msg.className = 'save-status saved'; setTimeout(function(){ msg.style.display = 'none'; }, 3000); }
-      } catch(e2) {
-        if (err) err.textContent = 'Invalid save code — please check and try again.';
-      }
-    }
-  });
+  var code = prompt('Paste your save code:'); if (!code) return;
+  try { var decoded=atob(code.trim()); var parsed=JSON.parse(decoded); localStorage.setItem(SAVE_KEY,JSON.stringify(parsed)); var msg=document.getElementById('settings-save-msg');if(msg){msg.textContent='✓ Imported! Use Resume to continue.';msg.style.display='block';msg.className='save-status saved';setTimeout(function(){msg.style.display='none';},3000);} }
+  catch(e) { alert('Invalid save code.'); }
 }
 
 
@@ -4576,66 +4482,11 @@ function showOfflineToast(earned, awaySecs, rate) {
 
 // ── DEV CONSOLE ───────────────────────────────────────────────────────
 var devTapCount = 0, devTapTimer = null, unlimitedBoosts = false, infiniteTimers = false, devTenMult = false, devHundredMult = false, devHoldUnlock = false, devHoldSpeed10 = false;
-var _devCode = '09021989';
-var _devCodeEntry = '';
-
 function devTap() {
   devTapCount++;
   if (devTapTimer) clearTimeout(devTapTimer);
   devTapTimer = setTimeout(function(){ devTapCount = 0; }, 1500);
-  if (devTapCount >= 5) { devTapCount = 0; _showDevKeypad(); }
-}
-
-function _showDevKeypad() {
-  if (document.getElementById('dev-keypad-overlay')) return;
-  _devCodeEntry = '';
-  var el = document.createElement('div');
-  el.id = 'dev-keypad-overlay';
-  el.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#04010c;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9000;pointer-events:all;';
-  el.innerHTML = '<div style="font-size:13px;color:#3a1060;margin-bottom:16px;letter-spacing:2px;">DEVELOPER ACCESS</div>'
-    + '<div id="dev-kp-display" style="width:180px;padding:12px;border-radius:8px;border:1px solid #2a1050;background:#0a0018;color:#c080ff;font-size:22px;text-align:center;letter-spacing:6px;margin-bottom:20px;min-height:48px;">&nbsp;</div>'
-    + '<div id="dev-kp-error" style="font-size:11px;color:#ff5050;min-height:16px;margin-bottom:12px;"></div>'
-    + '<div style="display:grid;grid-template-columns:repeat(3,64px);gap:8px;">'
-    + ['1','2','3','4','5','6','7','8','9','','0','⌫'].map(function(k) {
-        if (k === '') return '<div></div>';
-        var bg = k === '⌫' ? '#2a0a0a' : '#150828';
-        var col = k === '⌫' ? '#ff6060' : '#c0a0e0';
-        return '<div data-kp="' + k + '" style="width:64px;height:64px;border-radius:10px;background:' + bg + ';border:1px solid #2a1050;color:' + col + ';font-size:20px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;">' + k + '</div>';
-      }).join('')
-    + '</div>'
-    + '<div style="margin-top:24px;font-size:11px;color:#2a1040;cursor:pointer;touch-action:manipulation;" data-kp="CANCEL">Cancel</div>';
-
-  document.body.appendChild(el);
-
-  el.addEventListener('pointerdown', function(e) {
-    var btn = e.target.closest('[data-kp]');
-    if (!btn) return;
-    e.preventDefault();
-    var k = btn.getAttribute('data-kp');
-    if (k === 'CANCEL') { el.remove(); return; }
-    if (k === '⌫') {
-      _devCodeEntry = _devCodeEntry.slice(0, -1);
-    } else {
-      if (_devCodeEntry.length < 8) _devCodeEntry += k;
-    }
-    var disp = document.getElementById('dev-kp-display');
-    if (disp) disp.textContent = _devCodeEntry.replace(/./g, '●') || '\u00a0';
-    var err = document.getElementById('dev-kp-error');
-    // Auto-check when 8 digits entered
-    if (_devCodeEntry.length === 8) {
-      if (_devCodeEntry === _devCode) {
-        el.remove();
-        document.getElementById('devoverlay').classList.add('show');
-      } else {
-        if (err) err.textContent = 'Incorrect code';
-        setTimeout(function() {
-          _devCodeEntry = '';
-          if (disp) disp.textContent = '\u00a0';
-          if (err) err.textContent = '';
-        }, 800);
-      }
-    }
-  });
+  if (devTapCount >= 5) { devTapCount = 0; document.getElementById('devoverlay').classList.add('show'); }
 }
 function closeDev() { document.getElementById('devoverlay').classList.remove('show'); }
 function devToggleUnlimitedBoosts() {
@@ -4680,37 +4531,6 @@ function devToggleHoldSpeed10() {
 var devKOEnabled = false;
 
 var _devResetHoldTimer = null;
-var _settingsResetHoldTimer = null;
-
-function settingsResetHoldStart(btn) {
-  if (_settingsResetHoldTimer) return;
-  var orig = btn.textContent;
-  var start = Date.now();
-  var iv = setInterval(function() {
-    var elapsed = Date.now() - start;
-    var remaining = Math.ceil((3000 - elapsed) / 1000);
-    var pct = Math.min(100, elapsed / 3000 * 100).toFixed(0);
-    btn.textContent = '\u26a0\ufe0f Erasing in ' + remaining + 's\u2026';
-    btn.style.background = 'linear-gradient(to right, #550000 ' + pct + '%, #1a0000 ' + pct + '%)';
-  }, 100);
-  _settingsResetHoldTimer = setTimeout(function() {
-    clearInterval(iv);
-    _settingsResetHoldTimer = null;
-    btn.textContent = orig;
-    btn.style.background = '#1a0000';
-    _execFullReset();
-  }, 3000);
-  btn._iv = iv;
-}
-
-function settingsResetHoldEnd(btn) {
-  if (!_settingsResetHoldTimer) return;
-  clearTimeout(_settingsResetHoldTimer);
-  clearInterval(btn._iv);
-  _settingsResetHoldTimer = null;
-  btn.textContent = '\u26a0\ufe0f Hold to reset everything';
-  btn.style.background = '#1a0000';
-}
 function devFullReset() { /* onclick stub — hold handled via devResetHoldStart/End */ }
 function devResetHoldStart(btn) {
   if (_devResetHoldTimer) return;
@@ -4770,16 +4590,13 @@ function _execFullReset() {
   var ht = document.getElementById('home-title');
   if (ht) { ht.style.animation = ''; ht.style.textShadow = ''; ht.style.color = ''; }
   // Reset settings
-  settings = {motion:false,bigtap:false,story:true,lvlup:true,ads:true,fontSize:1,tapPos:'center',haptic:true,sfx:true};
+  settings = {motion:false,bigtap:false,story:true,lvlup:true,ads:true,fontSize:1,musicVol:70,tapPos:'center',haptic:true,sfx:true};
   // Close dev panel and go home
   closeDev();
   stopHold();
   clearInterval(saveInterval); clearInterval(gameLoopInterval);
-  // Remove screens-ready so CSS hides screens until name is re-chosen
-  document.body.classList.remove('screens-ready');
   showScreen('home-screen');
   refreshHomeBtns();
-  checkWizardNamePrompt();
 }
 
 // ── BOSS PLAYTEST MODE ───────────────────────────────────────────────
@@ -4946,425 +4763,19 @@ function updateHomeWizard() {
   var pct = 0;
   var msgs = ['Awakening the dark arts…','Binding familiars…','Inscribing grimoires…','Opening the void…','Ready.'];
   var iv = setInterval(function(){
-    pct = Math.min(100, pct + Math.random() * 35 + 20);
+    pct = Math.min(100, pct + Math.random() * 25 + 10);
     if (lb) lb.style.width = pct + '%';
     if (lt) lt.textContent = msgs[Math.min(msgs.length-1, Math.floor(pct/25))];
     if (pct >= 100) {
       clearInterval(iv);
       setTimeout(function(){
-        ls.style.transition = 'opacity .3s';
+        ls.style.transition = 'opacity .4s';
         ls.style.opacity = '0';
-        setTimeout(function(){
-          ls.style.display = 'none';
-          checkDevAccess(); // check Supabase for dev/playtest access
-          refreshHomeBtns(); // ensure wizard name shows immediately on home screen
-          checkWizardNamePrompt(); // first-ever boot name picker, shown before home screen
-        }, 400);
-      }, 100);
+        setTimeout(function(){ ls.style.display = 'none'; }, 400);
+      }, 200);
     }
   }, 80);
 })();
-
-// ══════════════════════════════════════════════════════════════════════
-// ── LEADERBOARD SYSTEM ───────────────────────────────────────────────
-// ══════════════════════════════════════════════════════════════════════
-
-var SUPABASE_URL = 'https://kzuefykdkhsvgjdawrbe.supabase.co';
-var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6dWVmeWtka2hzdmdqZGF3cmJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMzU0MDgsImV4cCI6MjA5NjcxMTQwOH0.ZTSrg9RGvvDS9NYaQisj8DxPupfvwAyuThZmrI5ZOlo';
-var SUPABASE_TABLE = 'Leaderboard';
-var _devAccess = false; // set true if Supabase flags this device for dev access
-
-var DARK_TITLES = [
-  'Dread Phantom','Shadow Lich','Void Wraith','Bone Tyrant','Soul Reaper',
-  'Crypt Walker','Dark Oracle','Night Blade','Doom Caller','Ash Revenant',
-  'Plague Sage','Rune Breaker','Death Knell','Hollow King','Grave Warden',
-  'Cursed Flame','Veil Stalker','Abyss Spawn','Blood Pact','Fell Watcher',
-  'Iron Specter','Storm Wraith','Ember Lich','Frost Reaper','Void Herald',
-  'Null Walker','Chaos Binder','Soul Flayer','Dark Warden','Hex Bringer'
-];
-
-// ── Device ID ────────────────────────────────────────────────────────
-function getDeviceId() {
-  var id = localStorage.getItem('da_device_id');
-  if (!id) {
-    id = 'dev_' + Math.random().toString(36).slice(2,10) + Math.random().toString(36).slice(2,10);
-    localStorage.setItem('da_device_id', id);
-  }
-  return id;
-}
-
-// ── Wizard Name ──────────────────────────────────────────────────────
-function getWizardName() { return localStorage.getItem('da_wizard_name') || null; }
-function setWizardName(n) { localStorage.setItem('da_wizard_name', n); }
-
-function genGenericName() {
-  var title = DARK_TITLES[Math.floor(Math.random() * DARK_TITLES.length)];
-  var num = Math.floor(1000 + Math.random() * 9000);
-  return title + ' #' + num;
-}
-
-// Client-side profanity pre-check (same list as server, faster feedback)
-var _badWords = ['fuck','shit','cunt','bitch','asshole','nigger','nigga','faggot','retard',
-  'cock','pussy','dick','whore','slut','bastard','twat','wanker','piss','arse','kike','spic','chink','gook'];
-function _hasProfanity(str) {
-  var lower = str.toLowerCase().replace(/[^a-z0-9]/g,'');
-  return _badWords.some(function(w){ return lower.indexOf(w) >= 0; });
-}
-
-// ── Name Picker Overlay ──────────────────────────────────────────────
-function checkWizardNamePrompt() {
-  if (getWizardName()) {
-    document.body.classList.add('screens-ready'); // name already set, reveal immediately
-    return;
-  }
-  document.body.classList.add('name-pending');
-  setTimeout(showWizardNamePicker, 100);
-}
-
-function showWizardNamePicker() {
-  if (document.getElementById('wizard-name-overlay')) return;
-
-  var _caps = true; // start uppercase
-  var _nums = false;
-
-  var ALPHA_UPPER = [
-    ['Q','W','E','R','T','Y','U','I','O','P'],
-    ['A','S','D','F','G','H','J','K','L'],
-    ['CAPS','Z','X','C','V','B','N','M','DEL'],
-    ['123','SPACE','ENTER']
-  ];
-  var ALPHA_LOWER = [
-    ['q','w','e','r','t','y','u','i','o','p'],
-    ['a','s','d','f','g','h','j','k','l'],
-    ['CAPS','z','x','c','v','b','n','m','DEL'],
-    ['123','SPACE','ENTER']
-  ];
-  var NUM_ROWS = [
-    ['1','2','3','4','5','6','7','8','9','0'],
-    ['DEL'],
-    ['ABC','SPACE','ENTER']
-  ];
-
-  function renderKb() {
-    var rows = _nums ? NUM_ROWS : (_caps ? ALPHA_UPPER : ALPHA_LOWER);
-    var html = rows.map(function(keys) {
-      return '<div style="display:flex;gap:5px;margin-bottom:5px;">' + keys.map(function(k) {
-        var label = k === 'DEL' ? '⌫'
-          : k === 'ENTER' ? '↵ Done'
-          : k === 'SPACE' ? 'SPACE'
-          : k === 'CAPS'  ? (_caps ? '⬆ ABC' : '⬆ abc')
-          : k === '123'   ? '123'
-          : k === 'ABC'   ? 'ABC'
-          : k;
-        var flex = (k === 'SPACE') ? '4' : (k === 'ENTER') ? '3' : (k === 'CAPS' || k === '123' || k === 'ABC') ? '2' : '1';
-        var bg   = (k === 'CAPS' && _caps) ? '#2a0a50' : '#150828';
-        var col  = (k === 'CAPS' || k === '123' || k === 'ABC') ? '#e0a0ff' : '#c0a0e0';
-        return '<div data-wkb="' + k + '" style="flex:' + flex + ';padding:11px 2px;border-radius:7px;background:' + bg + ';border:1px solid #2a1050;color:' + col + ';font-size:14px;font-weight:600;text-align:center;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent;">' + label + '</div>';
-      }).join('') + '</div>';
-    }).join('');
-    var kbEl = document.getElementById('wkb-keys');
-    if (kbEl) kbEl.innerHTML = html;
-  }
-
-  var el = document.createElement('div');
-  el.id = 'wizard-name-overlay';
-  el.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#04010c;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;z-index:8000;padding:28px 20px 16px;box-sizing:border-box;overflow:hidden;pointer-events:all;';
-
-  el.innerHTML = '<div style="font-size:26px;margin-bottom:6px;">&#127761;</div>'
-    + '<div style="font-size:17px;font-weight:700;color:#c080ff;margin-bottom:4px;">Choose Your Wizard Name</div>'
-    + '<div style="font-size:11px;color:#5030a0;margin-bottom:16px;text-align:center;">Appears on the global leaderboard &middot; 2&ndash;24 characters</div>'
-    + '<div id="wkb-display" style="width:100%;max-width:320px;padding:11px 14px;border-radius:8px;border:1px solid #5030a0;background:#0a0018;color:#e0c0ff;font-size:16px;text-align:center;box-sizing:border-box;margin-bottom:6px;min-height:44px;letter-spacing:0.5px;">'
-    + '<span id="wkb-text"></span><span id="wkb-cursor" style="display:inline-block;width:2px;height:16px;background:#c080ff;vertical-align:middle;margin-left:2px;animation:wkbBlink 1s step-end infinite;"></span>'
-    + '</div>'
-    + '<div id="wizard-name-error" style="font-size:11px;color:#ff5050;min-height:16px;margin-bottom:8px;text-align:center;"></div>'
-    + '<div id="wizard-name-confirm-btn" style="width:100%;max-width:320px;padding:11px;border-radius:8px;background:#3a0070;border:1px solid #7030c0;color:#e0a0ff;font-size:14px;font-weight:600;text-align:center;cursor:pointer;margin-bottom:14px;touch-action:manipulation;">Claim this name &#8594;</div>'
-    + '<div id="wkb-keys" style="width:100%;max-width:360px;"></div>'
-    + '<div id="wkb-random" style="margin-top:14px;font-size:11px;color:#4a2870;text-decoration:underline;cursor:pointer;touch-action:manipulation;">Generate a random dark fantasy name for me</div>'
-    + '<div id="wkb-import" style="margin-top:10px;font-size:11px;color:#3a2060;text-decoration:underline;cursor:pointer;touch-action:manipulation;">Already played? Import a save file →</div>';
-
-  if (!document.getElementById('wkb-style')) {
-    var s = document.createElement('style');
-    s.id = 'wkb-style';
-    s.textContent = '@keyframes wkbBlink{0%,100%{opacity:1}50%{opacity:0}}';
-    document.head.appendChild(s);
-  }
-
-  document.body.appendChild(el);
-  renderKb();
-
-  el.addEventListener('pointerdown', function(e) {
-    var btn = e.target.closest('[data-wkb]');
-    if (btn) {
-      e.preventDefault();
-      var k = btn.getAttribute('data-wkb');
-      if (k === 'CAPS') { _caps = !_caps; renderKb(); return; }
-      if (k === '123')  { _nums = true;  _caps = false; renderKb(); return; }
-      if (k === 'ABC')  { _nums = false; _caps = true;  renderKb(); return; }
-      // After typing a letter, switch to lowercase (like a real keyboard)
-      if (k !== 'DEL' && k !== 'SPACE' && k !== 'ENTER' && _caps && !_nums) {
-        _wkbTap(k);
-        _caps = false; renderKb(); return;
-      }
-      _wkbTap(k); return;
-    }
-    if (e.target.closest('#wizard-name-confirm-btn')) { e.preventDefault(); confirmWizardName(); return; }
-    if (e.target.closest('#wkb-random')) { e.preventDefault(); useGenericName(); return; }
-    if (e.target.closest('#wkb-import')) { e.preventDefault(); closeWizardNamePicker(); promptImportSave(); return; }
-  });
-}
-
-var _wkbValue = '';
-function _wkbTap(k) {
-  var err = document.getElementById('wizard-name-error');
-  if (err) err.textContent = '';
-  if (k === 'DEL') {
-    _wkbValue = _wkbValue.slice(0, -1);
-  } else if (k === 'ENTER') {
-    confirmWizardName(); return;
-  } else if (k === 'SPACE') {
-    if (_wkbValue.length < 24 && _wkbValue.slice(-1) !== ' ') _wkbValue += ' ';
-  } else {
-    if (_wkbValue.length < 24) _wkbValue += k;
-  }
-  var t = document.getElementById('wkb-text');
-  if (t) t.textContent = _wkbValue;
-}
-
-function confirmWizardName() {
-  var err = document.getElementById('wizard-name-error');
-  var name = _wkbValue.trim();
-  if (name.length < 2) { if (err) err.textContent = 'Name must be at least 2 characters.'; return; }
-  if (name.length > 24) { if (err) err.textContent = 'Name must be 24 characters or fewer.'; return; }
-  if (!/^[a-zA-Z0-9 '#\-\.]+$/.test(name)) { if (err) err.textContent = "Letters, numbers, spaces and # - . ' only."; return; }
-  if (_hasProfanity(name)) { if (err) err.textContent = 'Please choose a different name.'; return; }
-  if (err) err.textContent = '';
-  var btn = document.getElementById('wizard-name-confirm-btn');
-  if (btn) { btn.textContent = 'Checking…'; btn.style.opacity = '.6'; btn.style.pointerEvents = 'none'; }
-  var myDevice = getDeviceId();
-  fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE
-    + '?select=device_id&wizard_name=eq.' + encodeURIComponent(name) + '&limit=1', {
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(rows) {
-    if (rows && rows.length > 0 && rows[0].device_id !== myDevice) {
-      if (err) err.textContent = 'Name already taken — please choose another.';
-      if (btn) { btn.textContent = 'Claim this name →'; btn.style.opacity = '1'; btn.style.pointerEvents = ''; }
-    } else {
-      setWizardName(name);
-      _wkbValue = '';
-      setTimeout(closeWizardNamePicker, 300);
-    }
-  })
-  .catch(function() {
-    // Offline — skip check and allow
-    setWizardName(name);
-    _wkbValue = '';
-    setTimeout(closeWizardNamePicker, 300);
-  });
-}
-
-function useGenericName() {
-  var name = genGenericName();
-  // Show the generated name on screen briefly before closing
-  _wkbValue = name;
-  var t = document.getElementById('wkb-text');
-  if (t) t.textContent = name;
-  var btn = document.getElementById('wizard-name-confirm-btn');
-  if (btn) { btn.textContent = 'Using: ' + name + ' →'; btn.style.opacity = '.8'; }
-  setWizardName(name);
-  _wkbValue = '';
-  setTimeout(closeWizardNamePicker, 1400);
-}
-
-function closeWizardNamePicker() {
-  var el = document.getElementById('wizard-name-overlay');
-  if (el && el.parentNode) el.parentNode.removeChild(el);
-  document.body.classList.remove('name-pending');
-  document.body.classList.add('screens-ready');
-  refreshHomeBtns(); // show wizard name on home screen immediately
-}
-
-// ── Score Submission ─────────────────────────────────────────────────
-function checkDevAccess() {
-  var device_id = getDeviceId();
-  fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE
-    + '?select=dev_access&device_id=eq.' + encodeURIComponent(device_id) + '&limit=1', {
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(rows) {
-    if (rows && rows.length > 0 && rows[0].dev_access === true) {
-      _devAccess = true;
-      applyDevAccess();
-    }
-  })
-  .catch(function() {}); // silent fail
-}
-
-function applyDevAccess() {
-  // Show playtest button on home screen
-  var btn = document.getElementById('home-dev-btn');
-  if (btn) btn.style.display = '';
-  // Refresh shop if open
-  if (document.getElementById('shopoverlay') && document.getElementById('shopoverlay').classList.contains('show')) {
-    buildShop();
-  }
-}
-
-function openDevPanel() {
-  document.getElementById('devoverlay').classList.add('show');
-}
-
-function hasAdsFree() {
-  return _devAccess || (gameState && gameState.removeAds);
-}
-
-function _sbH() {
-  return {
-    'apikey': SUPABASE_KEY,
-    'Authorization': 'Bearer ' + SUPABASE_KEY,
-    'Content-Type': 'application/json'
-  };
-}
-
-function submitLeaderboardScore(silent) {
-  if (!getWizardName()) return;
-  var name = getWizardName();
-  var prestige = (gameState && gameState.prestigeCount) || 0;
-  var best_time_ms = (gameState && gameState.stats && gameState.stats.bestTime100) || 0;
-  var device_id = getDeviceId();
-  var timeFmt = best_time_ms > 0
-    ? Math.floor(best_time_ms/60000) + 'm ' + Math.floor((best_time_ms%60000)/1000) + 's'
-    : null;
-  fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE, {
-    method: 'POST',
-    headers: Object.assign(_sbH(), {'Prefer': 'resolution=merge-duplicates,return=minimal'}),
-    body: JSON.stringify({
-      device_id: device_id,
-      wizard_name: name,
-      prestige: prestige,
-      best_time_ms: best_time_ms,
-      best_time_fmt: timeFmt,
-      level: (gameState && gameState.level) || 1,
-      updated_at: new Date().toISOString()
-    })
-  })
-  .then(function(r) {
-    console.log('[LB] submit status:', r.status);
-  })
-  .catch(function(e) { console.log('[LB] submit error:', e); });
-}
-
-
-function openLeaderboard() {
-  var existing = document.getElementById('leaderboard-overlay');
-  if (existing) { existing.style.display = 'flex'; fetchLeaderboard(); return; }
-
-  var el = document.createElement('div');
-  el.id = 'leaderboard-overlay';
-  el.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#04010c;display:flex;flex-direction:column;align-items:center;z-index:7000;padding:0;box-sizing:border-box;overflow:hidden;pointer-events:all;';
-
-  el.innerHTML = [
-    // Header
-    '<div style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 4% 12px;border-bottom:1px solid #1a0a2a;flex-shrink:0;">',
-      '<div style="font-size:18px;font-weight:700;color:#c080ff;">🏆 Leaderboard</div>',
-      '<div id="lb-close-btn" style="font-size:14px;color:#a060e0;cursor:pointer;padding:8px 16px;border:1px solid #4a1080;border-radius:8px;touch-action:manipulation;font-weight:600;">✕ Close</div>',
-    '</div>',
-    // My name bar
-    '<div id="lb-my-name" style="width:100%;padding:10px 4%;font-size:13px;color:#6040a0;flex-shrink:0;border-bottom:1px solid #0e0520;box-sizing:border-box;"></div>',
-    // Column headers
-    '<div style="width:100%;display:grid;grid-template-columns:10% 1fr 12% 12% 18%;padding:8px 4%;border-bottom:1px solid #1a0a2a;flex-shrink:0;">',
-      '<div style="font-size:11px;color:#4a2070;font-weight:700;letter-spacing:0.5px;">#</div>',
-      '<div style="font-size:11px;color:#4a2070;font-weight:700;letter-spacing:0.5px;">WIZARD</div>',
-      '<div style="font-size:11px;color:#4a2070;font-weight:700;text-align:center;letter-spacing:0.5px;">LVL</div>',
-      '<div style="font-size:11px;color:#4a2070;font-weight:700;text-align:center;letter-spacing:0.5px;">ASC</div>',
-      '<div style="font-size:11px;color:#4a2070;font-weight:700;text-align:right;letter-spacing:0.5px;">BEST RUN</div>',
-    '</div>',
-    // List
-    '<div id="lb-list" style="width:100%;flex:1;overflow-y:auto;"></div>',
-    // Status
-    '<div id="lb-status" style="padding:40px;color:#4a2070;font-size:14px;text-align:center;flex-shrink:0;"></div>',
-  ].join('');
-
-  document.body.appendChild(el);
-
-  el.addEventListener('pointerdown', function(e) {
-    if (e.target.closest('#lb-close-btn')) { e.preventDefault(); closeLeaderboard(); }
-  });
-
-  var myName = getWizardName();
-  var nameEl = document.getElementById('lb-my-name');
-  if (nameEl) nameEl.textContent = myName ? ('Playing as: ' + myName) : 'No wizard name set yet.';
-
-  fetchLeaderboard();
-}
-
-function closeLeaderboard() {
-  var el = document.getElementById('leaderboard-overlay');
-  if (el && el.parentNode) el.parentNode.removeChild(el);
-}
-
-function fetchLeaderboard() {
-  var list = document.getElementById('lb-list');
-  var status = document.getElementById('lb-status');
-  if (!list) return;
-  if (status) { status.textContent = 'Loading...'; status.style.display = 'block'; }
-  list.innerHTML = '';
-
-  fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE
-    + '?select=device_id,wizard_name,prestige,best_time_ms,best_time_fmt,level'
-    + '&limit=50', {
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-  })
-  .then(function(r) {
-    if (!r.ok) return r.text().then(function(t) { throw new Error('HTTP ' + r.status + ': ' + t); });
-    return r.json();
-  })
-  .then(function(rows) {
-    console.log('[LB] fetch got', rows.length, 'rows');
-    if (status) status.style.display = 'none';
-    if (!rows || rows.length === 0) {
-      list.innerHTML = '<div style="padding:40px;text-align:center;color:#3a1060;font-size:13px;">No entries yet -- be the first!</div>';
-      return;
-    }
-    var myDevice = getDeviceId();
-    rows.sort(function(a, b) {
-      if (b.prestige !== a.prestige) return b.prestige - a.prestige;
-      if ((b.level || 0) !== (a.level || 0)) return (b.level || 0) - (a.level || 0);
-      if (!a.best_time_ms) return 1;
-      if (!b.best_time_ms) return -1;
-      return a.best_time_ms - b.best_time_ms;
-    });
-    var html = '';
-    rows.forEach(function(e, i) {
-      var rank = i + 1;
-      var isMe = e.device_id === myDevice;
-      var rankColor = rank === 1 ? '#ffd700' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : '#6040a0';
-      var rankSize = rank <= 3 ? '16px' : '14px';
-      var rowBg = isMe ? 'background:rgba(120,60,200,0.18);border-left:3px solid #8040d0;' : 'border-left:3px solid transparent;';
-      var lvl = e.level || 1;
-      var lvlColor = lvl >= 100 ? '#ffd700' : lvl >= 50 ? '#c080ff' : '#8060c0';
-      var bc = e.prestige > 0 ? (BADGE_COLORS[Math.min(e.prestige, BADGE_COLORS.length)-1] || BADGE_COLORS[0]) : null;
-      var ascended = e.prestige > 0
-        ? '<span style="background:rgba(80,20,120,0.3);border-radius:12px;padding:2px 8px;font-size:12px;color:' + bc.color + ';font-weight:700;border:1px solid ' + bc.border + ';text-shadow:0 0 6px ' + bc.border + ';">' + e.prestige + 'x</span>'
-        : '<span style="color:#3a1060;font-size:12px;">—</span>';
-      html += '<div style="display:grid;grid-template-columns:10% 1fr 12% 12% 18%;padding:13px 4%;' + rowBg + 'border-bottom:1px solid #0e0520;align-items:center;">'
-        + '<div style="font-size:' + rankSize + ';font-weight:700;color:' + rankColor + ';">' + rank + '</div>'
-        + '<div style="font-size:14px;color:' + (isMe ? '#e8b0ff' : '#c080ff') + ';font-weight:' + (isMe ? '700' : '500') + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + e.wizard_name + '</div>'
-        + '<div style="text-align:center;font-size:13px;font-weight:700;color:' + lvlColor + ';">' + lvl + '</div>'
-        + '<div style="text-align:center;">' + ascended + '</div>'
-        + '<div style="text-align:right;font-size:11px;color:#6040a0;">' + (e.best_time_fmt || '<span style="color:#2a1050;">—</span>') + '</div>'
-        + '</div>';
-    });
-    list.innerHTML = html;
-  })
-  .catch(function(e) {
-    console.log('[LB] fetch error:', e);
-    if (status) { status.textContent = 'Error: ' + e.message; status.style.display = 'block'; status.style.color = '#ff5050'; status.style.fontSize = '10px'; }
-  });
-}
-
 
 </script>
 </body>
