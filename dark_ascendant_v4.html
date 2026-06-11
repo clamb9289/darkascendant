@@ -4969,10 +4969,29 @@ function confirmWizardName() {
   if (_hasProfanity(name)) { if (err) err.textContent = 'Please choose a different name.'; return; }
   if (err) err.textContent = '';
   var btn = document.getElementById('wizard-name-confirm-btn');
-  if (btn) { btn.textContent = 'Claiming…'; btn.style.opacity = '.6'; btn.style.pointerEvents = 'none'; }
-  setWizardName(name);
-  _wkbValue = '';
-  setTimeout(closeWizardNamePicker, 300);
+  if (btn) { btn.textContent = 'Checking…'; btn.style.opacity = '.6'; btn.style.pointerEvents = 'none'; }
+  var myDevice = getDeviceId();
+  fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE
+    + '?select=device_id&wizard_name=eq.' + encodeURIComponent(name) + '&limit=1', {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(rows) {
+    if (rows && rows.length > 0 && rows[0].device_id !== myDevice) {
+      if (err) err.textContent = 'Name already taken — please choose another.';
+      if (btn) { btn.textContent = 'Claim this name →'; btn.style.opacity = '1'; btn.style.pointerEvents = ''; }
+    } else {
+      setWizardName(name);
+      _wkbValue = '';
+      setTimeout(closeWizardNamePicker, 300);
+    }
+  })
+  .catch(function() {
+    // Offline — skip check and allow
+    setWizardName(name);
+    _wkbValue = '';
+    setTimeout(closeWizardNamePicker, 300);
+  });
 }
 
 function useGenericName() {
