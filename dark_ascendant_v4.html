@@ -4718,6 +4718,7 @@ function updateHomeWizard() {
         ls.style.opacity = '0';
         setTimeout(function(){
           ls.style.display = 'none';
+          refreshHomeBtns(); // ensure wizard name shows immediately on home screen
           checkWizardNamePrompt(); // first-ever boot name picker, shown before home screen
         }, 400);
       }, 200);
@@ -4920,6 +4921,7 @@ function closeWizardNamePicker() {
   if (el && el.parentNode) el.parentNode.removeChild(el);
   document.body.classList.remove('name-pending');
   document.body.classList.add('screens-ready');
+  refreshHomeBtns(); // show wizard name on home screen immediately
 }
 
 // ── Score Submission ─────────────────────────────────────────────────
