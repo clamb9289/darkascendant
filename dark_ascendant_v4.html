@@ -575,6 +575,7 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
     <div id="home-wizard-name" style="font-size:16px;color:#8050c0;margin-top:8px;letter-spacing:0.5px;font-weight:600;min-height:20px;"></div>
   </div>
   <div id="home-buttons">
+    <div style="display:flex;justify-content:flex-end;padding:0 2px 6px;"><div id="home-gem-count" style="font-size:13px;color:#a060e0;font-weight:600;display:none;">💎 <span id="home-gem-val">0</span></div></div>
     <div id="save-status-bar" class="save-status" style="display:none;"></div>
     <div class="home-btn" onclick="handleStartGame()"><div class="home-btn-icon">✨</div><div style="flex:1"><div class="home-btn-title">New game</div><div class="home-btn-sub">Begin your dark ascent from level 1</div></div><div class="home-btn-arrow">→</div></div>
     <div class="home-btn" id="ascend-home-btn" onclick="handleHomeAscend()" style="display:none;border-color:#9a6a00;"><div class="home-btn-icon" style="color:#ffcc44;">🌀</div><div style="flex:1"><div class="home-btn-title" style="color:#ffcc44;">Ascend</div><div class="home-btn-sub">Choose your prestige form</div></div><div class="home-btn-arrow" style="color:#ffcc44;">→</div></div>
@@ -1457,6 +1458,16 @@ function refreshHomeBtns() {
   if (wnEl) {
     var wn = getWizardName();
     wnEl.textContent = wn ? ('🌑 ' + wn) : '';
+  }
+  // Show gem count
+  var gemEl = document.getElementById('home-gem-count');
+  var gemVal = document.getElementById('home-gem-val');
+  var gemSave = save || loadGame();
+  if (gemEl && gemVal && gemSave && (gemSave.gems || 0) > 0) {
+    gemVal.textContent = gemSave.gems;
+    gemEl.style.display = 'block';
+  } else if (gemEl) {
+    gemEl.style.display = 'none';
   }
   // Fire title effect if player has ascended at least once
   var homeTitle = document.getElementById('home-title');
