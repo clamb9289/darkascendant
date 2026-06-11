@@ -4918,18 +4918,19 @@ function openLeaderboard() {
 
   el.innerHTML = [
     // Header
-    '<div style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid #1a0a2a;flex-shrink:0;">',
+    '<div style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 4% 12px;border-bottom:1px solid #1a0a2a;flex-shrink:0;">',
       '<div style="font-size:18px;font-weight:700;color:#c080ff;">🏆 Leaderboard</div>',
       '<div id="lb-close-btn" style="font-size:14px;color:#a060e0;cursor:pointer;padding:8px 16px;border:1px solid #4a1080;border-radius:8px;touch-action:manipulation;font-weight:600;">✕ Close</div>',
     '</div>',
     // My name bar
-    '<div id="lb-my-name" style="width:100%;padding:10px 18px;font-size:13px;color:#6040a0;flex-shrink:0;border-bottom:1px solid #0e0520;"></div>',
+    '<div id="lb-my-name" style="width:100%;padding:10px 4%;font-size:13px;color:#6040a0;flex-shrink:0;border-bottom:1px solid #0e0520;box-sizing:border-box;"></div>',
     // Column headers
-    '<div style="width:100%;display:grid;grid-template-columns:44px 1fr 72px 80px;padding:8px 18px;border-bottom:1px solid #1a0a2a;flex-shrink:0;">',
+    '<div style="width:100%;display:grid;grid-template-columns:10% 1fr 12% 12% 18%;padding:8px 4%;border-bottom:1px solid #1a0a2a;flex-shrink:0;">',
       '<div style="font-size:11px;color:#4a2070;font-weight:700;letter-spacing:0.5px;">#</div>',
       '<div style="font-size:11px;color:#4a2070;font-weight:700;letter-spacing:0.5px;">WIZARD</div>',
-      '<div style="font-size:11px;color:#4a2070;font-weight:700;text-align:center;letter-spacing:0.5px;">LEVEL</div>',
-      '<div style="font-size:11px;color:#4a2070;font-weight:700;text-align:right;letter-spacing:0.5px;">ASCENDED</div>',
+      '<div style="font-size:11px;color:#4a2070;font-weight:700;text-align:center;letter-spacing:0.5px;">LVL</div>',
+      '<div style="font-size:11px;color:#4a2070;font-weight:700;text-align:center;letter-spacing:0.5px;">ASC</div>',
+      '<div style="font-size:11px;color:#4a2070;font-weight:700;text-align:right;letter-spacing:0.5px;">BEST RUN</div>',
     '</div>',
     // List
     '<div id="lb-list" style="width:100%;flex:1;overflow-y:auto;"></div>',
@@ -4998,14 +4999,12 @@ function fetchLeaderboard() {
       var ascended = e.prestige > 0
         ? '<span style="background:#2a1040;border-radius:12px;padding:2px 8px;font-size:12px;color:#c080ff;font-weight:600;">' + e.prestige + 'x</span>'
         : '<span style="color:#3a1060;font-size:12px;">—</span>';
-      html += '<div style="display:grid;grid-template-columns:44px 1fr 72px 80px;padding:12px 18px;' + rowBg + 'border-bottom:1px solid #0e0520;align-items:center;">'
+      html += '<div style="display:grid;grid-template-columns:10% 1fr 12% 12% 18%;padding:13px 4%;' + rowBg + 'border-bottom:1px solid #0e0520;align-items:center;">'
         + '<div style="font-size:' + rankSize + ';font-weight:700;color:' + rankColor + ';">' + rank + '</div>'
-        + '<div style="min-width:0;">'
-        +   '<div style="font-size:14px;color:' + (isMe ? '#e8b0ff' : '#c080ff') + ';font-weight:' + (isMe ? '700' : '500') + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + e.wizard_name + '</div>'
-        +   (e.best_time_fmt ? '<div style="font-size:11px;color:#4a2070;margin-top:2px;">Best: ' + e.best_time_fmt + '</div>' : '')
-        + '</div>'
-        + '<div style="text-align:center;font-size:14px;font-weight:700;color:' + lvlColor + ';">Lv' + lvl + '</div>'
-        + '<div style="text-align:right;">' + ascended + '</div>'
+        + '<div style="font-size:14px;color:' + (isMe ? '#e8b0ff' : '#c080ff') + ';font-weight:' + (isMe ? '700' : '500') + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + e.wizard_name + '</div>'
+        + '<div style="text-align:center;font-size:13px;font-weight:700;color:' + lvlColor + ';">' + lvl + '</div>'
+        + '<div style="text-align:center;">' + ascended + '</div>'
+        + '<div style="text-align:right;font-size:11px;color:#6040a0;">' + (e.best_time_fmt || '<span style="color:#2a1050;">—</span>') + '</div>'
         + '</div>';
     });
     list.innerHTML = html;
