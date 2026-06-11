@@ -2961,21 +2961,43 @@ function openHoldAd() {
   startHoldAd();
 }
 function startHoldAd() {
+  var titleEl = document.querySelector('#adoverlay .otitle');
+  var bodyEl = document.querySelector('#adoverlay .obody');
   document.getElementById('ad-closebtn').style.display = 'none';
   document.getElementById('adprogfill').style.width = '0%';
   document.getElementById('adoverlay').classList.add('show');
-  var pct = 0;
-  var iv = setInterval(function(){
-    pct += 100/50;
-    document.getElementById('adprogfill').style.width = Math.min(100,pct) + '%';
-    if (pct >= 100) {
-      clearInterval(iv);
-      var btn = document.getElementById('ad-closebtn');
-      btn.textContent = 'Activate Hold to Tap →';
-      btn.style.display = 'block';
-      btn.onclick = closeHoldAd;
-    }
-  }, 100);
+
+  if (hasAdsFree()) {
+    if (titleEl) titleEl.textContent = '🌑 Thanks for playtesting!';
+    if (bodyEl) bodyEl.textContent = "If this game ever actually launches — thanks for paying to remove ads! It's much appreciated by your humble developer!";
+    var pct = 0;
+    var iv = setInterval(function(){
+      pct += 5;
+      document.getElementById('adprogfill').style.width = Math.min(100, pct) + '%';
+      if (pct >= 100) {
+        clearInterval(iv);
+        if (titleEl) titleEl.textContent = 'Watching ad...';
+        if (bodyEl) bodyEl.textContent = 'A merchant of dark arts has a message for you.';
+        var btn = document.getElementById('ad-closebtn');
+        btn.textContent = 'Activate Hold to Tap →';
+        btn.style.display = 'block';
+        btn.onclick = closeHoldAd;
+      }
+    }, 100);
+  } else {
+    var pct = 0;
+    var iv = setInterval(function(){
+      pct += 100/50;
+      document.getElementById('adprogfill').style.width = Math.min(100,pct) + '%';
+      if (pct >= 100) {
+        clearInterval(iv);
+        var btn = document.getElementById('ad-closebtn');
+        btn.textContent = 'Activate Hold to Tap →';
+        btn.style.display = 'block';
+        btn.onclick = closeHoldAd;
+      }
+    }, 100);
+  }
 }
 function closeHoldAd() {
   document.getElementById('adoverlay').classList.remove('show');
@@ -3089,7 +3111,7 @@ function startAd(fromLvlUp) {
     if (bodyEl) bodyEl.textContent = "If this game ever actually launches — thanks for paying to remove ads! It's much appreciated by your humble developer!";
     var pct = 0;
     var iv = setInterval(function(){
-      pct += 10;
+      pct += 5;
       document.getElementById('adprogfill').style.width = Math.min(100, pct) + '%';
       if (pct >= 100) {
         clearInterval(iv);
@@ -3162,15 +3184,29 @@ function watchBossAd() {
   ['btn-attack','btn-spell','btn-drain','btn-ritual','btn-boss-ad'].forEach(function(id){
     var el = document.getElementById(id); if (el) { el.style.opacity = '.4'; el.style.pointerEvents = 'none'; }
   });
-  // Show ad overlay reusing existing ad system
+  // Show ad overlay — short version for dev/remove-ads players
+  var titleEl = document.querySelector('#adoverlay .otitle');
+  var bodyEl = document.querySelector('#adoverlay .obody');
   document.getElementById('ad-closebtn').style.display = 'none';
   document.getElementById('adprogfill').style.width = '0%';
   document.getElementById('adoverlay').classList.add('show');
+
+  if (hasAdsFree()) {
+    if (titleEl) titleEl.textContent = '🌑 Thanks for playtesting!';
+    if (bodyEl) bodyEl.textContent = "If this game ever actually launches — thanks for paying to remove ads! It's much appreciated by your humble developer!";
+  }
+
+  var adSpeed = hasAdsFree() ? 10 : 100/50;
   var pct = 0;
   var iv = setInterval(function(){
-    pct += 100/50;
+    pct += adSpeed;
     document.getElementById('adprogfill').style.width = Math.min(100,pct) + '%';
-    if (pct >= 100) { clearInterval(iv); document.getElementById('ad-closebtn').style.display = 'block'; }
+    if (pct >= 100) {
+      clearInterval(iv);
+      if (titleEl) titleEl.textContent = 'Watching ad...';
+      if (bodyEl) bodyEl.textContent = 'A merchant of dark arts has a message for you.';
+      document.getElementById('ad-closebtn').style.display = 'block';
+    }
   }, 100);
   // Override close button for boss context
   document.getElementById('ad-closebtn').onclick = function(){
