@@ -4096,7 +4096,11 @@ function exportSave() {
   var raw = localStorage.getItem(SAVE_KEY);
   if (!raw) { alert('No save data to export.'); return; }
   try {
-    var compressed = compressSave(raw);
+    // Embed wizard name and device ID so they transfer to new device
+    var saveObj = JSON.parse(raw);
+    saveObj._wizardName = getWizardName();
+    saveObj._deviceId = getDeviceId();
+    var compressed = compressSave(JSON.stringify(saveObj));
     var code = btoa(compressed);
     navigator.clipboard.writeText(code).then(function() {
       var msg = document.getElementById('settings-save-msg');
@@ -4145,10 +4149,15 @@ function promptImportSave() {
         var decoded = atob(code);
         var decompressed = decompressSave(decoded);
         var parsed = JSON.parse(decompressed);
+        // Restore wizard name and device ID if embedded in save
+        if (parsed._wizardName) { localStorage.setItem('da_wizard_name', parsed._wizardName); }
+        if (parsed._deviceId)   { localStorage.setItem('da_device_id',   parsed._deviceId);   }
+        delete parsed._wizardName;
+        delete parsed._deviceId;
         // Fully wipe and replace save
         localStorage.setItem(SAVE_KEY, JSON.stringify(parsed));
         el.remove();
-        // Reload the game state completely
+        // Reload game state completely
         gameState = parsed;
         recalc();
         saveGame();
