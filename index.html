@@ -152,6 +152,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:
 .fn{position:absolute;font-size:var(--fs-xl);font-weight:700;color:var(--t-acc2);animation:fu 3.6s ease-out forwards;pointer-events:none;z-index:201;}
 .fn-dmg{color:#ff5555;}.fn-gem{color:#cc88ff;}
 @keyframes fu{0%{opacity:1;transform:translateY(0) scale(1);}40%{opacity:1;transform:translateY(-300px) scale(.7);}70%{opacity:.5;transform:translateY(-580px) scale(.35);}100%{opacity:0;transform:translateY(-850px) scale(0)}}
+@keyframes toastfu{0%{opacity:0;transform:translateY(8px) scale(.92);}15%{opacity:1;transform:translateY(0) scale(1);}75%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-10px) scale(.96);}}
 .overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(4,1,12,.97);z-index:90;flex-direction:column;align-items:center;justify-content:center;padding:16px;overflow-y:auto;}
 .overlay.show{display:flex;animation:fadeInOverlay .3s ease-out;}
 @keyframes fadeInOverlay{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}}
@@ -407,7 +408,7 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
       <div class="setting-row" style="background:#1a0800;border-color:#ff6600;">
         <div class="setting-label">
           <div class="setting-name" style="color:#ffcc44;">Gem boosts cost 1</div>
-          <div class="setting-desc">Tap power/passive/all-gains boosts cost 💎1 (real IAP unaffected)</div>
+          <div class="setting-desc" id="dev-gemboost-desc">Tap power/passive/all-gains boosts cost 💎1 (real IAP unaffected)</div>
         </div>
         <div class="toggle" id="toggle-dev-gemboosts1" onclick="devToggleGemBoostsOneCost()"><div class="toggle-knob"></div></div>
       </div>
@@ -1070,7 +1071,7 @@ function checkPendingGemGrant() {
     var amount = (rows && rows.length > 0) ? (rows[0].pending_gems || 0) : 0;
     if (amount > 0) {
       _grantGems(amount);
-      showBoostExtendedToast('\uD83C\uDF81 +' + amount + ' \uD83D\uDC8E Gift from the developer!');
+      showBoostExtendedToast('\uD83C\uDF81 +' + amount + ' ' + gemHtml() + ' Gift from the developer!');
       // Claim it: reset to 0 so it isn't granted again
       fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE
         + '?device_id=eq.' + encodeURIComponent(device_id), {
@@ -1325,6 +1326,15 @@ function upgIconHtml(u) {
 function gemHtml() {
   if (SPRITES['icon_gem']) return '<img src="' + SPRITES['icon_gem'] + '" style="width:14px;height:14px;display:inline-block;vertical-align:middle;image-rendering:pixelated;margin-right:2px;" draggable="false">';
   return '💎';
+}
+// Replaces any remaining static 💎 emoji (in shop title, revive button,
+// home gem count, dev console description, etc.) with the custom sprite.
+function applyGemSprites() {
+  if (!SPRITES['icon_gem']) return; // no sprite available — leave emoji as fallback
+  ['shop-title','btn-revive','home-gem-count','dev-gemboost-desc','gemcount','mon-gem-icon'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el && el.innerHTML.indexOf('💎') >= 0) el.innerHTML = el.innerHTML.replace(/💎/g, gemHtml());
+  });
 }
 
 // ── DATA ──────────────────────────────────────────────────────────────
@@ -2404,7 +2414,7 @@ function spawnFloat(txt, x, y, cls) {
   }
   var el = document.createElement('div');
   el.className = cls || 'fn';
-  el.textContent = txt;
+  el.innerHTML = txt;
   el.style.cssText = 'position:absolute;left:' + (x-16) + 'px;top:' + y + 'px;';
   fc.appendChild(el);
   setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 3600);
@@ -2624,12 +2634,12 @@ function addLog(type, msg) {
     if (!log) return;
     var d = document.createElement('div');
     d.style.cssText = 'color:#cc88ff;font-style:italic;padding:2px 0;border-left:2px solid #8040c0;padding-left:6px;margin:2px 0;';
-    d.textContent = msg;
+    d.innerHTML = msg;
     log.appendChild(d); log.scrollTop = log.scrollHeight;
     return;
   }
   var log = document.getElementById('combat-log');
-  var d = document.createElement('div'); d.className = 'log-entry log-' + type; d.textContent = msg;
+  var d = document.createElement('div'); d.className = 'log-entry log-' + type; d.innerHTML = msg;
   log.appendChild(d); log.scrollTop = log.scrollHeight;
 }
 function setCooldown(btnId, secs, origText) {
@@ -2922,7 +2932,7 @@ function gemRevive() {
   if (!gameState || gameState.gems < 10) return;
   gameState.gems -= 10;
   playerHP = playerMaxHP;
-  spawnGemFloat('-10 💎', document.getElementById('btn-revive'));
+  spawnGemFloat('-10 ' + gemHtml(), document.getElementById('btn-revive'));
   // Hide defeat panel
   var result = document.getElementById('boss-result');
   if (result) { result.style.display = 'none'; result.className = ''; }
@@ -2935,7 +2945,7 @@ function gemRevive() {
   if (ko && devKOEnabled) ko.style.display = '';
   combatLocked = false; bossDefeated = false;
   clearAllCooldowns();
-  addLog('system', '💎 Revived! Full HP restored.');
+  addLog('system', gemHtml() + ' Revived! Full HP restored.');
   updateBossUI(); updateGameUI();
 }
 
@@ -2947,7 +2957,7 @@ function showBossGemFanfare(gems) {
     + 'border:2px solid #ffaa00;border-radius:18px;z-index:500;'
     + 'padding:28px 40px;text-align:center;pointer-events:none;'
     + 'animation:gemFanfare 3.2s ease-out forwards;box-shadow:0 0 40px rgba(255,170,0,0.4);';
-  el.innerHTML = '<div style="font-size:38px;margin-bottom:8px;">💎</div>'
+  el.innerHTML = '<div style="font-size:38px;margin-bottom:8px;">' + gemHtml() + '</div>'
     + '<div style="font-size:28px;font-weight:700;color:#ffcc44;letter-spacing:1px;">+' + gems + ' Soul Gems</div>'
     + '<div style="font-size:13px;color:#aa8800;margin-top:6px;">Boss reward</div>';
   fc.appendChild(el);
@@ -2979,7 +2989,7 @@ function showBossVictory() {
   ov.innerHTML = '<div style="font-size:38px;margin-bottom:12px;">⚔️</div>'
     + '<div style="font-size:22px;font-weight:700;color:#6adc40;margin-bottom:18px;letter-spacing:0.5px;">Victory!</div>'
     + '<div style="font-size:14px;color:#88aa88;line-height:1.75;white-space:pre-line;max-width:340px;margin-bottom:28px;">' + bossData.victory + '</div>'
-    + '<div style="font-size:13px;color:#ffdd44;margin-bottom:28px;">+' + _pendingGems + ' 💎 soul gems</div>'
+    + '<div style="font-size:13px;color:#ffdd44;margin-bottom:28px;">+' + _pendingGems + ' ' + gemHtml() + ' soul gems</div>'
     + '<div id="boss-victory-btn" style="font-size:15px;font-weight:600;color:#6adc40;border:2px solid #6adc40;'
     + 'border-radius:12px;padding:14px 36px;cursor:pointer;letter-spacing:0.3px;">Claim reward →</div>'
     + '<div style="font-size:11px;color:#446644;margin-top:16px;">Tap anywhere to continue</div>';
@@ -3479,7 +3489,7 @@ function openHoldAd() {
   if (holdUnlocked) return; // already active
   if (gameState && gameState.holdForever) { startHoldAd(); return; } // gem purchase bypasses gate
   if (!gameState || gameState.level < 10) {
-    showHoldLockedToast('Hold to Tap unlocks at Level 10 — or purchase for 💎 200 gems');
+    showHoldLockedToast('Hold to Tap unlocks at Level 10 — or purchase for ' + gemHtml() + ' 200 gems');
     return;
   }
   // Mark as used — removes the new-unlock pulse
@@ -4153,7 +4163,7 @@ function buyHoldForever() {
   var hb = document.getElementById('hold-btn');
   if (hb) hb.classList.remove('hold-new');
   var btn = document.getElementById('sbtn-holdforever');
-  spawnGemFloat('-200 💎', btn);
+  spawnGemFloat('-200 ' + gemHtml(), btn);
   activateHoldUnlock(999999);
   saveGame(); updateGameUI(); buildShop();
 }
@@ -4163,7 +4173,7 @@ function buyOfflineBoost() {
   gameState.gems -= 50;
   gameState.offlineBoostUntil = Date.now() + 8 * 3600 * 1000; // 8 hours
   var btn = document.getElementById('sbtn-offlineboost');
-  spawnGemFloat('-50 💎', btn);
+  spawnGemFloat('-50 ' + gemHtml(), btn);
   saveGame(); updateGameUI(); buildShop();
 }
 // ── Shared grant functions (called by all payment platform configs) ──
@@ -4176,7 +4186,7 @@ function _grantGems(n) {
     var r = btn ? btn.getBoundingClientRect() : {left:window.innerWidth/2-30,top:window.innerHeight/2,width:60,height:0};
     var el = document.createElement('div');
     el.className = 'fn fn-gem';
-    el.textContent = '+' + n + ' 💎';
+    el.innerHTML = '+' + n + ' ' + gemHtml();
     el.style.cssText = 'position:absolute;left:' + (r.left + r.width/2 - 16) + 'px;top:' + (r.top - 4) + 'px;font-size:20px;';
     fc.appendChild(el);
     setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 3600);
@@ -4198,7 +4208,7 @@ function devBuyGems(n) {
   if (!gameState || gameState.gems < 1) return;
   gameState.gems += n - 1;
   saveGame(); updateGameUI(); buildShop();
-  showBoostExtendedToast('+' + n + ' 💎 (dev price)');
+  showBoostExtendedToast('+' + n + ' ' + gemHtml() + ' (dev price)');
 }
 function buyGems(n) {
   if (!gameState) return;
@@ -4212,7 +4222,7 @@ function spendGems(id) {
   if (!canAddBoost()) { alert('Purchased boost slots full (3/3). Watch an ad to add more!'); return; }
   gameState.gems -= cost;
   var btn = document.getElementById('sbtn-' + id);
-  spawnGemFloat('-' + cost + ' 💎', btn);
+  spawnGemFloat('-' + cost + ' ' + gemHtml(), btn);
   applyBoost(b.type, b.mult, b.dur, b.name);
   updateGameUI(); buildShop();
 }
@@ -4615,7 +4625,7 @@ function _runAchievementQueue() {
     + 'animation:achieveInTopLeft 0.35s ease-out forwards;';
   el.innerHTML = '<div style="font-size:11px;color:#aa8800;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Achievement Unlocked</div>'
     + '<div style="font-size:17px;font-weight:700;color:#ffdd44;margin-bottom:8px;">🏆 ' + item.name + '</div>'
-    + '<div style="font-size:14px;color:#ffaa44;">+' + item.gems + ' 💎</div>';
+    + '<div style="font-size:14px;color:#ffaa44;">+' + item.gems + ' ' + gemHtml() + '</div>';
   document.body.appendChild(el);
   haptic([10,20,10]);
   _flashGemCount(item.gems);
@@ -4658,7 +4668,7 @@ function _flashGemCount(gems) {
         + 'font-size:12px;font-weight:700;padding:3px 8px;border-radius:8px;'
         + 'z-index:500;pointer-events:none;'
         + 'animation:achieveIn 0.3s ease-out forwards;';
-      t.textContent = '+' + gems + ' 💎';
+      t.innerHTML = '+' + gems + ' ' + gemHtml();
       fc.appendChild(t);
       setTimeout(function(){
         t.style.transition = 'opacity 0.4s';
@@ -4855,7 +4865,7 @@ function showMilestoneOverlay(m) {
   el.innerHTML = '<div style="font-size:13px;color:var(--t-txt3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Milestone Reached</div>'
     + '<div style="font-size:22px;font-weight:700;color:var(--t-acc2);margin-bottom:4px;">Level ' + m.level + '</div>'
     + '<div style="font-size:14px;color:var(--t-txt2);margin-bottom:14px;">' + m.label + '</div>'
-    + '<div style="font-size:36px;font-weight:700;color:#ffcc44;">+' + m.gems + ' 💎</div>'
+    + '<div style="font-size:36px;font-weight:700;color:#ffcc44;">+' + m.gems + ' ' + gemHtml() + '</div>'
     + '<div style="font-size:12px;color:var(--t-txt3);margin-top:10px;">Tap to continue</div>';
   el.onclick = function(){ if (el.parentNode) el.parentNode.removeChild(el); haptic(20); eventDone(); };
   fc.appendChild(el);
@@ -4907,7 +4917,7 @@ function showDailyLoginOverlay(gems, streak, callback) {
   el.innerHTML = '<div style="font-size:13px;color:#aa8800;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Daily Reward</div>'
     + '<div style="margin-bottom:12px;">' + stars + '</div>'
     + '<div style="font-size:13px;color:var(--t-txt2);margin-bottom:10px;">Day ' + streak + ' streak</div>'
-    + '<div style="font-size:38px;font-weight:700;color:#ffcc44;">+' + gems + ' 💎</div>'
+    + '<div style="font-size:38px;font-weight:700;color:#ffcc44;">+' + gems + ' ' + gemHtml() + '</div>'
     + '<div style="font-size:12px;color:var(--t-txt3);margin-top:10px;">Tap to claim</div>';
   el.onclick = function(){ if (el.parentNode) el.parentNode.removeChild(el); haptic(20); if (callback) callback(); };
   fc.appendChild(el);
@@ -5030,8 +5040,8 @@ function showHoldLockedToast(msg) {
     + 'background:var(--t-bg2);border:1px solid #888;color:#aaa;'
     + 'font-size:var(--fs-md);font-weight:600;padding:8px 22px;border-radius:14px;z-index:300;'
     + 'max-width:85vw;text-align:center;pointer-events:none;'
-    + 'animation:fu 4s ease-out forwards;';
-  el.textContent = msg;
+    + 'animation:toastfu 4.5s ease-out forwards;';
+  el.innerHTML = msg;
   fc.appendChild(el);
   setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 4000);
 }
@@ -5044,8 +5054,8 @@ function showHoldExpiredToast(msg) {
     + 'background:var(--t-bg2);border:1px solid #44cc88;color:#44cc88;'
     + 'font-size:var(--fs-lg);font-weight:600;padding:8px 22px;border-radius:14px;z-index:300;'
     + 'max-width:85vw;text-align:center;pointer-events:none;'
-    + 'animation:fu 4s ease-out forwards;';
-  el.textContent = msg;
+    + 'animation:toastfu 4.5s ease-out forwards;';
+  el.innerHTML = msg;
   fc.appendChild(el);
   setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 4000);
 }
@@ -5073,8 +5083,8 @@ function showBoostExtendedToast(msg) {
     + 'background:var(--t-bg2);border:1px solid #ffaa00;color:#ffcc44;'
     + 'font-size:var(--fs-md);font-weight:600;padding:6px 20px;border-radius:12px;z-index:300;'
     + 'white-space:nowrap;pointer-events:none;'
-    + 'animation:fu 4s ease-out forwards;';
-  el.textContent = msg;
+    + 'animation:toastfu 4.5s ease-out forwards;';
+  el.innerHTML = msg;
   fc.appendChild(el);
   setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 4000);
 }
@@ -5493,6 +5503,7 @@ function updateHomeWizard() {
           checkDevAccess(); // check Supabase for dev/playtest access
           refreshHomeBtns(); // ensure wizard name shows immediately on home screen
           checkWizardNamePrompt(); // first-ever boot name picker, shown before home screen
+          applyGemSprites(); // swap static 💎 placeholders for the custom soul gem sprite
           checkPendingPurchase(); // credit gems/remove-ads if returning from Stripe, and launch into shop
         }, 400);
       }, 100);
