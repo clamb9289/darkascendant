@@ -402,6 +402,13 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
         </div>
         <div class="toggle" id="toggle-dev-hundredmult" onclick="devToggleHundredMult()"><div class="toggle-knob"></div></div>
       </div>
+      <div class="setting-row" style="background:#1a0800;border-color:#ff6600;">
+        <div class="setting-label">
+          <div class="setting-name" style="color:#ffcc44;">Gem boosts cost 1</div>
+          <div class="setting-desc">Tap power/passive/all-gains boosts cost 💎1 (real IAP unaffected)</div>
+        </div>
+        <div class="toggle" id="toggle-dev-gemboosts1" onclick="devToggleGemBoostsOneCost()"><div class="toggle-knob"></div></div>
+      </div>
     </div>
     <div class="obtn" style="background:#001a1a;border-color:#00ccaa;color:#00ffcc;margin-top:4px;" onclick="devBossPlaytest()">⚔️ Boss Playtest Mode</div>
     <div class="obtn" style="background:#1a0000;border-color:#ff2222;color:#ff4444;margin-top:4px;user-select:none;-webkit-user-select:none;" onpointerdown="devResetHoldStart(this)" onpointerup="devResetHoldEnd(this)" onpointerleave="devResetHoldEnd(this)">⚠️ Full Reset</div>
@@ -4096,9 +4103,10 @@ function buildShop() {
   od.innerHTML = '<div class="shopitem-icon">💤</div><div style="flex:1"><div class="shopitem-name">Full Offline Income</div><div class="shopitem-desc">' + (offlineOwned ? '100% passive rate while away — ' + offlineLeft : '100% passive rate while away (8hrs) — normally 10%') + '</div></div><div class="shopitem-price" id="sbtn-offlineboost" style="' + (offlineOwned ? 'opacity:.4;cursor:default;' : offlineAfford ? '' : 'opacity:.4;cursor:default;') + '" onclick="buyOfflineBoost()">' + (offlineOwned ? 'Active' : (_devAccess ? gemHtml() + ' 1' : gemHtml() + ' 50')) + '</div>';
   sg.appendChild(od);
   GEM_BOOSTS.forEach(function(b){
-    var ok = gameState && gameState.gems >= b.gems && canAddBoost();
+    var displayCost = (devGemBoostsOneCost || _devAccess) ? 1 : b.gems;
+    var ok = gameState && gameState.gems >= displayCost && canAddBoost();
     var d = document.createElement('div'); d.className = 'shopitem';
-    d.innerHTML = '<div class="shopitem-icon">' + b.icon + '</div><div style="flex:1"><div class="shopitem-name">' + b.name + '</div><div class="shopitem-desc">' + b.desc + (canAddBoost()?'':' — Purchased boosts full (3/3, ad boosts still available)') + '</div></div><div class="shopitem-price" id="sbtn-' + b.id + '" style="' + (ok?'':'opacity:.4;cursor:default;') + '" onclick="spendGems(\'' + b.id + '\')">' + gemHtml() + ' ' + b.gems + '</div>';
+    d.innerHTML = '<div class="shopitem-icon">' + b.icon + '</div><div style="flex:1"><div class="shopitem-name">' + b.name + '</div><div class="shopitem-desc">' + b.desc + (canAddBoost()?'':' — Purchased boosts full (3/3, ad boosts still available)') + '</div></div><div class="shopitem-price" id="sbtn-' + b.id + '" style="' + (ok?'':'opacity:.4;cursor:default;') + '" onclick="spendGems(\'' + b.id + '\')">' + gemHtml() + ' ' + displayCost + '</div>';
     sg.appendChild(d);
   });
 }
@@ -4165,7 +4173,7 @@ function buyGems(n) {
 function spendGems(id) {
   if (!gameState) return;
   var b = GEM_BOOSTS.find(function(x){ return x.id===id; }); if (!b) return;
-  var cost = _devAccess ? 1 : b.gems;
+  var cost = (devGemBoostsOneCost || _devAccess) ? 1 : b.gems;
   if (gameState.gems < cost) return;
   if (!canAddBoost()) { alert('Purchased boost slots full (3/3). Watch an ad to add more!'); return; }
   gameState.gems -= cost;
@@ -5061,7 +5069,7 @@ function showOfflineToast(earned, awaySecs, rate) {
 }
 
 // ── DEV CONSOLE ───────────────────────────────────────────────────────
-var devTapCount = 0, devTapTimer = null, unlimitedBoosts = false, infiniteTimers = false, devTenMult = false, devHundredMult = false, devHoldUnlock = false, devHoldSpeed10 = false;
+var devTapCount = 0, devTapTimer = null, unlimitedBoosts = false, infiniteTimers = false, devTenMult = false, devHundredMult = false, devHoldUnlock = false, devHoldSpeed10 = false, devGemBoostsOneCost = false;
 var _devCode = '09021989';
 var _devCodeEntry = '';
 
@@ -5148,6 +5156,12 @@ function devToggleHundredMult() {
   devHundredMult = !devHundredMult;
   var el = document.getElementById('toggle-dev-hundredmult');
   if (el) { if (devHundredMult) el.classList.add('on'); else el.classList.remove('on'); }
+}
+function devToggleGemBoostsOneCost() {
+  devGemBoostsOneCost = !devGemBoostsOneCost;
+  var el = document.getElementById('toggle-dev-gemboosts1');
+  if (el) { if (devGemBoostsOneCost) el.classList.add('on'); else el.classList.remove('on'); }
+  buildShop(); // refresh displayed boost prices
 }
 function holdInterval_ms() {
   if (devHoldSpeed10) return 12;
