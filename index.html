@@ -1052,6 +1052,37 @@ function checkDevAccess() {
   .catch(function() {}); // silent fail
 }
 
+// ── Remote Gem Grants ────────────────────────────────────────────────
+// Lets the developer credit gems to a specific device by setting
+// pending_gems on their Leaderboard row via the Supabase Table Editor.
+// On next launch, the game claims the grant: credits the gems, then
+// resets pending_gems to 0 (the DB trigger prevents anon from ever
+// increasing this value, only decreasing/claiming it).
+function checkPendingGemGrant() {
+  if (!gameState) return;
+  var device_id = getDeviceId();
+  fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE
+    + '?select=pending_gems&device_id=eq.' + encodeURIComponent(device_id) + '&limit=1', {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(rows) {
+    var amount = (rows && rows.length > 0) ? (rows[0].pending_gems || 0) : 0;
+    if (amount > 0) {
+      _grantGems(amount);
+      showBoostExtendedToast('\uD83C\uDF81 +' + amount + ' \uD83D\uDC8E Gift from the developer!');
+      // Claim it: reset to 0 so it isn't granted again
+      fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE
+        + '?device_id=eq.' + encodeURIComponent(device_id), {
+        method: 'PATCH',
+        headers: Object.assign(_sbH(), {'Prefer':'return=minimal'}),
+        body: JSON.stringify({ pending_gems: 0 })
+      }).catch(function(){});
+    }
+  })
+  .catch(function() {}); // silent fail
+}
+
 function applyDevAccess() {
   // Show playtest button on home screen
   var btn = document.getElementById('home-dev-btn');
@@ -2156,6 +2187,7 @@ function launchGame() {
 function _doLaunchGame() {
   hideBlackout();
   cacheElements();
+  checkPendingGemGrant(); // claim any gems the developer has gifted via Supabase
   updatePrestigeBadge(); // show badge immediately on launch
   clearInterval(saveInterval);
   saveInterval = setInterval(function(){ saveGame(); }, 30000);
