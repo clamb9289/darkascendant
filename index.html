@@ -31,7 +31,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:
 #home-wizard{font-size:72px;animation:float 3s ease-in-out infinite;line-height:1;}
 @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
 #home-title{font-size:30px;font-weight:600;color:var(--t-acc2);letter-spacing:.06em;text-align:center;}
-#home-tagline{font-size:12px;color:var(--t-txt3);text-align:center;letter-spacing:.1em;text-transform:uppercase;}
+#home-tagline{font-size:var(--fs-sm);color:var(--t-txt3);text-align:center;letter-spacing:.1em;text-transform:uppercase;}
 #home-buttons{width:100%;padding:24px 20px;display:flex;flex-direction:column;gap:10px;}
 .home-btn{width:100%;padding:14px 18px;border-radius:10px;border:1px solid var(--t-bdr);display:flex;align-items:center;gap:12px;cursor:pointer;background:var(--t-bg1);transition:opacity .12s,background .15s;touch-action:manipulation;}
 .home-btn:hover{background:var(--t-bg2);}
@@ -105,8 +105,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:
 .monbtn:hover{background:var(--t-bg3);}
 .monbtn:active{opacity:.75;}
 .monbtn-icon{font-size:15px;}
-.monbtn-title{font-size:10px;font-weight:500;color:var(--t-acc2);text-align:center;}
-.monbtn-sub{font-size:9px;color:var(--t-txt3);text-align:center;}
+.monbtn-title{font-size:var(--fs-xs);font-weight:500;color:var(--t-acc2);text-align:center;}
+.monbtn-sub{font-size:var(--fs-xs);color:var(--t-txt3);text-align:center;}
 .monbtn-ad{background:#0f1a08;border-color:#3a6a20;}
 .monbtn-ad .monbtn-title{color:#8fc860;}.monbtn-ad .monbtn-sub{color:#4a7a30;}
 .monbtn-ad.ad-ready{background:#162e08;border-color:#5aaa20;}
@@ -138,8 +138,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:
 .uc-sm-top{display:flex;align-items:center;gap:5px;}
 .uc-sm-icon{font-size:14px;flex-shrink:0;}
 .uc-sm-name{font-size:var(--fs-xs);font-weight:500;color:var(--t-acc2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.uc-sm-desc{font-size:9px;color:var(--t-txt3);}
-.uc-sm-cost{font-size:9px;color:var(--t-txt2);background:var(--t-bg0);border:1px solid var(--t-bdr);border-radius:3px;padding:2px 4px;white-space:nowrap;align-self:flex-end;}
+.uc-sm-desc{font-size:var(--fs-xs);color:var(--t-txt3);}
+.uc-sm-cost{font-size:var(--fs-xs);color:var(--t-txt2);background:var(--t-bg0);border:1px solid var(--t-bdr);border-radius:3px;padding:2px 4px;white-space:nowrap;align-self:flex-end;}
 .uc-sm-cost.ok2{color:var(--t-acc2);border-color:var(--t-bdr2);}.uc-sm-cost.bgt{color:#4a8a4a;border-color:#2a5a2a;}
 .spell-tier-hdr{display:flex;align-items:center;gap:7px;padding:6px 2px;margin-top:5px;}
 .spell-tier-locked{display:flex;align-items:center;gap:8px;background:var(--t-bg1);border:1px solid var(--t-bdr);border-radius:8px;padding:8px 10px;opacity:.5;}
@@ -192,10 +192,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:
 #boss-rage-bar-wrap{width:100%;background:#1a0808;border-radius:3px;height:4px;overflow:hidden;margin-bottom:2px;}
 #boss-rage-bar{height:100%;background:#ff3010;border-radius:3px;transition:width .2s;}
 #combat-log{width:100%;background:#060108;border:1px solid #2a0a1a;border-radius:6px;padding:9px 11px;min-height:100px;max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;}
-.log-entry{font-size:13px;line-height:1.5;}
+.log-entry{font-size:var(--fs-md);line-height:1.5;}
 .log-player{color:#9060d0;}.log-boss{color:#c04030;}.log-system{color:#5a4a6a;font-style:italic;}.log-rage{color:#ff2020;font-weight:500;}.log-super{color:#ffcc00;font-weight:600;}
 #boss-action-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;}
-.boss-action-btn{padding:16px 6px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;text-align:center;border:1px solid;transition:opacity .12s;touch-action:manipulation;min-height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;}
+.boss-action-btn{padding:16px 6px;border-radius:9px;font-size:var(--fs-md);font-weight:600;cursor:pointer;text-align:center;border:1px solid;transition:opacity .12s;touch-action:manipulation;min-height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;}
 .boss-action-btn:active{opacity:.75;}
 @keyframes gemFanfare{0%{opacity:0;transform:translate(-50%,-50%) scale(.7);}15%{opacity:1;transform:translate(-50%,-50%) scale(1.08);}25%{transform:translate(-50%,-50%) scale(1);}80%{opacity:1;}100%{opacity:0;transform:translate(-50%,-50%) scale(.95);}}
 @keyframes offlineFade{0%{opacity:0;transform:translate(-50%,-50%) scale(.85);}12%{opacity:1;transform:translate(-50%,-50%) scale(1);}75%{opacity:1;}100%{opacity:0;transform:translate(-50%,-50%) scale(.95);}}
@@ -233,10 +233,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:
 .theme-card{border-radius:10px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;border:2px solid transparent;position:relative;transition:opacity .12s;touch-action:manipulation;}
 .theme-card:hover{opacity:.85;}.theme-card.active-theme{border-color:#fff !important;}
 .theme-preview{width:100%;height:40px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:20px;}
-.theme-name{font-size:var(--fs-sm);font-weight:500;text-align:center;}.theme-sub{font-size:9px;text-align:center;opacity:.7;}
-.theme-price{font-size:9px;padding:2px 7px;border-radius:4px;border:1px solid;margin-top:1px;}
+.theme-name{font-size:var(--fs-sm);font-weight:500;text-align:center;}.theme-sub{font-size:var(--fs-xs);text-align:center;opacity:.7;}
+.theme-price{font-size:var(--fs-xs);padding:2px 7px;border-radius:4px;border:1px solid;margin-top:1px;}
 .tp-free{background:#0a1a06;border-color:#3a6a20;color:#8fc860;}.tp-gem{background:#150a28;border-color:#5a2a9a;color:#c080ff;}.tp-iap{background:#1a0818;border-color:#8a2070;color:#ff80cc;}
-.theme-active-badge{position:absolute;top:5px;right:5px;font-size:8px;font-weight:500;padding:2px 5px;border-radius:3px;background:rgba(255,255,255,.2);color:#fff;}
+.theme-active-badge{position:absolute;top:5px;right:5px;font-size:var(--fs-xs);font-weight:500;padding:2px 5px;border-radius:3px;background:rgba(255,255,255,.2);color:#fff;}
 .score-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;}
 .score-card{background:var(--t-bg1);border:1px solid var(--t-bdr);border-radius:9px;padding:11px;display:flex;flex-direction:column;gap:3px;}
 .score-card-val{font-size:var(--fs-xxl);font-weight:500;color:var(--t-acc2);}
@@ -254,7 +254,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:
 .toggle-knob{position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:var(--t-txt4);transition:left .2s,background .2s;}
 .toggle.on .toggle-knob{left:21px;background:#fff;}
 .font-size-ctrl{display:flex;align-items:center;gap:6px;}
-.fs-btn{width:28px;height:28px;border-radius:5px;border:1px solid var(--t-bdr);background:var(--t-bg2);color:var(--t-acc2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s;touch-action:manipulation;}
+.fs-btn{width:28px;height:28px;border-radius:5px;border:1px solid var(--t-bdr);background:var(--t-bg2);color:var(--t-acc2);font-size:var(--fs-md);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s;touch-action:manipulation;}
 .fs-btn:hover{background:var(--t-bg3);}
 .fs-val{font-size:var(--fs-sm);color:var(--t-txt3);min-width:28px;text-align:center;}
 .dark-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:var(--t-bdr);outline:none;}
@@ -262,7 +262,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:
 .slider-val{font-size:var(--fs-sm);color:var(--t-txt3);min-width:28px;}
 
 /* Combo display */
-#combo-display{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;text-shadow:0 1px 4px rgba(0,0,0,.6);}
+#combo-display{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:var(--fs-sm);font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;text-shadow:0 1px 4px rgba(0,0,0,.6);}
 /* Passive float animation */
 @keyframes passiveFloat{0%{opacity:0;transform:translateX(-50%) translateY(0);}15%{opacity:.9;}80%{opacity:.7;}100%{opacity:0;transform:translateX(-50%) translateY(-38px);}}
 /* Milestone in animation */
@@ -792,6 +792,8 @@ function checkPendingPurchase() {
   if (pendingGems > 0 || removeAds === '1') {
     window.history.replaceState({}, '', window.location.pathname);
     saveGame();
+    // Bring the player back to the shop so they can see their new balance / Owned state
+    setTimeout(function(){ openShop(); }, 600);
   }
 }
 
@@ -2116,6 +2118,7 @@ function launchGame() {
 function _doLaunchGame() {
   hideBlackout();
   cacheElements();
+  checkPendingPurchase(); // credit gems/remove-ads if returning from Stripe, now that gameState exists
   updatePrestigeBadge(); // show badge immediately on launch
   clearInterval(saveInterval);
   saveInterval = setInterval(function(){ saveGame(); }, 30000);
@@ -5410,7 +5413,6 @@ function updateHomeWizard() {
         setTimeout(function(){
           ls.style.display = 'none';
           checkDevAccess(); // check Supabase for dev/playtest access
-          checkPendingPurchase(); // credit gems if returning from Stripe checkout
           refreshHomeBtns(); // ensure wizard name shows immediately on home screen
           checkWizardNamePrompt(); // first-ever boot name picker, shown before home screen
         }, 400);
