@@ -41,7 +41,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:
 .home-btn-sub{font-size:var(--fs-sm);margin-top:2px;color:var(--t-txt3);}
 .home-btn-arrow{font-size:var(--fs);color:var(--t-txt4);margin-left:auto;}
 .btn-resume.disabled{opacity:.4;cursor:default;}
-#home-version{font-size:var(--fs-xs);color:var(--t-txt4);text-align:center;padding:0 20px;margin-top:auto;}
+#home-version{font-size:var(--fs-xs);color:var(--t-txt4);text-align:center;padding:0 20px;margin-top:16px;}
 .save-status{width:100%;text-align:center;font-size:var(--fs-sm);padding:6px 0;border-radius:6px;}
 .save-status.saved{color:#4a8a4a;background:#040e04;border:1px solid #1a4a1a;}
 .save-status.unsaved{color:#8a6020;background:#100a00;border:1px solid #3a2a00;}
@@ -309,8 +309,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:
 /* runs before any other JS — mark screens ready if wizard name already chosen */
 if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens-ready');
 </script>
-<div id="app" class="fsize-1">
-<div id="floats"></div>
 <div id="app" class="fsize-1">
 <div id="floats"></div>
 <!-- LEVEL 100 FANFARE -->
@@ -703,7 +701,6 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
   </div>
 </div>
 
-</div>
 </div>
 <script>
 const SPRITES={
@@ -1599,7 +1596,8 @@ function getDefaultState() {
   return {
     mana:0, xp:0, level:1, gems:50, tapPow:1, passRate:0,
     lvls:lvls, unlockedSpells:[], lastTierShown:-1,
-    prestigeCount:0, prestigePerks:{tapMult:1,passMult:1,xpMult:1},
+    prestigeCount:0, prestigePerks:{tapMult:1,passMult:1,xpMult:1,offlineMult:1,bossDamageMult:1,upgradeCostMult:1,adCooldownMult:1},
+    removeAds:false,
     holdEverUsed:false,
     lastLoginDate:null, loginStreak:0,
     milestonesClaimed:[], runStartTime:Date.now(),
@@ -1609,6 +1607,26 @@ function getDefaultState() {
       sessionStartTime:Date.now(),tapTimes:[],prestigeCount:0,bossesDefeated:0},
     earnedAchievements:[], savedAt:null
   };
+}
+
+// ── SAVE MIGRATION ───────────────────────────────────────────────────
+// Recursively fills any fields missing from `save` (old/imported data)
+// with values from `defaults` (current getDefaultState()), without
+// touching any field the save already has. Arrays are left as-is.
+function migrateSave(save, defaults) {
+  if (!save || typeof save !== 'object') return defaults;
+  Object.keys(defaults).forEach(function(key) {
+    var defVal = defaults[key];
+    if (!(key in save)) {
+      save[key] = defVal;
+    } else if (
+      defVal !== null && typeof defVal === 'object' && !Array.isArray(defVal) &&
+      save[key] !== null && typeof save[key] === 'object' && !Array.isArray(save[key])
+    ) {
+      migrateSave(save[key], defVal);
+    }
+  });
+  return save;
 }
 
 // ── SAVE / LOAD ───────────────────────────────────────────────────────
@@ -2068,7 +2086,7 @@ function skipIntro() {
 }
 function handleResume() {
   var s = loadGame(); if (!s) return;
-  gameState = s;
+  gameState = migrateSave(s, getDefaultState());
   if (!gameState.earnedAchievements) gameState.earnedAchievements = [];
   if (!gameState.unlockedSpells) gameState.unlockedSpells = [];
   if (!gameState.prestigePerks) gameState.prestigePerks = {tapMult:1,passMult:1,xpMult:1,offlineMult:1,bossDamageMult:1,upgradeCostMult:1,adCooldownMult:1};
@@ -4702,6 +4720,8 @@ function promptImportSave() {
         var decoded = atob(code);
         var decompressed = decompressSave(decoded);
         var parsed = JSON.parse(decompressed);
+        // Fill in any fields missing from this (possibly old) save with current defaults
+        parsed = migrateSave(parsed, getDefaultState());
         // Restore wizard name and device ID if embedded in save
         if (parsed._wizardName) { localStorage.setItem('da_wizard_name', parsed._wizardName); }
         if (parsed._deviceId)   { localStorage.setItem('da_device_id',   parsed._deviceId);   }
