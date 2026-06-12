@@ -774,24 +774,35 @@ function restorePurchases() {
 }
 
 // ── Handle return from Stripe Payment Link ───────────────────────────
+// Runs on every page load, BEFORE the player taps Resume/New Game —
+// gameState does not exist yet at this point, so we work with the
+// saved data directly, then launch straight into the game and open
+// the shop so the player gets a clear confirmation their purchase worked.
 function checkPendingPurchase() {
   var params = new URLSearchParams(window.location.search);
   var pendingGems = parseInt(params.get('gems'));
   var removeAds = params.get('remove_ads');
-  if (pendingGems > 0) {
-    _grantGems(pendingGems);
-    showBoostExtendedToast('+' + pendingGems + ' \uD83D\uDC8E Purchase successful!');
-  }
-  if (removeAds === '1') {
-    _grantRemoveAds();
-    showBoostExtendedToast('\uD83D\uDD15 Ads removed! Thank you! \uD83C\uDF11');
-  }
-  if (pendingGems > 0 || removeAds === '1') {
-    window.history.replaceState({}, '', window.location.pathname);
-    saveGame();
-    // Bring the player back to the shop so they can see their new balance / Owned state
-    setTimeout(function(){ openShop(); }, 600);
-  }
+  if (!(pendingGems > 0) && removeAds !== '1') return;
+
+  // Clean the URL immediately so a refresh doesn't re-grant
+  window.history.replaceState({}, '', window.location.pathname);
+
+  // Load (or initialize) the save directly, independent of gameState
+  var save = loadGame() || getDefaultState();
+  save = migrateSave(save, getDefaultState());
+  gameState = save;
+
+  if (pendingGems > 0) _grantGems(pendingGems);
+  if (removeAds === '1') _grantRemoveAds();
+
+  // Launch straight into the game (skips intro) and open the shop
+  // so the updated gem count / Owned state is immediately visible.
+  _doLaunchGame();
+  setTimeout(function(){
+    openShop();
+    if (pendingGems > 0) showBoostExtendedToast('+' + pendingGems + ' \uD83D\uDC8E Purchase successful!');
+    if (removeAds === '1') showBoostExtendedToast('\uD83D\uDD15 Ads removed! Thank you! \uD83C\uDF11');
+  }, 500);
 }
 
 // ── LEADERBOARD SYSTEM ───────────────────────────────────────────────
@@ -2136,7 +2147,6 @@ function launchGame() {
 function _doLaunchGame() {
   hideBlackout();
   cacheElements();
-  checkPendingPurchase(); // credit gems/remove-ads if returning from Stripe, now that gameState exists
   updatePrestigeBadge(); // show badge immediately on launch
   clearInterval(saveInterval);
   saveInterval = setInterval(function(){ saveGame(); }, 30000);
@@ -5435,6 +5445,7 @@ function updateHomeWizard() {
           checkDevAccess(); // check Supabase for dev/playtest access
           refreshHomeBtns(); // ensure wizard name shows immediately on home screen
           checkWizardNamePrompt(); // first-ever boot name picker, shown before home screen
+          checkPendingPurchase(); // credit gems/remove-ads if returning from Stripe, and launch into shop
         }, 400);
       }, 100);
     }
