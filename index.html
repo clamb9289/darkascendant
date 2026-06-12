@@ -1707,7 +1707,7 @@ function applySettings() {
   });
   // Haptic has special default-on handling
   var ht = document.getElementById('toggle-haptic');
-  if (ht) { if (settings.haptic !== false) ht.classList.add('on'); else ht.classList.remove('on'); }  var idx = Math.max(0, Math.min(3, settings.fontSize || 1));
+  if (ht) { if (settings.haptic !== false) ht.classList.add('on'); else ht.classList.remove('on'); }  var idx = Math.max(0, Math.min(3, (settings.fontSize !== undefined && settings.fontSize !== null) ? settings.fontSize : 1));
   var app = document.getElementById('app');
   FONT_CLASSES.forEach(function(c){app.classList.remove(c);}); app.classList.add(FONT_CLASSES[idx]);
   var fv = document.getElementById('fs-val'); if (fv) fv.textContent = FONT_SIZES[idx];
@@ -4637,7 +4637,7 @@ function toggleSetting(k) {
   }
   applySettings(); saveSettings();
 }
-function changeFontSize(d) { settings.fontSize = Math.max(0,Math.min(3,(settings.fontSize||1)+d)); applySettings(); saveSettings(); }
+function changeFontSize(d) { var cur = (settings.fontSize !== undefined && settings.fontSize !== null) ? settings.fontSize : 1; settings.fontSize = Math.max(0,Math.min(3,cur+d)); applySettings(); saveSettings(); }
 function manualSave() {
   if (gameState) saveGame(gameState, true);
   else { var msg=document.getElementById('settings-save-msg'); if(msg){msg.textContent='No active game.';msg.style.display='block';msg.className='save-status unsaved';setTimeout(function(){msg.style.display='none';},2000);} }
