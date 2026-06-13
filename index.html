@@ -859,7 +859,13 @@ function checkWizardNamePrompt() {
   setTimeout(showWizardNamePicker, 100);
 }
 
-function showWizardNamePicker() {
+// Opens the name picker in rename mode — pre-filled with the player's
+// current name. Called from the "✎ Rename" link on the home screen.
+function openRenamePicker() {
+  showWizardNamePicker(true);
+}
+
+function showWizardNamePicker(isRename) {
   if (document.getElementById('wizard-name-overlay')) return;
 
   var _caps = true; // start uppercase
@@ -909,18 +915,28 @@ function showWizardNamePicker() {
   el.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#04010c;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;z-index:8000;padding:28px 20px 16px;box-sizing:border-box;overflow:hidden;pointer-events:all;';
 
   el.innerHTML = '<div style="font-size:26px;margin-bottom:6px;">&#127761;</div>'
-    + '<div style="font-size:17px;font-weight:700;color:#c080ff;margin-bottom:4px;">Choose Your Wizard Name</div>'
+    + '<div style="font-size:17px;font-weight:700;color:#c080ff;margin-bottom:4px;">' + (isRename ? 'Rename Your Wizard' : 'Choose Your Wizard Name') + '</div>'
     + '<div style="font-size:11px;color:#5030a0;margin-bottom:16px;text-align:center;">Appears on the global leaderboard &middot; 2&ndash;24 characters</div>'
+    + (isRename ? '' : '<div id="wkb-skip" style="width:100%;max-width:320px;padding:12px;border-radius:8px;background:#1a0a30;border:1px solid #7030c0;color:#e0c0ff;font-size:14px;font-weight:700;text-align:center;cursor:pointer;margin-bottom:14px;touch-action:manipulation;">🎲 Skip — give me a random name</div>'
+      + '<div style="font-size:11px;color:#3a2060;margin-bottom:14px;text-align:center;">You can rename yourself anytime from the home screen</div>')
     + '<input id="wkb-input" type="text" maxlength="24" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" inputmode="text" placeholder="Tap here to type with your keyboard" style="width:100%;max-width:320px;padding:11px 14px;border-radius:8px;border:1px solid #5030a0;background:#0a0018;color:#e0c0ff;font-size:16px;text-align:center;box-sizing:border-box;margin-bottom:6px;min-height:44px;letter-spacing:0.5px;outline:none;-webkit-appearance:none;font-family:inherit;">'
     + '<div id="wizard-name-error" style="font-size:11px;color:#ff5050;min-height:16px;margin-bottom:8px;text-align:center;"></div>'
-    + '<div id="wizard-name-confirm-btn" style="width:100%;max-width:320px;padding:11px;border-radius:8px;background:#3a0070;border:1px solid #7030c0;color:#e0a0ff;font-size:14px;font-weight:600;text-align:center;cursor:pointer;margin-bottom:14px;touch-action:manipulation;">Claim this name &#8594;</div>'
+    + '<div id="wizard-name-confirm-btn" style="width:100%;max-width:320px;padding:11px;border-radius:8px;background:#3a0070;border:1px solid #7030c0;color:#e0a0ff;font-size:14px;font-weight:600;text-align:center;cursor:pointer;margin-bottom:14px;touch-action:manipulation;">' + (isRename ? 'Save name &#8594;' : 'Claim this name &#8594;') + '</div>'
     + '<div id="wkb-keys" style="width:100%;max-width:360px;"></div>'
     + '<div id="wkb-random" style="margin-top:14px;font-size:11px;color:#4a2870;text-decoration:underline;cursor:pointer;touch-action:manipulation;">Generate a random dark fantasy name for me</div>'
-    + '<div id="wkb-import" style="margin-top:10px;font-size:11px;color:#3a2060;text-decoration:underline;cursor:pointer;touch-action:manipulation;">Already played? Import a save file →</div>';
+    + (isRename ? '<div id="wkb-cancel" style="margin-top:10px;font-size:11px;color:#3a2060;text-decoration:underline;cursor:pointer;touch-action:manipulation;">Cancel</div>'
+      : '<div id="wkb-import" style="margin-top:10px;font-size:11px;color:#3a2060;text-decoration:underline;cursor:pointer;touch-action:manipulation;">Already played? Import a save file →</div>');
 
 
   document.body.appendChild(el);
   renderKb();
+
+  // Rename mode — prefill with the player's current name
+  if (isRename) {
+    _wkbValue = getWizardName() || '';
+    var prefillEl = document.getElementById('wkb-input');
+    if (prefillEl) prefillEl.value = _wkbValue;
+  }
 
   // Real <input> wiring — desktop physical keyboard types directly, and
   // tapping the field on mobile opens the native on-screen keyboard.
@@ -959,6 +975,8 @@ function showWizardNamePicker() {
     }
     if (e.target.closest('#wizard-name-confirm-btn')) { e.preventDefault(); confirmWizardName(); return; }
     if (e.target.closest('#wkb-random')) { e.preventDefault(); useGenericName(); return; }
+    if (e.target.closest('#wkb-skip')) { e.preventDefault(); useGenericName(); return; }
+    if (e.target.closest('#wkb-cancel')) { e.preventDefault(); closeWizardNamePicker(); return; }
     if (e.target.closest('#wkb-import')) { e.preventDefault(); closeWizardNamePicker(); promptImportSave(); return; }
   });
 }
@@ -1033,6 +1051,10 @@ function closeWizardNamePicker() {
   document.body.classList.remove('name-pending');
   document.body.classList.add('screens-ready');
   refreshHomeBtns(); // show wizard name on home screen immediately
+  // If this was a rename mid-session (gameState already exists), push the
+  // new name to the leaderboard right away rather than waiting for the
+  // next periodic submit.
+  if (typeof gameState !== 'undefined' && gameState) submitLeaderboardScore(true);
 }
 
 // ── Score Submission ─────────────────────────────────────────────────
@@ -1992,7 +2014,9 @@ function refreshHomeBtns() {
   var wnEl = document.getElementById('home-wizard-name');
   if (wnEl) {
     var wn = getWizardName();
-    wnEl.textContent = wn ? ('🌑 ' + wn) : '';
+    wnEl.innerHTML = wn
+      ? ('🌑 ' + wn + ' <span onclick="event.stopPropagation();openRenamePicker()" style="cursor:pointer;text-decoration:underline;color:#6a4090;font-size:12px;font-weight:500;touch-action:manipulation;">✎ Rename</span>')
+      : '';
   }
   // Show gem count
   var gemEl = document.getElementById('home-gem-count');
