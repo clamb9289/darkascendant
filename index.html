@@ -534,9 +534,9 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
 <!-- AD -->
 <div id="adoverlay" class="overlay">
   <div class="ocard">
-    <div class="oavatar">📺</div>
-    <div class="otitle">Watching ad...</div>
-    <div class="obody">A merchant of dark arts has a message for you.</div>
+    <div class="oavatar">🚫📺</div>
+    <div class="otitle">No ad here.</div>
+    <div class="obody">An ad would be here — but f*** Google. Have fun, and we don't sell your data!</div>
     <div id="ad-progress-wrap"><div id="adprogfill"></div></div>
     <div class="obtn obtn-green" id="ad-closebtn" style="display:none;" onclick="closeAd()">Claim your dark reward →</div>
   </div>
@@ -755,8 +755,7 @@ var STRIPE_PAYMENT_LINKS = {
   gems_50:    'https://buy.stripe.com/bJecN58QH7PP4gV9BQcAo03',
   gems_150:   'https://buy.stripe.com/5kQ5kD0kb5HHbJn15kcAo00',
   gems_500:   'https://buy.stripe.com/14AdR9ff54DD5kZ3dscAo02',
-  gems_1500:  'https://buy.stripe.com/8x2bJ17MD7PP5kZg0ecAo01',
-  remove_ads: 'https://buy.stripe.com/3cI00jgj94DDeVz3dscAo04'
+  gems_1500:  'https://buy.stripe.com/8x2bJ17MD7PP5kZg0ecAo01'
 };
 
 // ── Purchase gem pack ────────────────────────────────────────────────
@@ -767,15 +766,6 @@ function processPurchase(gems, priceKey) {
     + '?gems=' + gems;
   window.location.href = link + '?client_reference_id=' + gems
     + '&success_url=' + encodeURIComponent(returnUrl);
-}
-
-// ── Purchase Remove Ads ──────────────────────────────────────────────
-function processPurchaseRemoveAds() {
-  var link = STRIPE_PAYMENT_LINKS['remove_ads'];
-  if (!link) { _grantRemoveAds(); return; }
-  var returnUrl = window.location.origin + window.location.pathname
-    + '?remove_ads=1';
-  window.location.href = link + '?success_url=' + encodeURIComponent(returnUrl);
 }
 
 // ── Restore purchases (web — not applicable, stubbed for parity) ─────
@@ -791,8 +781,7 @@ function restorePurchases() {
 function checkPendingPurchase() {
   var params = new URLSearchParams(window.location.search);
   var pendingGems = parseInt(params.get('gems'));
-  var removeAds = params.get('remove_ads');
-  if (!(pendingGems > 0) && removeAds !== '1') return;
+  if (!(pendingGems > 0)) return;
 
   // Clean the URL immediately so a refresh doesn't re-grant
   window.history.replaceState({}, '', window.location.pathname);
@@ -803,15 +792,13 @@ function checkPendingPurchase() {
   gameState = save;
 
   if (pendingGems > 0) _grantGems(pendingGems);
-  if (removeAds === '1') _grantRemoveAds();
 
   // Launch straight into the game (skips intro) and open the shop
-  // so the updated gem count / Owned state is immediately visible.
+  // so the updated gem count is immediately visible.
   _doLaunchGame();
   setTimeout(function(){
     openShop();
     if (pendingGems > 0) showBoostExtendedToast('+' + pendingGems + ' \uD83D\uDC8E Purchase successful!');
-    if (removeAds === '1') showBoostExtendedToast('\uD83D\uDD15 Ads removed! Thank you! \uD83C\uDF11');
   }, 500);
 }
 
@@ -1108,10 +1095,6 @@ function applyDevAccess() {
 
 function openDevPanel() {
   document.getElementById('devoverlay').classList.add('show');
-}
-
-function hasAdsFree() {
-  return _devAccess || (gameState && gameState.removeAds);
 }
 
 function _sbH() {
@@ -1555,7 +1538,6 @@ var GEM_PACKS = [
   {gems:150, price:'$2.99', label:"Adept's satchel",  desc:'150 Soul gems'},
   {gems:500, price:'$7.99', label:"Lich's hoard",     desc:'500 Soul gems'},
   {gems:1500,price:'$17.99',label:'Void treasury',    desc:'1500 Soul gems'},
-  {gems:0,   price:'$4.99', label:'Remove Ads',       desc:'Replace all ad breaks with a short thank-you screen. Forever.', removeAds:true},
 ];
 var GEM_BOOSTS = [
   {id:'tap2x5', icon:'⚡',name:'2× tap power',  desc:'5 min',gems:20,type:'tap', mult:2,dur:300},
@@ -1670,7 +1652,6 @@ function getDefaultState() {
     mana:0, xp:0, level:1, gems:50, tapPow:1, passRate:0,
     lvls:lvls, unlockedSpells:[], lastTierShown:-1,
     prestigeCount:0, prestigePerks:{tapMult:1,passMult:1,xpMult:1,offlineMult:1,bossDamageMult:1,upgradeCostMult:1,adCooldownMult:1},
-    removeAds:false,
     holdEverUsed:false,
     lastLoginDate:null, loginStreak:0,
     milestonesClaimed:[], runStartTime:Date.now(),
@@ -3538,49 +3519,31 @@ function openHoldAd() {
   }
   startHoldAd();
 }
-function startHoldAd() {
-  var titleEl = document.querySelector('#adoverlay .otitle');
-  var bodyEl = document.querySelector('#adoverlay .obody');
+// ── "AD" SYSTEM ───────────────────────────────────────────────────────
+// No real ads are served anywhere in this game — no ad SDK, no tracking,
+// nothing sold. "Watch Ad" buttons show this 3-second joke overlay, then
+// grant the same bonus they always granted. Kept as a quick "watch
+// something, get something" beat without any of the actual ad baggage.
+var FAKE_AD_MS = 3000;
+function showFakeAdOverlay(onDone) {
   document.getElementById('ad-closebtn').style.display = 'none';
   document.getElementById('adprogfill').style.width = '0%';
   document.getElementById('adoverlay').classList.add('show');
-
-  if (hasAdsFree()) {
-    if (titleEl) titleEl.textContent = '🌑 Thanks for playtesting!';
-    if (bodyEl) bodyEl.textContent = "If this game ever actually launches — thanks for paying to remove ads! It's much appreciated by your humble developer!";
-    var pct = 0;
-    var iv = setInterval(function(){
-      pct += 5;
-      document.getElementById('adprogfill').style.width = Math.min(100, pct) + '%';
-      if (pct >= 100) {
-        clearInterval(iv);
-        if (titleEl) titleEl.textContent = 'Watching ad...';
-        if (bodyEl) bodyEl.textContent = 'A merchant of dark arts has a message for you.';
-        var btn = document.getElementById('ad-closebtn');
-        btn.textContent = 'Activate Hold to Tap →';
-        btn.style.display = 'block';
-        btn.onclick = closeHoldAd;
-      }
-    }, 100);
-  } else {
-    var pct = 0;
-    var iv = setInterval(function(){
-      pct += 100/50;
-      document.getElementById('adprogfill').style.width = Math.min(100,pct) + '%';
-      if (pct >= 100) {
-        clearInterval(iv);
-        var btn = document.getElementById('ad-closebtn');
-        btn.textContent = 'Activate Hold to Tap →';
-        btn.style.display = 'block';
-        btn.onclick = closeHoldAd;
-      }
-    }, 100);
-  }
+  var pct = 0;
+  var iv = setInterval(function(){
+    pct += 100 / (FAKE_AD_MS / 100);
+    document.getElementById('adprogfill').style.width = Math.min(100, pct) + '%';
+    if (pct >= 100) {
+      clearInterval(iv);
+      document.getElementById('adoverlay').classList.remove('show');
+      if (onDone) onDone();
+    }
+  }, 100);
+}
+function startHoldAd() {
+  showFakeAdOverlay(closeHoldAd);
 }
 function closeHoldAd() {
-  document.getElementById('adoverlay').classList.remove('show');
-  document.getElementById('ad-closebtn').textContent = 'Claim your dark reward →';
-  document.getElementById('ad-closebtn').onclick = closeAd;
   activateHoldUnlock(AUTO_TAP_DUR);
 }
 function activateHoldUnlock(dur) {
@@ -3679,39 +3642,7 @@ function watchAdFromLvlUp() {
 }
 function startAd(fromLvlUp) {
   adFromLvlUp = fromLvlUp;
-  document.getElementById('adoverlay').classList.add('show');
-
-  if (hasAdsFree()) {
-    // Short 1-second thank-you screen for dev/remove-ads players
-    document.getElementById('ad-closebtn').style.display = 'none';
-    document.getElementById('adprogfill').style.width = '0%';
-    var titleEl = document.querySelector('#adoverlay .otitle');
-    var bodyEl = document.querySelector('#adoverlay .obody');
-    if (titleEl) titleEl.textContent = '🌑 Thanks for playtesting!';
-    if (bodyEl) bodyEl.textContent = "If this game ever actually launches — thanks for paying to remove ads! It's much appreciated by your humble developer!";
-    var pct = 0;
-    var iv = setInterval(function(){
-      pct += 5;
-      document.getElementById('adprogfill').style.width = Math.min(100, pct) + '%';
-      if (pct >= 100) {
-        clearInterval(iv);
-        // Reset text back to normal for next time
-        if (titleEl) titleEl.textContent = 'Watching ad...';
-        if (bodyEl) bodyEl.textContent = 'A merchant of dark arts has a message for you.';
-        closeAd();
-      }
-    }, 100);
-  } else {
-    // Normal full-length ad
-    document.getElementById('ad-closebtn').style.display = 'none';
-    document.getElementById('adprogfill').style.width = '0%';
-    var pct = 0;
-    var iv = setInterval(function(){
-      pct += 100/50;
-      document.getElementById('adprogfill').style.width = Math.min(100, pct) + '%';
-      if (pct >= 100) { clearInterval(iv); document.getElementById('ad-closebtn').style.display='block'; }
-    }, 100);
-  }
+  showFakeAdOverlay(closeAd);
 }
 function closeAd() {
   document.getElementById('adoverlay').classList.remove('show');
@@ -3759,39 +3690,12 @@ function closeAd() {
 function watchBossAd() {
   if (bossAdCooldown > 0 || bossAdInProgress || bossDefeated) return;
   bossAdInProgress = true;
-  // Pause boss — disable all player buttons and freeze combat during ad
+  // Pause boss — disable all player buttons and freeze combat during the popup
   combatLocked = true;
   ['btn-attack','btn-spell','btn-drain','btn-ritual','btn-boss-ad'].forEach(function(id){
     var el = document.getElementById(id); if (el) { el.style.opacity = '.4'; el.style.pointerEvents = 'none'; }
   });
-  // Show ad overlay — short version for dev/remove-ads players
-  var titleEl = document.querySelector('#adoverlay .otitle');
-  var bodyEl = document.querySelector('#adoverlay .obody');
-  document.getElementById('ad-closebtn').style.display = 'none';
-  document.getElementById('adprogfill').style.width = '0%';
-  document.getElementById('adoverlay').classList.add('show');
-
-  if (hasAdsFree()) {
-    if (titleEl) titleEl.textContent = '🌑 Thanks for playtesting!';
-    if (bodyEl) bodyEl.textContent = "If this game ever actually launches — thanks for paying to remove ads! It's much appreciated by your humble developer!";
-  }
-
-  var adSpeed = hasAdsFree() ? 10 : 100/50;
-  var pct = 0;
-  var iv = setInterval(function(){
-    pct += adSpeed;
-    document.getElementById('adprogfill').style.width = Math.min(100,pct) + '%';
-    if (pct >= 100) {
-      clearInterval(iv);
-      if (titleEl) titleEl.textContent = 'Watching ad...';
-      if (bodyEl) bodyEl.textContent = 'A merchant of dark arts has a message for you.';
-      document.getElementById('ad-closebtn').style.display = 'block';
-    }
-  }, 100);
-  // Override close button for boss context
-  document.getElementById('ad-closebtn').onclick = function(){
-    document.getElementById('adoverlay').classList.remove('show');
-    document.getElementById('ad-closebtn').onclick = function(){ closeAd(); }; // restore
+  showFakeAdOverlay(function(){
     bossAdInProgress = false;
     bossAdBoostEnd = Date.now() + 90*1000; // 90 sec boost
     bossAdCooldown = 90; // 90 sec cooldown
@@ -3809,7 +3713,7 @@ function watchBossAd() {
       _updateBossAdBtn();
       if (bossAdCooldown <= 0) { clearInterval(cdIv); }
     }, 1000);
-  };
+  });
 }
 function _updateBossAdBtn() {
   var el = document.getElementById('btn-boss-ad'); if (!el) return;
@@ -4189,15 +4093,9 @@ function buildShop() {
   var bg = document.getElementById('gembuygrid'); bg.innerHTML = '';
   GEM_PACKS.forEach(function(p){
     var d = document.createElement('div'); d.className = 'shopitem';
-    if (p.removeAds) {
-      var owned = gameState && gameState.removeAds;
-      var price = _devAccess ? '<span style="color:#ffd700;">DEV: Free</span>' : p.price;
-      d.innerHTML = '<div class="shopitem-icon">🔕</div><div style="flex:1"><div class="shopitem-name">' + p.label + '</div><div class="shopitem-desc">' + (owned ? 'Already purchased ✓' : p.desc) + '</div></div><div class="shopitem-price" style="' + (owned ? 'opacity:.4;cursor:default;' : '') + '" onclick="buyRemoveAds()">' + (owned ? 'Owned' : price) + '</div>';
-    } else {
-      var devPrice = _devAccess ? (gemHtml() + ' 1') : p.price;
-      var buyFn = _devAccess ? 'devBuyGems(' + p.gems + ')' : 'buyGems(' + p.gems + ')';
-      d.innerHTML = '<div class="shopitem-icon">' + gemHtml() + '</div><div style="flex:1"><div class="shopitem-name">' + p.label + '</div><div class="shopitem-desc">' + p.desc + '</div></div><div class="shopitem-price" onclick="' + buyFn + '">' + devPrice + '</div>';
-    }
+    var devPrice = _devAccess ? (gemHtml() + ' 1') : p.price;
+    var buyFn = _devAccess ? 'devBuyGems(' + p.gems + ')' : 'buyGems(' + p.gems + ')';
+    d.innerHTML = '<div class="shopitem-icon">' + gemHtml() + '</div><div style="flex:1"><div class="shopitem-name">' + p.label + '</div><div class="shopitem-desc">' + p.desc + '</div></div><div class="shopitem-price" onclick="' + buyFn + '">' + devPrice + '</div>';
     bg.appendChild(d);
   });
   var sg = document.getElementById('gemspendgrid'); sg.innerHTML = '';
@@ -4261,16 +4159,6 @@ function _grantGems(n) {
   }
   sfxGemEarn();
   saveGame(); updateGameUI(); buildShop();
-}
-function _grantRemoveAds() {
-  if (!gameState) return;
-  gameState.removeAds = true;
-  saveGame(); buildShop();
-}
-function buyRemoveAds() {
-  if (!gameState || gameState.removeAds) return;
-  if (_devAccess) { _grantRemoveAds(); showBoostExtendedToast('🔕 Ads removed (dev mode)!'); return; }
-  processPurchaseRemoveAds();
 }
 function devBuyGems(n) {
   if (!gameState || gameState.gems < 1) return;
