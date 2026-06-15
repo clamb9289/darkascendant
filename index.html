@@ -752,10 +752,12 @@ const SPRITES={
 var PAYMENT_PLATFORM = 'web';
 
 var STRIPE_PAYMENT_LINKS = {
-  gems_50:    'https://buy.stripe.com/bJecN58QH7PP4gV9BQcAo03',
   gems_150:   'https://buy.stripe.com/5kQ5kD0kb5HHbJn15kcAo00',
   gems_500:   'https://buy.stripe.com/14AdR9ff54DD5kZ3dscAo02',
-  gems_1500:  'https://buy.stripe.com/8x2bJ17MD7PP5kZg0ecAo01'
+  gems_1500:  'https://buy.stripe.com/8x2bJ17MD7PP5kZg0ecAo01',
+  tip_coffee: 'https://buy.stripe.com/8x27sLc2Teed9Bf5lAcAo05',
+  tip_beer:   'https://buy.stripe.com/28E3cvff5c657t701gcAo06',
+  tip_whiskey:'https://buy.stripe.com/5kQdR90kb1rrcNr5lAcAo07'
 };
 
 // ── Purchase gem pack ────────────────────────────────────────────────
@@ -766,6 +768,13 @@ function processPurchase(gems, priceKey) {
     + '?gems=' + gems;
   window.location.href = link + '?client_reference_id=' + gems
     + '&success_url=' + encodeURIComponent(returnUrl);
+}
+
+// ── Tip Jar ──────────────────────────────────────────────────────────
+function openTipJar(key) {
+  var link = STRIPE_PAYMENT_LINKS[key];
+  if (!link) return;
+  window.open(link, '_blank');
 }
 
 // ── Restore purchases (web — not applicable, stubbed for parity) ─────
@@ -810,7 +819,7 @@ var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 var SUPABASE_TABLE = 'Leaderboard';
 
 // =====================================================================
-var _devAccess = false; // set true if Supabase flags this device for dev access
+var _devAccess = true; // everyone gets dev/playtest perks — we'd rather people play than pay
 
 var DARK_TITLES = [
   'Dread Phantom','Shadow Lich','Void Wraith','Bone Tyrant','Soul Reaper',
@@ -1556,7 +1565,9 @@ var SPELL_TIERS = [
 ];
 
 var GEM_PACKS = [
-  {gems:50,  price:'$0.99', label:"Initiate's pouch", desc:'50 Soul gems'},
+  {gems:0, price:'$2',  label:'☕ Buy the dev a coffee', desc:'Thanks for playing — this one keeps the lights on.', tipKey:'tip_coffee'},
+  {gems:0, price:'$5',  label:'🍺 Buy the dev a beer',   desc:'Cheers! You\'re the reason this game exists.', tipKey:'tip_beer'},
+  {gems:0, price:'$10', label:'🥃 Buy the dev a whiskey',desc:'Now we\'re talking. Genuinely, thank you. 🌑', tipKey:'tip_whiskey'},
   {gems:150, price:'$2.99', label:"Adept's satchel",  desc:'150 Soul gems'},
   {gems:500, price:'$7.99', label:"Lich's hoard",     desc:'500 Soul gems'},
   {gems:1500,price:'$17.99',label:'Void treasury',    desc:'1500 Soul gems'},
@@ -4117,9 +4128,13 @@ function buildShop() {
   var bg = document.getElementById('gembuygrid'); bg.innerHTML = '';
   GEM_PACKS.forEach(function(p){
     var d = document.createElement('div'); d.className = 'shopitem';
-    var devPrice = _devAccess ? (gemHtml() + ' 1') : p.price;
-    var buyFn = _devAccess ? 'devBuyGems(' + p.gems + ')' : 'buyGems(' + p.gems + ')';
-    d.innerHTML = '<div class="shopitem-icon">' + gemHtml() + '</div><div style="flex:1"><div class="shopitem-name">' + p.label + '</div><div class="shopitem-desc">' + p.desc + '</div></div><div class="shopitem-price" onclick="' + buyFn + '">' + devPrice + '</div>';
+    if (p.tipKey) {
+      d.innerHTML = '<div class="shopitem-icon">' + p.label.split(' ')[0] + '</div><div style="flex:1"><div class="shopitem-name">' + p.label + '</div><div class="shopitem-desc">' + p.desc + '</div></div><div class="shopitem-price" onclick="openTipJar(\'' + p.tipKey + '\')" style="background:#3a0040;border-color:#9030a0;">' + p.price + ' →</div>';
+    } else {
+      var devPrice = _devAccess ? (gemHtml() + ' 1') : p.price;
+      var buyFn = _devAccess ? 'devBuyGems(' + p.gems + ')' : 'buyGems(' + p.gems + ')';
+      d.innerHTML = '<div class="shopitem-icon">' + gemHtml() + '</div><div style="flex:1"><div class="shopitem-name">' + p.label + '</div><div class="shopitem-desc">' + p.desc + '</div></div><div class="shopitem-price" onclick="' + buyFn + '">' + devPrice + '</div>';
+    }
     bg.appendChild(d);
   });
   var sg = document.getElementById('gemspendgrid'); sg.innerHTML = '';
