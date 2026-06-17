@@ -4,9 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>Dark Ascendant</title>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4731597353942263"
-     crossorigin="anonymous"></script>
 <style>
+
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;margin:0;padding:0;background:#000;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;justify-content:center;align-items:flex-start;overflow-x:hidden;}
@@ -298,6 +297,53 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:
 @keyframes lvlUpGlow{0%,100%{box-shadow:0 0 0 0 rgba(138,80,208,0);}50%{box-shadow:0 0 40px 10px rgba(138,80,208,0.5);}}
 .lvlup-pop{animation:lvlUpPop .45s cubic-bezier(.2,1.4,.4,1) forwards,lvlUpGlow 1.5s ease-in-out 0.3s 2;}
 
+/* ── ELEMENTAL BUTTON (replaces hold-btn in monetrow) ─────────────── */
+.monbtn-elem{background:linear-gradient(135deg,#0e0820,#1a0e38);border-color:#5a30a0;}
+.monbtn-elem .monbtn-title{color:#c090ff;}
+.monbtn-elem .monbtn-sub{color:#7050a0;}
+.monbtn-elem:hover{background:linear-gradient(135deg,#14103a,#220e48);}
+/* ── VOID CHARGE BARS ──────────────────────────────────────────────── */
+.void-charge-btn{width:100%;padding:4px 0 2px;cursor:pointer;touch-action:manipulation;transition:opacity .12s;}
+.void-charge-btn:active{opacity:.75;}
+.void-charge-lbl{font-size:var(--fs-xs);color:#8060c0;text-align:center;margin-bottom:3px;transition:color .3s;}
+.void-bar-track{width:100%;height:6px;background:#1a0a2a;border-radius:3px;overflow:hidden;}
+.void-bar-fill{height:100%;background:linear-gradient(to right,#4020a0,#a060ff);border-radius:3px;transition:width .4s linear;}
+.void-charge-btn.void-ready .void-charge-lbl{color:#c090ff;font-weight:600;animation:voidPulse 1.1s ease-in-out infinite;}
+.void-charge-btn.void-ready .void-bar-fill{background:linear-gradient(to right,#7040c0,#e0a0ff);box-shadow:0 0 8px #a060ff88;}
+@keyframes voidPulse{0%,100%{text-shadow:0 0 0 rgba(192,144,255,0);}50%{text-shadow:0 0 12px rgba(192,144,255,0.9);}}
+/* ── ELEMENTAL OVERLAY GRID ─────────────────────────────────────────── */
+#elemoverlay .ocard{background:var(--t-bg1);}
+.elem-col{display:flex;flex-direction:column;align-items:center;padding:8px 4px 12px;border-right:1px solid var(--t-bdr);gap:0;}
+.elem-col:last-child{border-right:none;}
+.elem-col-hdr{font-size:var(--fs-xs);font-weight:700;letter-spacing:.05em;text-align:center;padding:6px 2px 8px;text-transform:uppercase;}
+.elem-connector{width:2px;height:14px;border-left:2px dashed var(--t-bdr);margin:0 auto;}
+.elem-connector-lit{border-style:solid;}
+.elem-node{width:100%;border:1px solid var(--t-bdr);border-radius:8px;padding:8px 6px 7px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:background .15s,border-color .2s,box-shadow .2s;touch-action:manipulation;}
+.elem-node:active{opacity:.8;}
+.elem-node.elem-owned{background:color-mix(in srgb,var(--ecolor) 12%,var(--t-bg2));border-color:var(--ecolor);box-shadow:0 0 18px var(--eglow),inset 0 0 12px color-mix(in srgb,var(--ecolor) 8%,transparent);}
+.elem-node.elem-ready{background:var(--t-bg2);border-color:color-mix(in srgb,var(--ecolor) 60%,var(--t-bdr));cursor:pointer;}
+.elem-node.elem-ready:hover{background:var(--t-bg3);box-shadow:0 0 10px var(--eglow);}
+.elem-node.elem-locked{opacity:.45;cursor:default;pointer-events:none;}
+.elem-tier-lbl{font-size:9px;letter-spacing:.08em;color:var(--t-txt3);font-weight:600;}
+.elem-node-icon{font-size:22px;line-height:1;margin:2px 0;}
+.elem-node-name{font-size:var(--fs-xs);font-weight:600;text-align:center;line-height:1.2;}
+.elem-node-eff{font-size:9px;color:var(--t-txt3);text-align:center;line-height:1.3;min-height:24px;}
+.elem-node-bottom{width:100%;margin-top:4px;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.elem-cost{font-size:9px;color:var(--t-txt3);text-align:center;}
+.elem-cost.elem-cost-ok{color:var(--t-txt2);}
+.elem-buy-btn{font-size:var(--fs-xs);font-weight:600;padding:4px 6px;border-radius:5px;text-align:center;width:100%;box-sizing:border-box;}
+.elem-buy-ok{background:color-mix(in srgb,var(--ecolor) 20%,var(--t-bg3));color:var(--ecolor);border:1px solid var(--ecolor);cursor:pointer;}
+.elem-buy-ok:active{opacity:.7;}
+.elem-buy-poor{background:var(--t-bg2);color:var(--t-txt3);border:1px solid var(--t-bdr);cursor:default;font-size:8px;}
+/* ── STORM BOSS BUTTONS ─────────────────────────────────────────────── */
+.btn-thunder{background:#1a1400;border-color:#c0a020;color:#ffe040;}
+.btn-thunder:hover{background:#221c00;}
+.btn-paralyze{background:#0a0e1a;border-color:#3060c0;color:#80b0ff;}
+.btn-paralyze:hover{background:#0e1422;}
+/* fn-h4 for Infernal Charge milestone */
+.fn-h4{color:#ff9020;text-shadow:0 0 10px #ff902088;}
+
+
 </style>
 </head>
 <body>
@@ -467,6 +513,8 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
         <div class="boss-action-btn btn-spell" id="btn-spell" onclick="playerSpell()">🔮 Dark Spell<div style="font-size:10px;opacity:0.75;margin-top:2px;">stuns enemy</div></div>
         <div class="boss-action-btn btn-drain" id="btn-drain" onclick="playerDrain()">🩸 Soul Drain<div style="font-size:10px;opacity:0.75;margin-top:2px;">recover HP</div></div>
         <div class="boss-action-btn btn-ritual" id="btn-ritual" onclick="playerRitual()">🔥 Dark Ritual<div style="font-size:10px;opacity:0.75;margin-top:2px;">reduces rage</div></div>
+        <div class="boss-action-btn btn-thunder" id="btn-thunder" onclick="playerThunder()" style="display:none;">⚡ Thunder<div style="font-size:10px;opacity:0.75;margin-top:2px;">2.5× strike</div></div>
+        <div class="boss-action-btn btn-paralyze" id="btn-paralyze" onclick="playerParalyze()" style="display:none;">🌩️ Paralyze<div style="font-size:10px;opacity:0.75;margin-top:2px;">stun 3 turns</div></div>
         <div class="boss-action-btn" id="btn-dev-ko" onclick="devOneHitBoss()" style="display:none;background:#1a0800;border-color:#ff6600;color:#ffcc44;">💀 KO</div>
       </div>
       <div class="boss-action-btn btn-gem-revive" id="btn-revive" style="display:none;width:100%;margin-top:4px;" onclick="gemRevive()">💎 10 Gems — Revive</div>
@@ -690,6 +738,16 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
       <div id="tier-prog-row"><span id="tier-next-label">Next tier: Dark Initiate</span><span id="tier-next-pct">0%</span></div>
       <div id="tierprogbar"><div id="tierprogfill" style="width:0%"></div></div>
     </div>
+    <div id="void-charge-wrap" style="display:none;width:100%;padding:0 4px;box-sizing:border-box;">
+      <div id="void-btn-0" class="void-charge-btn" onclick="detonateVoidBomb(0)" style="display:none;">
+        <div id="void-lbl-0" class="void-charge-lbl">🌀 Void Charge — 0:00</div>
+        <div class="void-bar-track"><div id="void-bar-0" class="void-bar-fill" style="width:0%"></div></div>
+      </div>
+      <div id="void-btn-1" class="void-charge-btn" onclick="detonateVoidBomb(1)" style="display:none;">
+        <div id="void-lbl-1" class="void-charge-lbl">🌀 Void Charge 2 — 0:00</div>
+        <div class="void-bar-track"><div id="void-bar-1" class="void-bar-fill" style="width:0%"></div></div>
+      </div>
+    </div>
     <div id="tapbtn" style="position:relative;">🪄<div id="combo-display"></div></div>
     <div id="taphint">Tap to channel dark energy</div>
   </div>
@@ -697,7 +755,7 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
     <div class="monbtn monbtn-ad" onclick="openAdMenu()"><div class="monbtn-icon">📺</div><div class="monbtn-title">Receive Vision</div><div class="monbtn-sub" id="ad-btn-sub">+1 of 5 boosts</div></div>
     <div class="monbtn" onclick="openShop()"><div class="monbtn-icon" id="mon-gem-icon">💎</div><div class="monbtn-title">Soul Gems</div><div class="monbtn-sub" id="gem-sub">50 gems</div></div>
     <div class="monbtn" onclick="openTheme()"><div class="monbtn-icon">🎨</div><div class="monbtn-title">Themes</div><div class="monbtn-sub" id="theme-sub">Shadow</div></div>
-    <div class="monbtn monbtn-hold" id="hold-btn" onclick="openHoldAd()"><div class="monbtn-icon">👆</div><div class="monbtn-title">Hold to Tap</div><div class="monbtn-sub" id="hold-btn-sub">View ad</div></div>
+    <div class="monbtn monbtn-elem" id="elem-btn" onclick="openElemMenu()"><div class="monbtn-icon">⚗️</div><div class="monbtn-title">Elementals</div><div class="monbtn-sub" id="elem-btn-sub">Skill tree</div></div>
   </div>
   </div><!-- end game-fixed-top -->
   <div id="game-lower" style="position:relative;">
@@ -708,6 +766,21 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
     <div id="scroll-indicator-down" onclick="document.getElementById('game-lower').scrollTop=document.getElementById('game-lower').scrollHeight" style="position:sticky;bottom:0;left:0;right:0;height:44px;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .3s;z-index:50;background:linear-gradient(to top,rgba(138,80,208,0.55),transparent);margin-top:-44px;">
       <span style="font-size:18px;animation:indicatorPulse 1.2s ease-in-out infinite;">▼ Upgrade available ▼</span>
     </div>
+  </div>
+</div>
+
+<!-- ── ELEMENTAL SKILL OVERLAY ─────────────────────────────────── -->
+<div id="elemoverlay" class="overlay">
+  <div class="ocard" style="max-width:520px;width:96%;padding:0;overflow:hidden;">
+    <div class="otitle" style="padding:14px 16px 10px;border-bottom:1px solid var(--t-bdr);margin:0;display:flex;justify-content:space-between;align-items:center;">
+      <span>⚗️ Elemental Skills</span>
+      <span onclick="closeElemMenu()" style="cursor:pointer;font-size:20px;opacity:0.6;padding:0 4px;">✕</span>
+    </div>
+    <div style="padding:10px 12px 6px;font-size:var(--fs-xs);color:var(--t-txt3);border-bottom:1px solid var(--t-bdr);">
+      Unlock elemental grimoires first, then purchase the corresponding skill with essence.
+    </div>
+    <div id="elem-resonance-display" style="display:none;padding:8px 12px;font-size:var(--fs-xs);border-bottom:1px solid var(--t-bdr);background:rgba(112,64,192,0.12);"></div>
+    <div id="elem-skill-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0;overflow-y:auto;max-height:65vh;"></div>
   </div>
 </div>
 
@@ -744,6 +817,539 @@ const SPRITES={
   "upg_phylact":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACc0lEQVR4nO1bIUwDQRC8khYSTJuAAVFDSGoaQg2IR4AoAsSHpAaDwYDoC0hoDZYaRF+AAIPBYBAoBAggKYIazCcEUwGKhBoSCgTs3xH2cul/h+R23Gbv7+Ynu3vfvV5C9BhPV8Vvyj86c57oFRchhOjr5WL/ESwAmgAaybgXOKtnyZzXjV/0WrHWBOsjgAVAE0Aj9hqgotkMer0kCesjgAVAE0Aj8j22kmuQ+/7RgyfZK+N1o/lrwXSknK2PABYATQAN43xyBitkjjtZV7Jdd0qyN/2q6ZIkHt8vSf/z1y35jtZHAAuAJoCGtgaUS2ky58sfr49h209lxqjx9Y3Xdtj2djPpKOdX4Z+0uQZQYAHQBND4lR9nhe+9sF0LqmvUBE7DvQ3bbj6XpcbnRHqE8gei/Uz5T++DVtg+mvSm/horhBAHE439sL3YTKyHbesjgAVAE0Ajqea8miPOYEWqAeq3tyNcyZ7rHyJz/KnzKdmj/b/akuTz5bubFuVXob6P+r7WRwALgCaAhvG5wNjALOm/6LyQ+3ggpJ8C4qLzYrT+6X205wrWRwALgCaAhrYGFBb2Sf/q9s5w2PZTGXIf77Yf8Jaal779S0skPeGf0H7rI4AFQBNAo+t+gK4vjwb3AzRgAdAE0Oj6bPC/1wA+G9SABUATQMO4H+CUDiW7nJePAfztIvm8WjN0/QXd+gVlfW8rZTSf9RHAAqAJoBH7f4UrO8eaEbS/Vl02Wk+376uwPgJYADQBNCKvAddvNSUH5TtA59fyuYCKoiO3CNX5HDFsdAdJB+sjgAVAE0Aj9u8A9d6f7h5h3PcEVVgfASwAmgAaPxWRnXKx4EWmAAAAAElFTkSuQmCC",
   "upg_rift":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACBUlEQVR4nO2boVPDUAzGX7kyC6JmBjMzjenE0BOYGgwKM4FCoPgjEKiJmSl0DWJ+ghp0zQwGU8EsE8M2Kddcru2+ci8/l+ut/S6X5JK8t2A0jA+uQ9bX71nZnr1NYs3zrjk55sf6iDkALQBN2PYLm+b8sWuC9xFgDkALQBNIfcDFcEzsz6+c2OtHmrN56qKyvcmzEbF3aa2g6VlC7XG8LdvjxBVle/bcrEZ4HwHmALQANGIfoM35KHK1OZ/tF/Uf3DE7p+9zKU15rkdbE7yPAHMAWgCaSg2QenGeY3/UBA7J4Z/DN3k4CM5rBUp9wPz1zvqAJpgD0ALQhNr53NHRQOz9OTzneU24GjwRm/cVvMYsb1fWBzTBHIAWgCbkOc/nf47UB/BefZOltTVBoiic7QO6xByAFoCmMgssL1f1fYFyH8CRZoH49J7Ylb5CuQ+Q+hzvI8AcgBaAplIDpLO4pvsALdpzAe1s430EmAPQAtCo7wdozwI5be8DKrMIPcaoYH0AwxyAFoBGrAF8P/Df9gE2CwiYA9AC0HR+P4DT9T6AnxVKs433EWAOQAtAo54F+r4P0OJ9BJgD0ALQiHeFOVIf8LCdkJy/2b+Q32vvCidTmuJtnxV6HwHmALQANOoaIKHdy88/aO8unU22jfcRYA5AC0DTeg3g9O1/ghzvI8AcgBaA5hdsIQHcOrKoJAAAAABJRU5ErkJggg==",
 };
+
+// ══════════════════════════════════════════════════════════════════════
+// DARK ASCENDANT — Payment Config: WEB (Stripe Payment Links)
+// ══════════════════════════════════════════════════════════════════════
+
+var PAYMENT_PLATFORM = 'web';
+
+var STRIPE_PAYMENT_LINKS = {
+  gems_150:   'https://buy.stripe.com/5kQ5kD0kb5HHbJn15kcAo00',
+  gems_500:   'https://buy.stripe.com/14AdR9ff54DD5kZ3dscAo02',
+  gems_1500:  'https://buy.stripe.com/8x2bJ17MD7PP5kZg0ecAo01',
+  tip_coffee: 'https://buy.stripe.com/8x27sLc2Teed9Bf5lAcAo05',
+  tip_beer:   'https://buy.stripe.com/28E3cvff5c657t701gcAo06',
+  tip_whiskey:'https://buy.stripe.com/5kQdR90kb1rrcNr5lAcAo07'
+};
+
+// ── Purchase gem pack ────────────────────────────────────────────────
+function processPurchase(gems, priceKey) {
+  var link = STRIPE_PAYMENT_LINKS[priceKey];
+  if (!link) { _grantGems(gems); return; } // fallback for dev
+  var returnUrl = window.location.origin + window.location.pathname
+    + '?gems=' + gems;
+  window.location.href = link + '?client_reference_id=' + gems
+    + '&success_url=' + encodeURIComponent(returnUrl);
+}
+
+// ── Tip Jar ──────────────────────────────────────────────────────────
+function openTipJar(key) {
+  var link = STRIPE_PAYMENT_LINKS[key];
+  if (!link) return;
+  window.open(link, '_blank');
+}
+
+// ── Restore purchases (web — not applicable, stubbed for parity) ─────
+function restorePurchases() {
+  showBoostExtendedToast('Use Export/Import save to restore on a new device.');
+}
+
+// ── Handle return from Stripe Payment Link ───────────────────────────
+// Runs on every page load, BEFORE the player taps Resume/New Game —
+// gameState does not exist yet at this point, so we work with the
+// saved data directly, then launch straight into the game and open
+// the shop so the player gets a clear confirmation their purchase worked.
+function checkPendingPurchase() {
+  var params = new URLSearchParams(window.location.search);
+  var pendingGems = parseInt(params.get('gems'));
+  if (!(pendingGems > 0)) return;
+
+  // Clean the URL immediately so a refresh doesn't re-grant
+  window.history.replaceState({}, '', window.location.pathname);
+
+  // Load (or initialize) the save directly, independent of gameState
+  var save = loadGame() || getDefaultState();
+  save = migrateSave(save, getDefaultState());
+  gameState = save;
+
+  if (pendingGems > 0) _grantGems(pendingGems);
+
+  // Launch straight into the game (skips intro) and open the shop
+  // so the updated gem count is immediately visible.
+  _doLaunchGame();
+  setTimeout(function(){
+    openShop();
+    if (pendingGems > 0) showBoostExtendedToast('+' + pendingGems + ' \uD83D\uDC8E Purchase successful!');
+  }, 500);
+}
+
+// ── LEADERBOARD SYSTEM ───────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════
+
+var SUPABASE_URL = 'https://kzuefykdkhsvgjdawrbe.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6dWVmeWtka2hzdmdqZGF3cmJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMzU0MDgsImV4cCI6MjA5NjcxMTQwOH0.ZTSrg9RGvvDS9NYaQisj8DxPupfvwAyuThZmrI5ZOlo';
+var SUPABASE_TABLE = 'Leaderboard';
+
+// =====================================================================
+var _devAccess = true; // everyone gets dev/playtest perks — we'd rather people play than pay
+
+var DARK_TITLES = [
+  'Dread Phantom','Shadow Lich','Void Wraith','Bone Tyrant','Soul Reaper',
+  'Crypt Walker','Dark Oracle','Night Blade','Doom Caller','Ash Revenant',
+  'Plague Sage','Rune Breaker','Death Knell','Hollow King','Grave Warden',
+  'Cursed Flame','Veil Stalker','Abyss Spawn','Blood Pact','Fell Watcher',
+  'Iron Specter','Storm Wraith','Ember Lich','Frost Reaper','Void Herald',
+  'Null Walker','Chaos Binder','Soul Flayer','Dark Warden','Hex Bringer'
+];
+
+// ── Device ID ────────────────────────────────────────────────────────
+function getDeviceId() {
+  var id = localStorage.getItem('da_device_id');
+  if (!id) {
+    id = 'dev_' + Math.random().toString(36).slice(2,10) + Math.random().toString(36).slice(2,10);
+    localStorage.setItem('da_device_id', id);
+  }
+  return id;
+}
+
+// ── Wizard Name ──────────────────────────────────────────────────────
+function getWizardName() { return localStorage.getItem('da_wizard_name') || null; }
+function setWizardName(n) { localStorage.setItem('da_wizard_name', n); }
+
+function genGenericName() {
+  var title = DARK_TITLES[Math.floor(Math.random() * DARK_TITLES.length)];
+  var num = Math.floor(1000 + Math.random() * 9000);
+  return title + ' #' + num;
+}
+
+// Client-side profanity pre-check (same list as server, faster feedback)
+var _badWords = ['fuck','shit','cunt','bitch','asshole','nigger','nigga','faggot','retard',
+  'cock','pussy','dick','whore','slut','bastard','twat','wanker','piss','arse','kike','spic','chink','gook'];
+function _hasProfanity(str) {
+  var lower = str.toLowerCase().replace(/[^a-z0-9]/g,'');
+  return _badWords.some(function(w){ return lower.indexOf(w) >= 0; });
+}
+
+// ── Name Picker Overlay ──────────────────────────────────────────────
+function checkWizardNamePrompt() {
+  if (getWizardName()) {
+    document.body.classList.add('screens-ready'); // name already set, reveal immediately
+    return;
+  }
+  document.body.classList.add('name-pending');
+  setTimeout(showWizardNamePicker, 100);
+}
+
+// Opens the name picker in rename mode — pre-filled with the player's
+// current name. Called from the "✎ Rename" link on the home screen.
+function openRenamePicker() {
+  showWizardNamePicker(true);
+}
+
+function showWizardNamePicker(isRename) {
+  if (document.getElementById('wizard-name-overlay')) return;
+
+  var _caps = true; // start uppercase
+  var _nums = false;
+
+  var ALPHA_UPPER = [
+    ['Q','W','E','R','T','Y','U','I','O','P'],
+    ['A','S','D','F','G','H','J','K','L'],
+    ['CAPS','Z','X','C','V','B','N','M','DEL'],
+    ['123','SPACE','ENTER']
+  ];
+  var ALPHA_LOWER = [
+    ['q','w','e','r','t','y','u','i','o','p'],
+    ['a','s','d','f','g','h','j','k','l'],
+    ['CAPS','z','x','c','v','b','n','m','DEL'],
+    ['123','SPACE','ENTER']
+  ];
+  var NUM_ROWS = [
+    ['1','2','3','4','5','6','7','8','9','0'],
+    ['DEL'],
+    ['ABC','SPACE','ENTER']
+  ];
+
+  function renderKb() {
+    var rows = _nums ? NUM_ROWS : (_caps ? ALPHA_UPPER : ALPHA_LOWER);
+    var html = rows.map(function(keys) {
+      return '<div style="display:flex;gap:5px;margin-bottom:5px;">' + keys.map(function(k) {
+        var label = k === 'DEL' ? '⌫'
+          : k === 'ENTER' ? '↵ Done'
+          : k === 'SPACE' ? 'SPACE'
+          : k === 'CAPS'  ? (_caps ? '⬆ ABC' : '⬆ abc')
+          : k === '123'   ? '123'
+          : k === 'ABC'   ? 'ABC'
+          : k;
+        var flex = (k === 'SPACE') ? '4' : (k === 'ENTER') ? '3' : (k === 'CAPS' || k === '123' || k === 'ABC') ? '2' : '1';
+        var bg   = (k === 'CAPS' && _caps) ? '#2a0a50' : '#150828';
+        var col  = (k === 'CAPS' || k === '123' || k === 'ABC') ? '#e0a0ff' : '#c0a0e0';
+        return '<div data-wkb="' + k + '" style="flex:' + flex + ';padding:11px 2px;border-radius:7px;background:' + bg + ';border:1px solid #2a1050;color:' + col + ';font-size:14px;font-weight:600;text-align:center;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent;">' + label + '</div>';
+      }).join('') + '</div>';
+    }).join('');
+    var kbEl = document.getElementById('wkb-keys');
+    if (kbEl) kbEl.innerHTML = html;
+  }
+
+  var el = document.createElement('div');
+  el.id = 'wizard-name-overlay';
+  el.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#04010c;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;z-index:8000;padding:28px 20px 16px;box-sizing:border-box;overflow:hidden;pointer-events:all;';
+
+  el.innerHTML = '<div style="font-size:26px;margin-bottom:6px;">&#127761;</div>'
+    + '<div style="font-size:17px;font-weight:700;color:#c080ff;margin-bottom:4px;">' + (isRename ? 'Rename Your Wizard' : 'Choose Your Wizard Name') + '</div>'
+    + '<div style="font-size:11px;color:#5030a0;margin-bottom:16px;text-align:center;">Appears on the global leaderboard &middot; 2&ndash;24 characters</div>'
+    + (isRename ? '' : '<div id="wkb-skip" style="width:100%;max-width:320px;padding:12px;border-radius:8px;background:#1a0a30;border:1px solid #7030c0;color:#e0c0ff;font-size:14px;font-weight:700;text-align:center;cursor:pointer;margin-bottom:14px;touch-action:manipulation;">🎲 Skip — give me a random name</div>'
+      + '<div style="font-size:11px;color:#3a2060;margin-bottom:14px;text-align:center;">You can rename yourself anytime from the home screen</div>')
+    + '<input id="wkb-input" type="text" maxlength="24" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" inputmode="text" placeholder="Tap here to type with your keyboard" style="width:100%;max-width:320px;padding:11px 14px;border-radius:8px;border:1px solid #5030a0;background:#0a0018;color:#e0c0ff;font-size:16px;text-align:center;box-sizing:border-box;margin-bottom:6px;min-height:44px;letter-spacing:0.5px;outline:none;-webkit-appearance:none;font-family:inherit;">'
+    + '<div id="wizard-name-error" style="font-size:11px;color:#ff5050;min-height:16px;margin-bottom:8px;text-align:center;"></div>'
+    + '<div id="wizard-name-confirm-btn" style="width:100%;max-width:320px;padding:11px;border-radius:8px;background:#3a0070;border:1px solid #7030c0;color:#e0a0ff;font-size:14px;font-weight:600;text-align:center;cursor:pointer;margin-bottom:14px;touch-action:manipulation;">' + (isRename ? 'Save name &#8594;' : 'Claim this name &#8594;') + '</div>'
+    + '<div id="wkb-keys" style="width:100%;max-width:360px;"></div>'
+    + '<div id="wkb-random" style="margin-top:14px;font-size:11px;color:#4a2870;text-decoration:underline;cursor:pointer;touch-action:manipulation;">Generate a random dark fantasy name for me</div>'
+    + (isRename ? '<div id="wkb-cancel" style="margin-top:10px;font-size:11px;color:#3a2060;text-decoration:underline;cursor:pointer;touch-action:manipulation;">Cancel</div>'
+      : '<div id="wkb-import" style="margin-top:10px;font-size:11px;color:#3a2060;text-decoration:underline;cursor:pointer;touch-action:manipulation;">Already played? Import a save file →</div>');
+
+
+  document.body.appendChild(el);
+  renderKb();
+
+  // Rename mode — prefill with the player's current name
+  if (isRename) {
+    _wkbValue = getWizardName() || '';
+    var prefillEl = document.getElementById('wkb-input');
+    if (prefillEl) prefillEl.value = _wkbValue;
+  }
+
+  // Real <input> wiring — desktop physical keyboard types directly, and
+  // tapping the field on mobile opens the native on-screen keyboard.
+  var inputEl = document.getElementById('wkb-input');
+  if (inputEl) {
+    inputEl.addEventListener('input', function() {
+      _wkbValue = inputEl.value.slice(0, 24);
+      if (inputEl.value !== _wkbValue) inputEl.value = _wkbValue;
+      var err = document.getElementById('wizard-name-error');
+      if (err) err.textContent = '';
+    });
+    inputEl.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); confirmWizardName(); }
+    });
+    // Autofocus on desktop (pops the native keyboard on mobile if focused,
+    // so only do this automatically where there's no touch input).
+    if (!window.matchMedia || !window.matchMedia('(pointer: coarse)').matches) {
+      setTimeout(function(){ inputEl.focus(); }, 50);
+    }
+  }
+
+  el.addEventListener('pointerdown', function(e) {
+    var btn = e.target.closest('[data-wkb]');
+    if (btn) {
+      e.preventDefault();
+      var k = btn.getAttribute('data-wkb');
+      if (k === 'CAPS') { _caps = !_caps; renderKb(); return; }
+      if (k === '123')  { _nums = true;  _caps = false; renderKb(); return; }
+      if (k === 'ABC')  { _nums = false; _caps = true;  renderKb(); return; }
+      // After typing a letter, switch to lowercase (like a real keyboard)
+      if (k !== 'DEL' && k !== 'SPACE' && k !== 'ENTER' && _caps && !_nums) {
+        _wkbTap(k);
+        _caps = false; renderKb(); return;
+      }
+      _wkbTap(k); return;
+    }
+    if (e.target.closest('#wizard-name-confirm-btn')) { e.preventDefault(); confirmWizardName(); return; }
+    if (e.target.closest('#wkb-random')) { e.preventDefault(); useGenericName(); return; }
+    if (e.target.closest('#wkb-skip')) { e.preventDefault(); useGenericName(); return; }
+    if (e.target.closest('#wkb-cancel')) { e.preventDefault(); closeWizardNamePicker(); return; }
+    if (e.target.closest('#wkb-import')) { e.preventDefault(); closeWizardNamePicker(); promptImportSave(); return; }
+  });
+}
+
+var _wkbValue = '';
+function _wkbTap(k) {
+  var err = document.getElementById('wizard-name-error');
+  if (err) err.textContent = '';
+  if (k === 'DEL') {
+    _wkbValue = _wkbValue.slice(0, -1);
+  } else if (k === 'ENTER') {
+    confirmWizardName(); return;
+  } else if (k === 'SPACE') {
+    if (_wkbValue.length < 24 && _wkbValue.slice(-1) !== ' ') _wkbValue += ' ';
+  } else {
+    if (_wkbValue.length < 24) _wkbValue += k;
+  }
+  var t = document.getElementById('wkb-input');
+  if (t) t.value = _wkbValue;
+}
+
+function confirmWizardName() {
+  var err = document.getElementById('wizard-name-error');
+  var name = _wkbValue.trim();
+  if (name.length < 2) { if (err) err.textContent = 'Name must be at least 2 characters.'; return; }
+  if (name.length > 24) { if (err) err.textContent = 'Name must be 24 characters or fewer.'; return; }
+  if (!/^[a-zA-Z0-9 '#\-\.]+$/.test(name)) { if (err) err.textContent = "Letters, numbers, spaces and # - . ' only."; return; }
+  if (_hasProfanity(name)) { if (err) err.textContent = 'Please choose a different name.'; return; }
+  if (err) err.textContent = '';
+  var btn = document.getElementById('wizard-name-confirm-btn');
+  if (btn) { btn.textContent = 'Checking…'; btn.style.opacity = '.6'; btn.style.pointerEvents = 'none'; }
+  var myDevice = getDeviceId();
+  fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE
+    + '?select=device_id&wizard_name=eq.' + encodeURIComponent(name) + '&limit=1', {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(rows) {
+    if (rows && rows.length > 0 && rows[0].device_id !== myDevice) {
+      if (err) err.textContent = 'Name already taken — please choose another.';
+      if (btn) { btn.textContent = 'Claim this name →'; btn.style.opacity = '1'; btn.style.pointerEvents = ''; }
+    } else {
+      setWizardName(name);
+      _wkbValue = '';
+      setTimeout(closeWizardNamePicker, 300);
+    }
+  })
+  .catch(function() {
+    // Offline — skip check and allow
+    setWizardName(name);
+    _wkbValue = '';
+    setTimeout(closeWizardNamePicker, 300);
+  });
+}
+
+function useGenericName() {
+  var name = genGenericName();
+  // Show the generated name on screen briefly before closing
+  _wkbValue = name;
+  var t = document.getElementById('wkb-input');
+  if (t) t.value = name;
+  var btn = document.getElementById('wizard-name-confirm-btn');
+  if (btn) { btn.textContent = 'Using: ' + name + ' →'; btn.style.opacity = '.8'; }
+  setWizardName(name);
+  _wkbValue = '';
+  setTimeout(closeWizardNamePicker, 1400);
+}
+
+function closeWizardNamePicker() {
+  var el = document.getElementById('wizard-name-overlay');
+  if (el && el.parentNode) el.parentNode.removeChild(el);
+  document.body.classList.remove('name-pending');
+  document.body.classList.add('screens-ready');
+  refreshHomeBtns(); // show wizard name on home screen immediately
+  // If this was a rename mid-session (gameState already exists), push the
+  // new name to the leaderboard right away rather than waiting for the
+  // next periodic submit.
+  if (typeof gameState !== 'undefined' && gameState) submitLeaderboardScore(true);
+}
+
+// ── Score Submission ─────────────────────────────────────────────────
+function checkDevAccess() {
+  var device_id = getDeviceId();
+  fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE
+    + '?select=dev_access&device_id=eq.' + encodeURIComponent(device_id) + '&limit=1', {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(rows) {
+    if (rows && rows.length > 0 && rows[0].dev_access === true) {
+      _devAccess = true;
+      applyDevAccess();
+    }
+  })
+  .catch(function() {}); // silent fail
+}
+
+// ── Remote Gem Grants ────────────────────────────────────────────────
+// Lets the developer credit gems to a specific device by setting
+// pending_gems on their Leaderboard row via the Supabase Table Editor.
+// On next launch, the game claims the grant: credits the gems, then
+// resets pending_gems to 0 (the DB trigger prevents anon from ever
+// increasing this value, only decreasing/claiming it).
+function checkPendingGemGrant() {
+  if (!gameState) return;
+  var device_id = getDeviceId();
+  fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE
+    + '?select=pending_gems&device_id=eq.' + encodeURIComponent(device_id) + '&limit=1', {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(rows) {
+    var amount = (rows && rows.length > 0) ? (rows[0].pending_gems || 0) : 0;
+    if (amount > 0) {
+      _grantGems(amount);
+      showBoostExtendedToast('\uD83C\uDF81 +' + amount + ' ' + gemHtml() + ' Gift from the developer!');
+      // Claim it: reset to 0 so it isn't granted again
+      fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE
+        + '?device_id=eq.' + encodeURIComponent(device_id), {
+        method: 'PATCH',
+        headers: Object.assign(_sbH(), {'Prefer':'return=minimal'}),
+        body: JSON.stringify({ pending_gems: 0 })
+      }).catch(function(){});
+    }
+  })
+  .catch(function() {}); // silent fail
+}
+
+function applyDevAccess() {
+  // Show playtest button on home screen
+  var btn = document.getElementById('home-dev-btn');
+  if (btn) btn.style.display = '';
+  // Refresh shop if open
+  if (document.getElementById('shopoverlay') && document.getElementById('shopoverlay').classList.contains('show')) {
+    buildShop();
+  }
+}
+
+function openDevPanel() {
+  document.getElementById('devoverlay').classList.add('show');
+}
+
+function _sbH() {
+  return {
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_KEY,
+    'Content-Type': 'application/json'
+  };
+}
+
+function submitLeaderboardScore(silent) {
+  if (!getWizardName()) return;
+  var name = getWizardName();
+  var prestige = (gameState && gameState.prestigeCount) || 0;
+  var best_time_ms = (gameState && gameState.stats && gameState.stats.bestTime100) || 0;
+  var device_id = getDeviceId();
+  var timeFmt = best_time_ms > 0
+    ? Math.floor(best_time_ms/60000) + 'm ' + Math.floor((best_time_ms%60000)/1000) + 's'
+    : null;
+  fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE, {
+    method: 'POST',
+    headers: Object.assign(_sbH(), {'Prefer': 'resolution=merge-duplicates,return=minimal'}),
+    body: JSON.stringify({
+      device_id: device_id,
+      wizard_name: name,
+      prestige: prestige,
+      best_time_ms: best_time_ms,
+      best_time_fmt: timeFmt,
+      level: (gameState && gameState.level) || 1,
+      updated_at: new Date().toISOString()
+    })
+  })
+  .then(function(r) {
+    console.log('[LB] submit status:', r.status);
+  })
+  .catch(function(e) { console.log('[LB] submit error:', e); });
+}
+
+
+function openLeaderboard() {
+  var existing = document.getElementById('leaderboard-overlay');
+  if (existing) { existing.style.display = 'flex'; fetchLeaderboard(); return; }
+
+  var el = document.createElement('div');
+  el.id = 'leaderboard-overlay';
+  el.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#04010c;display:flex;flex-direction:column;align-items:center;z-index:7000;padding:0;box-sizing:border-box;overflow:hidden;pointer-events:all;';
+
+  el.innerHTML = [
+    // Header
+    '<div style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 4% 12px;border-bottom:1px solid #1a0a2a;flex-shrink:0;">',
+      '<div style="font-size:18px;font-weight:700;color:#c080ff;">🏆 Leaderboard</div>',
+      '<div id="lb-close-btn" style="font-size:14px;color:#a060e0;cursor:pointer;padding:8px 16px;border:1px solid #4a1080;border-radius:8px;touch-action:manipulation;font-weight:600;">✕ Close</div>',
+    '</div>',
+    // My name bar
+    '<div id="lb-my-name" style="width:100%;padding:10px 4%;font-size:13px;color:#6040a0;flex-shrink:0;border-bottom:1px solid #0e0520;box-sizing:border-box;"></div>',
+    // Column headers
+    '<div style="width:100%;display:grid;grid-template-columns:10% 1fr 12% 12% 18%;padding:8px 4%;border-bottom:1px solid #1a0a2a;flex-shrink:0;">',
+      '<div style="font-size:11px;color:#4a2070;font-weight:700;letter-spacing:0.5px;">#</div>',
+      '<div style="font-size:11px;color:#4a2070;font-weight:700;letter-spacing:0.5px;">WIZARD</div>',
+      '<div style="font-size:11px;color:#4a2070;font-weight:700;text-align:center;letter-spacing:0.5px;">LVL</div>',
+      '<div style="font-size:11px;color:#4a2070;font-weight:700;text-align:center;letter-spacing:0.5px;">ASC</div>',
+      '<div style="font-size:11px;color:#4a2070;font-weight:700;text-align:right;letter-spacing:0.5px;">BEST RUN</div>',
+    '</div>',
+    // List
+    '<div id="lb-list" style="width:100%;flex:1;overflow-y:auto;"></div>',
+    // Status
+    '<div id="lb-status" style="padding:40px;color:#4a2070;font-size:14px;text-align:center;flex-shrink:0;"></div>',
+  ].join('');
+
+  document.body.appendChild(el);
+
+  el.addEventListener('pointerdown', function(e) {
+    if (e.target.closest('#lb-close-btn')) { e.preventDefault(); closeLeaderboard(); }
+  });
+
+  var myName = getWizardName();
+  var nameEl = document.getElementById('lb-my-name');
+  if (nameEl) nameEl.textContent = myName ? ('Playing as: ' + myName) : 'No wizard name set yet.';
+
+  fetchLeaderboard();
+}
+
+function closeLeaderboard() {
+  var el = document.getElementById('leaderboard-overlay');
+  if (el && el.parentNode) el.parentNode.removeChild(el);
+}
+
+function fetchLeaderboard() {
+  var list = document.getElementById('lb-list');
+  var status = document.getElementById('lb-status');
+  if (!list) return;
+  if (status) { status.textContent = 'Loading...'; status.style.display = 'block'; }
+  list.innerHTML = '';
+
+  fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE
+    + '?select=device_id,wizard_name,prestige,best_time_ms,best_time_fmt,level'
+    + '&order=prestige.desc,level.desc'
+    + '&limit=1000', {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY
+    }
+  })
+  .then(function(r) {
+    if (!r.ok) return r.text().then(function(t) { throw new Error('HTTP ' + r.status + ': ' + t); });
+    return r.json();
+  })
+  .then(function(rows) {
+    console.log('[LB] fetch got', rows.length, 'rows');
+    if (status) status.style.display = 'none';
+    if (!rows || rows.length === 0) {
+      list.innerHTML = '<div style="padding:40px;text-align:center;color:#3a1060;font-size:13px;">No entries yet -- be the first!</div>';
+      return;
+    }
+    var myDevice = getDeviceId();
+    rows.sort(function(a, b) {
+      if (b.prestige !== a.prestige) return b.prestige - a.prestige;
+      if ((b.level || 0) !== (a.level || 0)) return (b.level || 0) - (a.level || 0);
+      if (!a.best_time_ms) return 1;
+      if (!b.best_time_ms) return -1;
+      return a.best_time_ms - b.best_time_ms;
+    });
+    var html = '';
+    rows.forEach(function(e, i) {
+      var rank = i + 1;
+      var isMe = e.device_id === myDevice;
+      var rankColor = rank === 1 ? '#ffd700' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : '#6040a0';
+      var rankSize = rank <= 3 ? '16px' : '14px';
+      var rowBg = isMe ? 'background:rgba(120,60,200,0.18);border-left:3px solid #8040d0;' : 'border-left:3px solid transparent;';
+      var lvl = e.level || 1;
+      var lvlColor = lvl >= 100 ? '#ffd700' : lvl >= 50 ? '#c080ff' : '#8060c0';
+      var bc = e.prestige > 0 ? (BADGE_COLORS[Math.min(e.prestige, BADGE_COLORS.length)-1] || BADGE_COLORS[0]) : null;
+      var ascended = e.prestige > 0
+        ? '<span style="background:rgba(80,20,120,0.3);border-radius:12px;padding:2px 8px;font-size:12px;color:' + bc.color + ';font-weight:700;border:1px solid ' + bc.border + ';text-shadow:0 0 6px ' + bc.border + ';">' + e.prestige + 'x</span>'
+        : '<span style="color:#3a1060;font-size:12px;">—</span>';
+      html += '<div style="display:grid;grid-template-columns:10% 1fr 12% 12% 18%;padding:13px 4%;' + rowBg + 'border-bottom:1px solid #0e0520;align-items:center;">'
+        + '<div style="font-size:' + rankSize + ';font-weight:700;color:' + rankColor + ';">' + rank + '</div>'
+        + '<div style="font-size:14px;color:' + (isMe ? '#e8b0ff' : '#c080ff') + ';font-weight:' + (isMe ? '700' : '500') + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + e.wizard_name + '</div>'
+        + '<div style="text-align:center;font-size:13px;font-weight:700;color:' + lvlColor + ';">' + lvl + '</div>'
+        + '<div style="text-align:center;">' + ascended + '</div>'
+        + '<div style="text-align:right;font-size:11px;color:#6040a0;">' + (e.best_time_fmt || '<span style="color:#2a1050;">—</span>') + '</div>'
+        + '</div>';
+    });
+    list.innerHTML = html;
+  })
+  .catch(function(e) {
+    console.log('[LB] fetch error:', e);
+    if (status) { status.textContent = 'Error: ' + e.message; status.style.display = 'block'; status.style.color = '#ff5050'; status.style.fontSize = '10px'; }
+  });
+}
+
 
 // ══════════════════════════════════════════════════════════════════════
 // DARK ASCENDANT — Payment Config: WEB (Stripe Payment Links)
@@ -1564,6 +2170,76 @@ var SPELL_TIERS = [
    ]},
 ];
 
+// ── ELEMENTAL SKILLS ──────────────────────────────────────────────────
+// Each skill is unlocked by purchasing it with essence once the player
+// has unlocked the corresponding spell tier (same SPELL_TIERS id).
+var ELEM_SKILLS = [
+  // ── FIRE 🔥 ─────────────────────────────────────────────────────────
+  {id:'elem_fire1', spellTier:'fire',  tier:1, elem:'fire',  icon:'🔥',
+   name:'Ember Rush',         color:'#e05020',
+   cost:5000,
+   effect:'Hold-to-tap fires at 35ms — a 4th speed tier beyond the base levels.',
+   effectShort:'Hold speed ×4 tier (35ms)'},
+  {id:'elem_fire2', spellTier:'fire2', tier:2, elem:'fire',  icon:'🔥',
+   name:'Infernal Charge',    color:'#ff7030',
+   cost:120000,
+   effect:'A 4th Hold Frenzy milestone unlocks at 60s — 2.0× tap multiplier with blazing aura.',
+   effectShort:'Hold Frenzy IV at 60s (2.0×)'},
+  {id:'elem_fire3', spellTier:'fire3', tier:3, elem:'fire',  icon:'🔥',
+   name:'Soulfire Ascension', color:'#ff9060',
+   cost:1500000,
+   effect:'Permanent +50% tap multiplier applied to all tap damage forever.',
+   effectShort:'+50% permanent tap power'},
+  // ── ICE ❄️ ──────────────────────────────────────────────────────────
+  {id:'elem_ice1',  spellTier:'frost',  tier:1, elem:'ice',  icon:'❄️',
+   name:'Frost Accumulation', color:'#3090c0',
+   cost:10000,
+   effect:'Passive income ticks twice as fast — same per-second rate, but paid out every 500ms.',
+   effectShort:'Passive tick rate ×2'},
+  {id:'elem_ice2',  spellTier:'frost2', tier:2, elem:'ice',  icon:'❄️',
+   name:'Glacial Reserves',   color:'#50c0ff',
+   cost:180000,
+   effect:'Offline earnings multiplied ×3, stacking with any prestige offline bonus.',
+   effectShort:'Offline earnings ×3'},
+  {id:'elem_ice3',  spellTier:'frost3', tier:3, elem:'ice',  icon:'❄️',
+   name:'Absolute Stillness', color:'#a0e8ff',
+   cost:2500000,
+   effect:'Permanent +100% passive multiplier — all passive income doubled forever.',
+   effectShort:'+100% permanent passive'},
+  // ── VOID 🌀 ─────────────────────────────────────────────────────────
+  {id:'elem_void1', spellTier:'void2',  tier:1, elem:'void', icon:'🌀',
+   name:'Void Conduit',       color:'#7040c0',
+   cost:20000,
+   effect:'A Void Charge bar appears in the main UI. Fills over 3 minutes. Tap it to Void Bomb — 3× all gains for 2 minutes.',
+   effectShort:'Void Bomb: 3× all gains 2min (3min charge)'},
+  {id:'elem_void2', spellTier:'void3',  tier:2, elem:'void', icon:'🌀',
+   name:'Twin Singularity',   color:'#a060ff',
+   cost:300000,
+   effect:'A second independent Void Charge bar. Two bombs can charge simultaneously.',
+   effectShort:'2nd Void Charge bar'},
+  {id:'elem_void3', spellTier:'void4',  tier:3, elem:'void', icon:'🌀',
+   name:'Dark Resonance',     color:'#c090ff',
+   cost:2000000,
+   effect:'Each Void Bomb detonation permanently adds +15% tap and +15% passive (stacks up to 10×).',
+   effectShort:'+15% tap & passive per Void Bomb (max 10×)'},
+  // ── STORM ⚡ ─────────────────────────────────────────────────────────
+  {id:'elem_storm1',spellTier:'storm',  tier:1, elem:'storm',icon:'⚡',
+   name:'Thunder Strike',     color:'#c0a020',
+   cost:40000,
+   effect:'Adds ⚡ Thunder boss action (2.5× Strike damage, 8s cooldown). Super effective vs Lv60 & Lv80.',
+   effectShort:'Boss: Thunder (2.5× dmg, 8s CD)'},
+  {id:'elem_storm2',spellTier:'storm2', tier:2, elem:'storm',icon:'⚡',
+   name:'Chain Lightning',    color:'#ffe040',
+   cost:500000,
+   effect:'Adds 🌩️ Paralyze boss action — always stuns for 3 turns. 20s cooldown.',
+   effectShort:'Boss: Paralyze (3-turn stun, 20s CD)'},
+  {id:'elem_storm3',spellTier:'storm3', tier:3, elem:'storm',icon:'⚡',
+   name:'Storm Sovereignty',  color:'#fff080',
+   cost:3000000,
+   effect:'Permanently increases your max active boost slots from 3 to 4.',
+   effectShort:'Max boost slots +1 (4 total)'},
+];
+
 var GEM_PACKS = [
   {gems:0, price:'$2',  label:'☕ Buy the dev a coffee', desc:'Thanks for playing — this one keeps the lights on.', tipKey:'tip_coffee'},
   {gems:0, price:'$5',  label:'🍺 Buy the dev a beer',   desc:'Cheers! You\'re the reason this game exists.', tipKey:'tip_beer'},
@@ -1667,6 +2343,7 @@ var postBossStoryMode = false; // keeps black screen visible through post-boss s
 var gameScreenBlocked = false; // suppresses floats during intro/ascension/ending
 var bossDefeated = false, pendingBossStory = null, combatLocked = false;
 var spellCooldown = false, drainCooldown = false, ritualCooldown = false;
+var thunderCooldown = false, paralyzeCooldown = false;
 var bossRage = 0, bossPhase = 1, bossLastAction = -1, bossTurnCount = 0;
 var bossStunTurns = 0; // turns boss cannot attack (Dark Spell)
 var bossHealedOnce = false, bossRevivedOnce = false, divineFuryActive = false;
@@ -1677,6 +2354,7 @@ var holdInterval = null;
 // Boost slots: array of {type, mult, endTime, label}
 var boostSlots = [];
 var MAX_BOOSTS = 3;
+function getMaxBoosts() { return MAX_BOOSTS + (hasElemSkill('elem_storm3') ? 1 : 0); }
 
 function getDefaultState() {
   var lvls = {grimoire:0,familiar:0,altar:0,harvest:0,phylact:0,rift:0,legion:0};
@@ -1686,6 +2364,10 @@ function getDefaultState() {
     lvls:lvls, unlockedSpells:[], lastTierShown:-1,
     prestigeCount:0, prestigePerks:{tapMult:1,passMult:1,xpMult:1,offlineMult:1,bossDamageMult:1,upgradeCostMult:1,adCooldownMult:1},
     holdEverUsed:false,
+    elemSkills:[],          // ids of purchased elemental skills
+    voidCharges:[0,0],      // fill progress 0–1 for each void bar
+    voidChargeLastTick:0,   // timestamp of last void charge tick
+    darkResonanceStacks:0,  // 0–10, each +15% tap/pass
     lastLoginDate:null, loginStreak:0,
     milestonesClaimed:[], runStartTime:Date.now(),
     ascensionLog:[], // [{path, taps, essence, spent, timeMs}]
@@ -1740,7 +2422,9 @@ function compressSave(str) {
       .replace(/"adCooldownMult"/g,'"acm"').replace(/"runStartTime"/g,'"rst"')
       .replace(/"ascensionLog"/g,'"al"').replace(/"bestRun"/g,'"br"')
       .replace(/"maxSingleDmg"/g,'"msd"').replace(/"prestigeCount"/g,'"pc"')
-      .replace(/"savedBoosts"/g,'"sb"');
+      .replace(/"savedBoosts"/g,'"sb"')
+      .replace(/"elemSkills"/g,'"es"').replace(/"voidCharges"/g,'"vc"')
+      .replace(/"darkResonanceStacks"/g,'"drs"');
   } catch(e) { return str; }
 }
 function decompressSave(str) {
@@ -1759,7 +2443,9 @@ function decompressSave(str) {
       .replace(/"acm"/g,'"adCooldownMult"').replace(/"rst"/g,'"runStartTime"')
       .replace(/"al"/g,'"ascensionLog"').replace(/"br"/g,'"bestRun"')
       .replace(/"msd"/g,'"maxSingleDmg"').replace(/"pc"/g,'"prestigeCount"')
-      .replace(/"sb"/g,'"savedBoosts"');
+      .replace(/"sb"/g,'"savedBoosts"')
+      .replace(/"es"/g,'"elemSkills"').replace(/"vc"/g,'"voidCharges"')
+      .replace(/"drs"/g,'"darkResonanceStacks"');
   } catch(e) { return str; }
 }
 function saveGame(gs, fb) {
@@ -1767,7 +2453,6 @@ function saveGame(gs, fb) {
   var d = JSON.parse(JSON.stringify(gs));
   d.savedAt = new Date().toISOString(); d.stats.lastSaved = d.savedAt;
   d._hiddenAt = Date.now();
-  d.holdUnlockEndTime = holdUnlockEndTime;
   var cooldownUntil = adCooldown > 0 ? Date.now() + Math.round(adCooldown * 1000) : 0;
   d.adCooldownUntil = cooldownUntil;
   if (gs) gs.adCooldownUntil = cooldownUntil; // also update live gameState so subsequent saves are correct
@@ -1848,17 +2533,39 @@ function xpForLevel(l) { return Math.floor(80 * Math.pow(1.18, l - 1)); }
 function getTier(lvl) { var t = TIERS[0]; for (var i = TIERS.length-1; i >= 0; i--) { if (lvl >= TIERS[i].minLvl) { t = TIERS[i]; break; } } return t; }
 function getTierIdx(lvl) { for (var i = TIERS.length-1; i >= 0; i--) { if (lvl >= TIERS[i].minLvl) return i; } return 0; }
 function rnd(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+// ── ELEMENTAL SKILL HELPERS ───────────────────────────────────────────
+function hasElemSkill(id) {
+  return gameState && gameState.elemSkills && gameState.elemSkills.indexOf(id) >= 0;
+}
+// Permanent tap multiplier from elemental skills (stacks multiplicatively)
+function elemTapMult() {
+  var m = 1;
+  if (hasElemSkill('elem_fire3')) m *= 1.5;  // Soulfire Ascension +50%
+  // Dark Resonance stacks +15% per bomb, up to 10 stacks
+  if (hasElemSkill('elem_void3') && gameState.darkResonanceStacks > 0)
+    m *= (1 + 0.15 * Math.min(10, gameState.darkResonanceStacks));
+  return m;
+}
+// Permanent passive multiplier from elemental skills
+function elemPassMult() {
+  var m = 1;
+  if (hasElemSkill('elem_ice3')) m *= 2.0;   // Absolute Stillness +100%
+  // Dark Resonance stacks +15% per bomb, up to 10 stacks
+  if (hasElemSkill('elem_void3') && gameState.darkResonanceStacks > 0)
+    m *= (1 + 0.15 * Math.min(10, gameState.darkResonanceStacks));
+  return m;
+}
 function effTap() {
   var base = (gameState ? gameState.tapPow : 1) * (gameState && gameState.prestigePerks ? gameState.prestigePerks.tapMult : 1);
   var devMult = devHundredMult ? 100 : devTenMult ? 10 : 1;
-  var mult = devMult;
+  var mult = devMult * elemTapMult();
   boostSlots.forEach(function(b){ if (b.type==='tap' || b.type==='all') mult *= b.mult; });
   return base * mult * holdBonus;
 }
 function effPass() {
   var base = (gameState ? gameState.passRate : 0) * (gameState && gameState.prestigePerks ? gameState.prestigePerks.passMult : 1);
   var devMult = devHundredMult ? 100 : devTenMult ? 10 : 1;
-  var mult = devMult;
+  var mult = devMult * elemPassMult();
   boostSlots.forEach(function(b){ if (b.type==='pass' || b.type==='all') mult *= b.mult; });
   return base * mult;
 }
@@ -1887,14 +2594,14 @@ function activeBoostCount() {
   boostSlots = boostSlots.filter(function(b){ return b.endTime > now; });
   return boostSlots.length;
 }
-function canAddBoost() { var purchased = boostSlots.filter(function(b){ return b.endTime > Date.now() && b.source !== 'ad'; }).length; return unlimitedBoosts || purchased < MAX_BOOSTS; }
+function canAddBoost() { var purchased = boostSlots.filter(function(b){ return b.endTime > Date.now() && b.source !== 'ad'; }).length; return unlimitedBoosts || purchased < getMaxBoosts(); }
 function applyBoost(type, mult, dur, label, source) {
   var now = Date.now();
   var adCount = boostSlots.filter(function(b){ return b.endTime > now && b.source === 'ad'; }).length;
   var purchased = boostSlots.filter(function(b){ return b.endTime > now && b.source !== 'ad'; }).length;
   if (!unlimitedBoosts) {
     if (source === 'ad' && adCount >= AD_BOOST_MAX) return false;
-    if (source !== 'ad' && purchased >= MAX_BOOSTS) return false;
+    if (source !== 'ad' && purchased >= getMaxBoosts()) return false;
   }
   var endTime = infiniteTimers ? Date.now() + 999*60*1000 : Date.now() + dur*1000;
   boostSlots.push({type:type, mult:mult, endTime:endTime, label:label||'', source:source||'purchased'});
@@ -2093,15 +2800,8 @@ function startNewGame() {
   if (pb) { pb.style.display = 'none'; pb.textContent = ''; pb.onclick = null; pb.style.animation = ''; pb.style.boxShadow = ''; }
   var ab = document.getElementById('ascension-btn');
   if (ab) ab.style.display = 'none';
-  // Stop any active hold session and clear all hold runtime state
-  if (holdUnlocked) deactivateHoldUnlock();
-  holdUnlockEndTime = 0;
   stopHold();
   gameState = getDefaultState(); displayedTierIdx = -1; boostSlots = [];
-  // Starter hold-to-tap window — fully unlocked for the first 5 minutes
-  // (at reduced tap speed below Lv10) so early levels aren't a tap grind.
-  // After it expires the normal Lv10 gate (ad / 200 gems / manual) applies.
-  activateHoldUnlock(300);
   // Preserve gem balance across new games — only full reset clears purchases
   var prevSave = loadGame();
   if (prevSave && prevSave.gems > 50) gameState.gems = prevSave.gems;
@@ -2190,11 +2890,6 @@ function handleResume() {
   gameState.stats.sessionStartTime = Date.now();
   gameState.stats.totalSessions = (gameState.stats.totalSessions||0) + 1;
   displayedTierIdx = gameState.lastTierShown || -1;
-  if (gameState && gameState.holdForever) activateHoldUnlock(999999);
-  else if (gameState.holdUnlockEndTime && gameState.holdUnlockEndTime > Date.now()) {
-    var remaining = Math.round((gameState.holdUnlockEndTime - Date.now()) / 1000);
-    activateHoldUnlock(remaining);
-  }
   applyOfflineIncome(); // must run after gameState loaded, before launchGame shows welcome screen
   launchGame();
 }
@@ -2204,7 +2899,6 @@ var _elBoostBar = null, _elBoostList = null, _elUpgrades = null;
 function cacheElements() {
   _elFloats    = document.getElementById('floats');
   _elTapBtn    = _elTapBtn || document.getElementById('tapbtn');
-  _elHoldBtn   = document.getElementById('hold-btn');
   _elGameLower = document.getElementById('game-lower');
   _elBoostBar  = document.getElementById('boostbar');
   _elBoostList = document.getElementById('boost-list');
@@ -2277,7 +2971,6 @@ function _doLaunchGame() {
   // Set gem sprite on monetisation button
   var monGemIcon = document.getElementById('mon-gem-icon');
   if (monGemIcon && SPRITES['icon_gem']) monGemIcon.innerHTML = '<img src="' + SPRITES['icon_gem'] + '" style="width:20px;height:20px;image-rendering:pixelated;" draggable="false">';
-  // Hold-to-tap on main button is activated via the Hold to Tap ad button (openHoldAd)
   // or via dev toggle — not wired directly here
 }
 function goHome() {
@@ -2291,9 +2984,10 @@ function goHome() {
 }
 
 // ── HOLD TO TAP ───────────────────────────────────────────────────────
-function startHold() {
+function startHold(e) {
+  if (e) e.preventDefault();
   if (holdInterval) return;
-  document.getElementById('hold-btn').classList.add('holding');
+  if (bossData && !bossDefeated) return; // no hold during boss
   var tb = _elTapBtn || document.getElementById('tapbtn'); if (tb) tb.classList.add('hold-active');
   doTap(null);
   holdComboStart = Date.now();
@@ -2301,8 +2995,9 @@ function startHold() {
   // Clear any existing milestone timers
   holdMilestoneTimers.forEach(function(t){ clearTimeout(t); });
   holdMilestoneTimers = [];
-  // Schedule milestone bonuses
+  // Schedule milestone bonuses (filter by elemReq if not yet unlocked)
   HOLD_MILESTONES.forEach(function(m, i) {
+    if (m.elemReq && !hasElemSkill(m.elemReq)) return;
     holdMilestoneTimers.push(setTimeout(function(){
       if (!holdInterval) return; // hold was released
       holdBonus = m.mult;
@@ -2315,11 +3010,10 @@ function startHold() {
 }
 function stopHold() {
   if (holdInterval) { clearInterval(holdInterval); holdInterval = null; }
-  _glScrollPid = null; // always release scroll lock when hold ends
+  _glScrollPid = null;
   holdMilestoneTimers.forEach(function(t){ clearTimeout(t); });
   holdMilestoneTimers = [];
   holdBonus = 1; holdBonusTier = 0;
-  var hb = document.getElementById('hold-btn'); if (hb) hb.classList.remove('holding');
   var tb = _elTapBtn || document.getElementById('tapbtn');
   if (tb) { tb.classList.remove('hold-active'); tb.style.boxShadow = ''; tb.style.transform = ''; }
   resetCombo();
@@ -2332,6 +3026,7 @@ var HOLD_MILESTONES = [
   {secs:5,   mult:1.025, label:'Hold Frenzy I',   color:'#ffaa44'},
   {secs:10,  mult:1.05,  label:'Hold Frenzy II',  color:'#ff7722'},
   {secs:30,  mult:1.10,  label:'Hold Frenzy III', color:'#ff4400'},
+  {secs:60,  mult:2.00,  label:'Infernal Charge',  color:'#ff9020', elemReq:'elem_fire2'}, // unlocked by Fire II
 ];
 var COMBO_LEVELS = [{tps:8,mult:2.0},{tps:6,mult:1.5},{tps:4,mult:1.2}];
 function updateCombo(fromHold) {
@@ -2379,10 +3074,24 @@ var _tapBtnRect = null, _tapBtnRectTime = 0;
 function wireTapBtn() {
   var tb = _elTapBtn || document.getElementById('tapbtn');
   if (!tb) return;
+  // Tap events
   tb.removeEventListener('touchstart', _tapTouchHandler);
   tb.removeEventListener('mousedown', _tapMouseHandler);
   tb.addEventListener('touchstart', _tapTouchHandler, {passive:false});
   tb.addEventListener('mousedown', _tapMouseHandler);
+  // Hold events — permanently wired, no unlock gate needed
+  tb.removeEventListener('mousedown',  startHold);
+  tb.removeEventListener('touchstart', startHold);
+  tb.removeEventListener('mouseup',    stopHold);
+  tb.removeEventListener('mouseleave', stopHold);
+  tb.removeEventListener('touchend',   stopHold);
+  tb.removeEventListener('touchcancel',stopHold);
+  tb.addEventListener('mousedown',  startHold);
+  tb.addEventListener('touchstart', startHold, {passive:false});
+  tb.addEventListener('mouseup',    stopHold);
+  tb.addEventListener('mouseleave', stopHold);
+  tb.addEventListener('touchend',   stopHold);
+  tb.addEventListener('touchcancel',stopHold);
 }
 function _tapTouchHandler(e) { e.preventDefault(); doTap(e); }
 function _tapMouseHandler(e) { e.preventDefault(); doTap(e); }
@@ -2533,9 +3242,6 @@ function onLevelUp() {
   } else if (LVLUP_LEVELS[gameState.level] && settings.lvlup) {
     queueEvent('lvlup', {level:gameState.level});
   }
-  if (gameState && gameState.level >= 10 && !gameState.holdEverUsed && !gameState.holdForever && !holdUnlocked) {
-    updateHoldBtn();
-  }
 }
 
 // ── TIER FANFARE ──────────────────────────────────────────────────────
@@ -2656,6 +3362,12 @@ function openBoss(boss) {
   ['btn-attack','btn-spell','btn-drain','btn-ritual'].forEach(function(id){
     var el = document.getElementById(id); el.style.display = ''; el.style.opacity = '1'; el.style.pointerEvents = '';
   });
+  // Storm elemental boss buttons
+  var btnThunder = document.getElementById('btn-thunder');
+  var btnParalyze = document.getElementById('btn-paralyze');
+  if (btnThunder) { btnThunder.style.display = hasElemSkill('elem_storm1') ? '' : 'none'; btnThunder.style.opacity = '1'; btnThunder.style.pointerEvents = ''; }
+  if (btnParalyze) { btnParalyze.style.display = hasElemSkill('elem_storm2') ? '' : 'none'; btnParalyze.style.opacity = '1'; btnParalyze.style.pointerEvents = ''; }
+  thunderCooldown = false; paralyzeCooldown = false;
   document.getElementById('boss-phase-label').textContent = 'Phase 1';
   document.getElementById('boss-rage-bar').style.width = '0%';
   document.getElementById('boss-rage-label').textContent = 'Rage: 0%';
@@ -2970,11 +3682,40 @@ function playerRitual() {
   if (bossHP <= 0) { showBossVictory(); return; }
   lockActions(200); setTimeout(bossCounterAttack, 200);
 }
+function playerThunder() {
+  if (!hasElemSkill('elem_storm1') || thunderCooldown || bossDefeated || playerHP <= 0) return;
+  if (!doPlayerAction(0, true)) return; // shares action slot with attack (no combatLocked check)
+  var dmg = Math.floor(calcPlayerDmg(0) * 2.5); // 2.5× Strike damage
+  bossHP = Math.max(0, bossHP - dmg);
+  // Super effective vs Lv60 and Lv80
+  var superMsg = (bossData.level === 60 || bossData.level === 80) ? ' ⚡ Super effective!' : '';
+  addLog('player', '⚡ Thunder Strike — ' + dmg + ' damage!' + superMsg);
+  if (superMsg) addLog('super', '⚡ Super effective!');
+  spawnBossFloat('-' + dmg);
+  var bossBar = document.getElementById('boss-hp-bar');
+  if (bossBar) { bossBar.classList.add('boss-hp-flash'); setTimeout(function(){ bossBar.classList.remove('boss-hp-flash'); }, 120); }
+  updateBossUI();
+  thunderCooldown = true; setCooldown('btn-thunder', 8, '⚡ Thunder'); setTimeout(function(){ thunderCooldown = false; }, 8000);
+  if (bossHP <= 0) { showBossVictory(); return; }
+  if (!_counterPending) { _counterPending = true; setTimeout(function(){ _counterPending = false; bossCounterAttack(); }, 350); }
+}
+function playerParalyze() {
+  if (!hasElemSkill('elem_storm2') || paralyzeCooldown || combatLocked || bossDefeated || playerHP <= 0) return;
+  if (!doPlayerAction(1)) return;
+  bossStunTurns += 3; // always 3 turns, no randomness
+  addLog('player', '🌩️ Paralyze — boss stunned for 3 turns!');
+  spawnBossFloat('STUNNED');
+  updateBossUI();
+  paralyzeCooldown = true; setCooldown('btn-paralyze', 20, '🌩️ Paralyze'); setTimeout(function(){ paralyzeCooldown = false; }, 20000);
+  lockActions(200); setTimeout(bossCounterAttack, 200);
+}
 function clearAllCooldowns() {
   spellCooldown = false; drainCooldown = false; ritualCooldown = false;
-  [['btn-spell','🔮 Dark Spell'],['btn-drain','🩸 Soul Drain'],['btn-ritual','🔥 Dark Ritual']].forEach(function(p){
+  thunderCooldown = false; paralyzeCooldown = false;
+  [['btn-spell','🔮 Dark Spell'],['btn-drain','🩸 Soul Drain'],['btn-ritual','🔥 Dark Ritual'],
+   ['btn-thunder','⚡ Thunder'],['btn-paralyze','🌩️ Paralyze']].forEach(function(p){
     var el = document.getElementById(p[0]);
-    if (el) { el.style.opacity='1'; el.style.pointerEvents=''; el.textContent=p[1]; }
+    if (el) { el.style.opacity='1'; el.style.pointerEvents=''; el.innerHTML=p[1]; }
   });
 }
 function gemRevive() {
@@ -3022,7 +3763,7 @@ function showBossVictory() {
     bossSprite.style.transform = 'scale(1.15)';
   }
   if (gameState) { gameState.pendingBossLevel = null; saveGame(); }
-  ['btn-attack','btn-spell','btn-drain','btn-ritual'].forEach(function(id){ document.getElementById(id).style.display='none'; });
+  ['btn-attack','btn-spell','btn-drain','btn-ritual','btn-thunder','btn-paralyze'].forEach(function(id){ var e=document.getElementById(id); if(e) e.style.display='none'; });
   document.getElementById('btn-revive').style.display = 'none';
   var _bab = document.getElementById('btn-boss-ad'); if (_bab) _bab.style.display = 'none';
   gameState.gems += bossData.gems;
@@ -3059,7 +3800,7 @@ function showBossVictory() {
     if (gameState.level >= 100) {
       setTimeout(function(){
         document.getElementById('bossoverlay').classList.remove('show');
-        ['btn-attack','btn-spell','btn-drain','btn-ritual','btn-dev-ko'].forEach(function(id){ document.getElementById(id).style.display='none'; });
+        ['btn-attack','btn-spell','btn-drain','btn-ritual','btn-thunder','btn-paralyze','btn-dev-ko'].forEach(function(id){ var e=document.getElementById(id); if(e) e.style.display='none'; });
         submitLeaderboardScore(); // submit final score to global leaderboard
         showEnding();
       }, 3400);
@@ -3071,7 +3812,7 @@ function showBossVictory() {
       boClose.classList.remove('show');
       boClose.style.background = '';
       boClose.querySelectorAll(':scope > *').forEach(function(c){ c.style.visibility = ''; });
-      ['btn-attack','btn-spell','btn-drain','btn-ritual','btn-dev-ko'].forEach(function(id){ document.getElementById(id).style.display='none'; });
+      ['btn-attack','btn-spell','btn-drain','btn-ritual','btn-thunder','btn-paralyze','btn-dev-ko'].forEach(function(id){ var e=document.getElementById(id); if(e) e.style.display='none'; });
       if (_story) {
         postBossStoryMode = true;
         storyQueue.push(_story);
@@ -3082,7 +3823,7 @@ function showBossVictory() {
         if (_bossPlaytestActive) {
           setTimeout(function(){
             if (_bossPlaytestIdx < BOSSES.length-1) devBossPlaytestNext();
-            else showToast('All bosses complete!');
+            else showTapPowerToast('All bosses complete!');
           }, 600);
         } else {
           eventDone();
@@ -3146,7 +3887,7 @@ function showBossVictory() {
 function showBossDefeat() {
   combatLocked = true;
   sfxBossDefeat();
-  ['btn-attack','btn-spell','btn-drain','btn-ritual'].forEach(function(id){ document.getElementById(id).style.display='none'; });
+  ['btn-attack','btn-spell','btn-drain','btn-ritual','btn-thunder','btn-paralyze'].forEach(function(id){ var e=document.getElementById(id); if(e) e.style.display='none'; });
   var res = document.getElementById('boss-result'); res.className='boss-result defeat'; res.style.display='flex';
   document.getElementById('boss-result-title').style.color = '#dc4040';
   document.getElementById('boss-result-title').textContent = 'Defeated... 💀';
@@ -3157,7 +3898,7 @@ function showBossDefeat() {
 }
 function closeBoss() {
   document.getElementById('bossoverlay').classList.remove('show');
-  ['btn-attack','btn-spell','btn-drain','btn-ritual','btn-dev-ko'].forEach(function(id){ document.getElementById(id).style.display='none'; });
+  ['btn-attack','btn-spell','btn-drain','btn-ritual','btn-thunder','btn-paralyze','btn-dev-ko'].forEach(function(id){ var e=document.getElementById(id); if(e) e.style.display='none'; });
   // Clear any lv90 repeat-move highlights
   ['btn-attack','btn-spell','btn-drain','btn-ritual'].forEach(function(id){
     var el = document.getElementById(id);
@@ -3478,9 +4219,7 @@ function doPrestige(pt) {
   var keptStats = gameState.stats;
   var keptAchievements = gameState.earnedAchievements;
   var keptOfflineBoost = gameState.offlineBoostUntil;
-  // Stop any active hold-to-tap session before reset
-  if (holdUnlocked) deactivateHoldUnlock();
-  holdUnlockEndTime = 0;
+  stopHold(); // stop any active hold session before reset
   // Full reset
   gameState = getDefaultState();
   gameState.gems = keptGems;
@@ -3489,7 +4228,6 @@ function doPrestige(pt) {
   gameState.stats = keptStats;
   gameState.stats.sessionStartTime = Date.now();
   gameState.earnedAchievements = keptAchievements;
-  // holdForever intentionally NOT carried over — player must re-unlock each run
   gameState.offlineBoostUntil = keptOfflineBoost;
   // Restore ascension log and append this run
   var prevLog = keptStats.ascensionLog || [];
@@ -3522,7 +4260,6 @@ function doPrestige(pt) {
   showScreen('game-screen');
   saveInterval = setInterval(function(){ saveGame(); }, 30000);
   // Let showIntro->skipIntro->launchGame handle full relaunch (avoids double init)
-  gameState.holdUnlockEndTime = null;
   hideBlackout(); // clear any lingering blackout from boss sequence
   showBlackout(); // black screen while game resets — hidden by showIntro
   gameScreenBlocked = true; // suppress all toasts immediately
@@ -3533,135 +4270,81 @@ function doPrestige(pt) {
   setTimeout(showIntro, 400);
 }
 
-// ── HOLD-AD SYSTEM ────────────────────────────────────────────────────
-var holdUnlocked = false;
-var holdUnlockTimer = null;
+// ── VOID CHARGE SYSTEM ────────────────────────────────────────────────
+// Void Conduit (elem_void1): 1 bar, 3-min fill, 2-min 3× all gains bomb
+// Twin Singularity (elem_void2): 2nd independent bar
+// Dark Resonance (elem_void3): each bomb grants +15% tap/pass (up to 10 stacks)
+var VOID_CHARGE_FILL_TICKS = 1800; // 180s × 10 ticks/sec = 1800 ticks to fill
+var VOID_BOMB_DUR = 120;           // 2 minutes
+
+function tickVoidCharges() {
+  if (!gameState || !hasElemSkill('elem_void1')) return;
+  var bars = hasElemSkill('elem_void2') ? 2 : 1;
+  if (!gameState.voidCharges || gameState.voidCharges.length < bars) {
+    gameState.voidCharges = [gameState.voidCharges ? (gameState.voidCharges[0]||0) : 0, 0];
+  }
+  for (var i = 0; i < bars; i++) {
+    if (gameState.voidCharges[i] < 1) {
+      gameState.voidCharges[i] = Math.min(1, (gameState.voidCharges[i]||0) + 1/VOID_CHARGE_FILL_TICKS);
+    }
+  }
+}
+
+function detonateVoidBomb(idx) {
+  if (!gameState || !hasElemSkill('elem_void1')) return;
+  if (!gameState.voidCharges || (gameState.voidCharges[idx]||0) < 1) return;
+  gameState.voidCharges[idx] = 0;
+  // Apply 3× all gains boost for 2 minutes
+  applyBoost('all', 3, VOID_BOMB_DUR, '🌀 Void Bomb', 'void');
+  // Dark Resonance: permanent stack
+  if (hasElemSkill('elem_void3')) {
+    var stacks = gameState.darkResonanceStacks || 0;
+    if (stacks < 10) {
+      gameState.darkResonanceStacks = stacks + 1;
+      showTapPowerToast('🌀 Dark Resonance — ' + gameState.darkResonanceStacks + '/10 stacks (+15% tap & passive)');
+    }
+  }
+  showTapPowerToast('🌀 Void Bomb detonated — 3× all gains for 2 minutes!');
+  playColorBurst(window.innerWidth/2, window.innerHeight/2, '#a060ff', '🌀');
+}
+
+function updateVoidChargeUI() {
+  var wrap = document.getElementById('void-charge-wrap');
+  if (!wrap) return;
+  if (!gameState || !hasElemSkill('elem_void1')) { wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  var bars = hasElemSkill('elem_void2') ? 2 : 1;
+  for (var i = 0; i < 2; i++) {
+    var bar = document.getElementById('void-bar-' + i);
+    var btn = document.getElementById('void-btn-' + i);
+    var lbl = document.getElementById('void-lbl-' + i);
+    if (!bar || !btn) continue;
+    if (i >= bars) { btn.style.display = 'none'; continue; }
+    btn.style.display = '';
+    var fill = Math.min(1, (gameState.voidCharges && gameState.voidCharges[i]) || 0);
+    bar.style.width = (fill * 100) + '%';
+    if (fill >= 1) {
+      btn.classList.add('void-ready');
+      lbl.textContent = '🌀 VOID BOMB — tap to detonate';
+    } else {
+      btn.classList.remove('void-ready');
+      var secsLeft = Math.ceil((1 - fill) * VOID_CHARGE_FILL_TICKS / 10);
+      var m = Math.floor(secsLeft/60), s = secsLeft%60;
+      lbl.textContent = '🌀 Void Charge ' + (bars > 1 ? (i+1) : '') + ' — ' + m + ':' + (s<10?'0':'') + s;
+    }
+  }
+}
+
+// ── HOLD STATE (stubs — hold is now always-on, no unlock gate) ────────
+var holdUnlocked = true; // always true — hold wired permanently
 var holdUnlockEndTime = 0;
-var AUTO_TAP_DUR = 240; // 4 minutes
+var holdUnlockTimer = null;
+function activateHoldUnlock(dur) {} // no-op — hold always active
+function deactivateHoldUnlock() {}  // no-op — hold always active
+function updateHoldBtn() {}         // no-op — hold-btn removed
+function openHoldAd() {}            // no-op — hold-btn removed
 
-function openHoldAd() {
-  if (holdUnlocked) return; // already active
-  if (gameState && gameState.holdForever) { startHoldAd(); return; } // gem purchase bypasses gate
-  if (!gameState || gameState.level < 10) {
-    showHoldLockedToast('Hold to Tap unlocks at Level 10 — or purchase for ' + gemHtml() + ' 200 gems');
-    return;
-  }
-  // Mark as used — removes the new-unlock pulse
-  if (!gameState.holdEverUsed) {
-    gameState.holdEverUsed = true;
-    var hb = document.getElementById('hold-btn');
-    if (hb) hb.classList.remove('hold-new');
-  }
-  startHoldAd();
-}
-// ── "AD" SYSTEM ───────────────────────────────────────────────────────
-// No real ads are served anywhere in this game — no ad SDK, no tracking,
-// nothing sold. "Watch Ad" buttons show this 3-second joke overlay, then
-// grant the same bonus they always granted. Kept as a quick "watch
-// something, get something" beat without any of the actual ad baggage.
-var FAKE_AD_MS = 3000;
-function showFakeAdOverlay(onDone) {
-  document.getElementById('ad-closebtn').style.display = 'none';
-  document.getElementById('adprogfill').style.width = '0%';
-  document.getElementById('adoverlay').classList.add('show');
-  var pct = 0;
-  var iv = setInterval(function(){
-    pct += 100 / (FAKE_AD_MS / 100);
-    document.getElementById('adprogfill').style.width = Math.min(100, pct) + '%';
-    if (pct >= 100) {
-      clearInterval(iv);
-      document.getElementById('adoverlay').classList.remove('show');
-      if (onDone) onDone();
-    }
-  }, 100);
-}
-function startHoldAd() {
-  showFakeAdOverlay(closeHoldAd);
-}
-function closeHoldAd() {
-  activateHoldUnlock(AUTO_TAP_DUR);
-}
-function activateHoldUnlock(dur) {
-  holdUnlocked = true;
-  // Wire hold listeners onto the main tap button
-  var tb = _elTapBtn || document.getElementById('tapbtn');
-  tb.addEventListener('mousedown', _holdStart);
-  tb.addEventListener('touchstart', _holdStart, {passive:false});
-  tb.addEventListener('mouseup', stopHold);
-  tb.addEventListener('mouseleave', stopHold);
-  tb.addEventListener('touchend', stopHold);
-  tb.addEventListener('touchcancel', stopHold);
-  // Start countdown unless infinite
-  holdUnlockEndTime = dur < 99999 ? Date.now() + dur * 1000 : 0;
-  if (holdUnlockTimer) clearTimeout(holdUnlockTimer);
-  if (dur < 99999) holdUnlockTimer = setTimeout(deactivateHoldUnlock, dur * 1000);
-  // Grey button while boost is active
-  var hb = document.getElementById('hold-btn');
-  if (hb) { hb.style.opacity = '0.45'; hb.style.filter = 'grayscale(80%)'; }
-  updateHoldBtn();
-}
-function deactivateHoldUnlock() {
-  holdUnlocked = false;
-  stopHold();
-  if (holdUnlockTimer) { clearTimeout(holdUnlockTimer); holdUnlockTimer = null; }
-  holdUnlockEndTime = 0;
-  var tb = _elTapBtn || document.getElementById('tapbtn');
-  if (tb) {
-    tb.removeEventListener('mousedown', _holdStart);
-    tb.removeEventListener('touchstart', _holdStart);
-    tb.removeEventListener('mouseup', stopHold);
-    tb.removeEventListener('mouseleave', stopHold);
-    tb.removeEventListener('touchend', stopHold);
-    tb.removeEventListener('touchcancel', stopHold);
-    tb.classList.remove('hold-active');
-  }
-  updateHoldBtn();
-  // Restore full colour — boost expired, player can watch again
-  var hb = document.getElementById('hold-btn');
-  if (hb && gameState && !gameState.holdForever) { hb.style.opacity = ''; hb.style.filter = ''; }
-  // Show expiry notification near the hold button
-  showHoldExpiredToast('Hold to Tap expired — watch an ad to reactivate');
-}
-function _holdStart(e) { if (bossData && !bossDefeated) return; e.preventDefault(); startHold(); }
-function updateHoldBtn() {
-  var btn = document.getElementById('hold-btn');
-  var sub = document.getElementById('hold-btn-sub');
-  if (!btn || !sub) return;
-  if (gameState && gameState.holdForever) {
-    btn.classList.remove('holding'); btn.style.opacity = ''; btn.style.filter = '';
-    sub.textContent = holdUnlocked ? 'Hold · active' : 'Hold main button';
-  } else if (holdUnlocked) {
-    // Active — full colour, holding state (also covers the starter
-    // pre-level-10 unlock window, which would otherwise be masked by
-    // the "Locked — Unlocks Lv10" state below)
-    btn.classList.add('holding'); btn.classList.remove('hold-new', 'hold-ready');
-    btn.style.opacity = ''; btn.style.filter = '';
-    if (holdUnlockEndTime > 0) {
-      var secs = Math.max(0, Math.round((holdUnlockEndTime - Date.now()) / 1000));
-      var m = Math.floor(secs/60), s = secs%60;
-      sub.textContent = 'Hold main · ' + m + ':' + (s<10?'0':'') + s;
-    } else {
-      sub.textContent = 'Hold main button';
-    }
-  } else if (!gameState || gameState.level < 10) {
-    // Locked — grey and dim
-    btn.classList.remove('holding', 'hold-new', 'hold-ready');
-    btn.style.opacity = '0.45'; btn.style.filter = 'grayscale(80%)';
-    sub.textContent = 'Unlocks Lv10';
-  } else {
-    // Unlocked and available — bright, clear opacity
-    btn.classList.remove('holding');
-    btn.style.opacity = ''; btn.style.filter = '';
-    if (!gameState.holdEverUsed) {
-      // First time available — pulse gold + bright
-      btn.classList.add('hold-new', 'hold-ready');
-    } else {
-      btn.classList.remove('hold-new', 'hold-ready');
-    }
-    sub.textContent = 'View ad';
-  }
-}
-
+// ── AD SYSTEM ─────────────────────────────────────────────────────────
 // ── AD SYSTEM ─────────────────────────────────────────────────────────
 var AD_BOOST_MAX = 2; // max 2 stacking ad boost slots
 function openAdMenu() {
@@ -4048,6 +4731,27 @@ function unlockSpell(id) {
   if (originEl) { var r = originEl.getBoundingClientRect(); ox = r.left + r.width/2; oy = r.top + r.height/2; }
   playColorBurst(ox, oy, color, emoji);
 }
+function buyElemSkill(id) {
+  var sk = ELEM_SKILLS.find(function(s){ return s.id===id; });
+  if (!sk || !gameState) return;
+  if (hasElemSkill(id)) return;
+  if ((gameState.unlockedSpells||[]).indexOf(sk.spellTier) < 0) {
+    showTapPowerToast('\uD83D\uDD12 Unlock the ' + sk.elem + ' spell tier first');
+    return;
+  }
+  if (gameState.mana < sk.cost) {
+    showTapPowerToast('Not enough essence — need ' + fmt(sk.cost) + ' \uD83C\uDF11');
+    return;
+  }
+  gameState.mana -= sk.cost;
+  if (!gameState.elemSkills) gameState.elemSkills = [];
+  gameState.elemSkills.push(id);
+  if (id === 'elem_storm3') updateBoostBar();
+  recalc(); saveGame(); updateGameUI();
+  playColorBurst(window.innerWidth/2, window.innerHeight/2, sk.color, sk.icon);
+  showTapPowerToast(sk.icon + ' ' + sk.name + ' unlocked!');
+  buildElemOverlay();
+}
 
 // Expanding color ring + emoji particle burst at a screen position.
 // Shared by elemental unlocks and other reward moments (e.g. tap-power-ups).
@@ -4121,6 +4825,124 @@ function showTapPowerToast(msg) {
   setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 4000);
 }
 
+// ── ELEMENTAL OVERLAY ─────────────────────────────────────────────────
+function openElemMenu() {
+  buildElemOverlay();
+  document.getElementById('elemoverlay').classList.add('show');
+}
+function closeElemMenu() { document.getElementById('elemoverlay').classList.remove('show'); }
+
+function buildElemOverlay() {
+  var grid = document.getElementById('elem-skill-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  var ELEMS = [
+    {key:'fire',  label:'Fire',  icon:'🔥', color:'#e05020', glow:'rgba(224,80,32,0.4)'},
+    {key:'ice',   label:'Ice',   icon:'❄️', color:'#3090c0', glow:'rgba(48,144,192,0.4)'},
+    {key:'void',  label:'Void',  icon:'🌀', color:'#a060ff', glow:'rgba(112,64,192,0.4)'},
+    {key:'storm', label:'Storm', icon:'⚡', color:'#c0a020', glow:'rgba(192,160,32,0.4)'},
+  ];
+
+  // Group skills by element
+  var byElem = {};
+  ELEM_SKILLS.forEach(function(sk){ (byElem[sk.elem] = byElem[sk.elem]||[]).push(sk); });
+
+  ELEMS.forEach(function(el) {
+    var col = document.createElement('div');
+    col.className = 'elem-col';
+
+    var colHdr = document.createElement('div');
+    colHdr.className = 'elem-col-hdr';
+    colHdr.style.color = el.color;
+    colHdr.style.textShadow = '0 0 12px ' + el.glow;
+    colHdr.textContent = el.icon + ' ' + el.label;
+    col.appendChild(colHdr);
+
+    (byElem[el.key]||[]).forEach(function(sk, ti) {
+      var owned    = hasElemSkill(sk.id);
+      var spellOk  = gameState && (gameState.unlockedSpells||[]).indexOf(sk.spellTier) >= 0;
+      var canAfford = gameState && gameState.mana >= sk.cost;
+      var locked   = !spellOk;
+
+      var node = document.createElement('div');
+      node.className = 'elem-node' + (owned ? ' elem-owned' : locked ? ' elem-locked' : canAfford ? ' elem-ready' : '');
+      node.style.setProperty('--ecolor', el.color);
+      node.style.setProperty('--eglow', el.glow);
+
+      // Connector line between tiers
+      if (ti > 0) {
+        var conn = document.createElement('div');
+        conn.className = 'elem-connector' + (owned ? ' elem-connector-lit' : '');
+        conn.style.borderColor = owned ? el.color : 'var(--t-bdr)';
+        col.appendChild(conn);
+      }
+
+      var tierLbl = document.createElement('div');
+      tierLbl.className = 'elem-tier-lbl';
+      tierLbl.textContent = 'TIER ' + sk.tier;
+      tierLbl.style.color = owned ? el.color : locked ? 'var(--t-txt3)' : 'var(--t-txt2)';
+
+      var nodeIcon = document.createElement('div');
+      nodeIcon.className = 'elem-node-icon';
+      nodeIcon.textContent = owned ? sk.icon : locked ? '🔒' : sk.icon;
+
+      var nodeName = document.createElement('div');
+      nodeName.className = 'elem-node-name';
+      nodeName.textContent = sk.name;
+      nodeName.style.color = owned ? el.color : locked ? 'var(--t-txt3)' : 'var(--t-txt)';
+
+      var nodeEff = document.createElement('div');
+      nodeEff.className = 'elem-node-eff';
+      nodeEff.textContent = sk.effectShort;
+
+      var nodeBottom = document.createElement('div');
+      nodeBottom.className = 'elem-node-bottom';
+
+      if (owned) {
+        nodeBottom.innerHTML = '<span style="color:' + el.color + ';font-weight:600;">✓ Active</span>';
+      } else if (locked) {
+        // Find which spell tier name is needed
+        var spellDef = SPELL_TIERS.find(function(st){ return st.id === sk.spellTier; });
+        nodeBottom.textContent = '🔒 Requires Lv' + (spellDef ? spellDef.minLevel : '?') + ' spell tier';
+      } else {
+        var costEl = document.createElement('div');
+        costEl.className = 'elem-cost' + (canAfford ? ' elem-cost-ok' : '');
+        costEl.textContent = fmt(sk.cost) + ' 🌑 essence';
+        var buyBtn = document.createElement('div');
+        buyBtn.className = 'elem-buy-btn' + (canAfford ? ' elem-buy-ok' : ' elem-buy-poor');
+        buyBtn.textContent = canAfford ? 'Unlock' : 'Need ' + fmt(sk.cost - (gameState ? gameState.mana : 0)) + ' more';
+        if (canAfford) {
+          (function(sid){ buyBtn.addEventListener('click', function(){ buyElemSkill(sid); }); })(sk.id);
+        }
+        nodeBottom.appendChild(costEl);
+        nodeBottom.appendChild(buyBtn);
+      }
+
+      node.appendChild(tierLbl);
+      node.appendChild(nodeIcon);
+      node.appendChild(nodeName);
+      node.appendChild(nodeEff);
+      node.appendChild(nodeBottom);
+      col.appendChild(node);
+    });
+
+    grid.appendChild(col);
+  });
+
+  // Update Dark Resonance stack display
+  var drEl = document.getElementById('elem-resonance-display');
+  if (drEl) {
+    if (hasElemSkill('elem_void3')) {
+      var stacks = (gameState && gameState.darkResonanceStacks) || 0;
+      drEl.style.display = '';
+      drEl.innerHTML = '🌀 Dark Resonance: <span style="color:#c090ff;font-weight:600;">' + stacks + '/10 stacks</span> (+' + (stacks*15) + '% tap & passive)';
+    } else {
+      drEl.style.display = 'none';
+    }
+  }
+}
+
 // ── SHOP ──────────────────────────────────────────────────────────────
 function openShop() { buildShop(); document.getElementById('shopoverlay').classList.add('show'); }
 function closeShop() { document.getElementById('shopoverlay').classList.remove('show'); }
@@ -4138,12 +4960,6 @@ function buildShop() {
     bg.appendChild(d);
   });
   var sg = document.getElementById('gemspendgrid'); sg.innerHTML = '';
-  // Permanent hold-to-tap purchase
-  var holdOwned = gameState && gameState.holdForever;
-  var holdAfford = gameState && gameState.gems >= 200;
-  var hd = document.createElement('div'); hd.className = 'shopitem';
-  hd.innerHTML = '<div class="shopitem-icon">👆</div><div style="flex:1"><div class="shopitem-name">Permanent Hold-to-Tap</div><div class="shopitem-desc">' + (holdOwned ? 'Already unlocked ✓' : 'Hold main button forever — no ad needed') + '</div></div><div class="shopitem-price" id="sbtn-holdforever" style="' + (holdOwned ? 'opacity:.4;cursor:default;' : holdAfford ? '' : 'opacity:.4;cursor:default;') + '" onclick="buyHoldForever()">' + (holdOwned ? 'Owned' : (_devAccess ? gemHtml() + ' 1' : gemHtml() + ' 200')) + '</div>';
-  sg.appendChild(hd);
   // Offline passive boost
   var offlineOwned = gameState && gameState.offlineBoostUntil && Date.now() < gameState.offlineBoostUntil;
   var offlineAfford = gameState && gameState.gems >= 50;
@@ -4158,19 +4974,6 @@ function buildShop() {
     d.innerHTML = '<div class="shopitem-icon">' + b.icon + '</div><div style="flex:1"><div class="shopitem-name">' + b.name + '</div><div class="shopitem-desc">' + b.desc + (canAddBoost()?'':' — Purchased boosts full (3/3, ad boosts still available)') + '</div></div><div class="shopitem-price" id="sbtn-' + b.id + '" style="' + (ok?'':'opacity:.4;cursor:default;') + '" onclick="spendGems(\'' + b.id + '\')">' + gemHtml() + ' ' + displayCost + '</div>';
     sg.appendChild(d);
   });
-}
-function buyHoldForever() {
-  var cost = _devAccess ? 1 : 200;
-  if (!gameState || gameState.holdForever || gameState.gems < cost) return;
-  gameState.gems -= cost;
-  gameState.holdForever = true;
-  gameState.holdEverUsed = true;
-  var hb = document.getElementById('hold-btn');
-  if (hb) hb.classList.remove('hold-new');
-  var btn = document.getElementById('sbtn-holdforever');
-  spawnGemFloat('-200 ' + gemHtml(), btn);
-  activateHoldUnlock(999999);
-  saveGame(); updateGameUI(); buildShop();
 }
 function buyOfflineBoost() {
   if (!gameState || gameState.gems < 50) return;
@@ -4550,13 +5353,16 @@ function startGameLoop() {
   clearInterval(gameLoopInterval);
   gameLoopInterval = setInterval(function(){
     if (!gameState) return;
-    // Passive income
+    // Passive income — Ice I doubles effective payout per tick
     if (gameState.passRate > 0) {
-      var g = effPass()/10; gameState.mana += g; gameState.stats.totalMana += g;
-    gameState.stats.highestPass = Math.max(gameState.stats.highestPass||0, gameState.passRate);
-    gainXP(0.02);
-
+      var g = effPass()/10;
+      if (hasElemSkill('elem_ice1')) g *= 2; // Frost Accumulation: same /sec, twice the feel
+      gameState.mana += g; gameState.stats.totalMana += g;
+      gameState.stats.highestPass = Math.max(gameState.stats.highestPass||0, gameState.passRate);
+      gainXP(0.02);
     }
+    // Void Charge tick
+    tickVoidCharges();
     // Session time
     gameState.stats.sessionSeconds = Math.round((Date.now() - gameState.stats.sessionStartTime) / 1000);
     // Ad cooldown
@@ -4571,13 +5377,12 @@ function startGameLoop() {
         document.getElementById('ad-btn-sub').textContent = 'Ready in: ' + (s>59 ? m+'m '+sec+'s' : s+'s');
       }
     }
-    if (holdUnlocked && holdUnlockEndTime > 0 && Date.now() >= holdUnlockEndTime && !gameScreenBlocked) deactivateHoldUnlock();
-    else if (holdUnlocked) updateHoldBtn();
     checkAchievements();
     maybeShowPassiveFloat();
     updateElementalNotify();
     refreshUpgradeAffordability();
     updateScrollIndicator();
+    updateVoidChargeUI();
     if (!_uiRafPending) {
       _uiRafPending = true;
       requestAnimationFrame(function(){ _uiRafPending = false; updateGameUI(); });
@@ -4989,6 +5794,8 @@ function applyOfflineIncome() {
   var passRate = gameState.passRate || 0;
   var rate = passRate * (gameState.prestigePerks ? (gameState.prestigePerks.passMult || 1) : 1);
   var offlineMult = gameState.prestigePerks && gameState.prestigePerks.offlineMult ? gameState.prestigePerks.offlineMult : 1;
+  // Glacial Reserves (elem_ice2) triples offline earnings
+  if (hasElemSkill('elem_ice2')) offlineMult *= 3;
 
   // Offline boost purchase overrides all tiers — full 100% rate
   if (gameState.offlineBoostUntil && Date.now() < gameState.offlineBoostUntil) {
@@ -5204,8 +6011,9 @@ function devToggleGemBoostsOneCost() {
 }
 function holdInterval_ms() {
   if (devHoldSpeed10) return 12;
+  if (hasElemSkill('elem_fire1')) return 35; // Ember Rush — 4th speed tier
   var lvl = (gameState && gameState.level) || 1;
-  if (lvl < 10) return 160;  // tap power tier 1 — slow, encourages manual tapping/upgrades
+  if (lvl < 10) return 160;  // tap power tier 1 — slow
   if (lvl < 20) return 90;   // tap power tier 2 — improved
   return 50;                 // tap power tier 3 — full speed
 }
@@ -5459,9 +6267,9 @@ function devToggleHoldUnlock() {
   var el = document.getElementById('toggle-dev-holdunlock');
   if (el) { if (devHoldUnlock) el.classList.add('on'); else el.classList.remove('on'); }
   if (devHoldUnlock) {
-    activateHoldUnlock(999999); // effectively infinite
+    // hold always active — no-op
   } else {
-    deactivateHoldUnlock();
+    // hold always active — no-op
   }
 }
 
@@ -5504,6 +6312,7 @@ function updateHomeWizard() {
         ls.style.opacity = '0';
         setTimeout(function(){
           ls.style.display = 'none';
+          showScreen('home-screen');
           checkDevAccess(); // check Supabase for dev/playtest access
           refreshHomeBtns(); // ensure wizard name shows immediately on home screen
           checkWizardNamePrompt(); // first-ever boot name picker, shown before home screen
@@ -5516,6 +6325,7 @@ function updateHomeWizard() {
 })();
 
 // ══════════════════════════════════════════════════════════════════════
+
 
 </script>
 </body>
