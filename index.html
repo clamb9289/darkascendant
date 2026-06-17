@@ -111,8 +111,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:
 .monbtn-ad{background:#0f1a08;border-color:#3a6a20;}
 .monbtn-ad .monbtn-title{color:#8fc860;}.monbtn-ad .monbtn-sub{color:#4a7a30;}
 .monbtn-ad.ad-ready{background:#162e08;border-color:#5aaa20;}
-.monbtn-ad.ad-full{opacity:0.45;filter:grayscale(80%);pointer-events:none;}
-.monbtn-ad.ad-cooldown{pointer-events:none;opacity:0.45;filter:grayscale(80%);}
+.monbtn-ad.ad-full{opacity:0.45;filter:grayscale(80%);}
+.monbtn-ad.ad-cooldown{opacity:0.45;filter:grayscale(80%);}
 .monbtn-ad.ad-cooldown:active,.monbtn-ad.ad-full:active{opacity:0.45;transform:none;}
 .monbtn-ad.ad-ready .monbtn-title{color:#aeff60;}.monbtn-ad.ad-ready .monbtn-sub{color:#80cc40;}
 .monbtn-hold{background:#061a14;border-color:#206a4a;}
@@ -518,7 +518,10 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
         <div class="boss-action-btn" id="btn-dev-ko" onclick="devOneHitBoss()" style="display:none;background:#1a0800;border-color:#ff6600;color:#ffcc44;">💀 KO</div>
       </div>
       <div class="boss-action-btn btn-gem-revive" id="btn-revive" style="display:none;width:100%;margin-top:4px;" onclick="gemRevive()">💎 10 Gems — Revive</div>
-      <div id="btn-boss-ad" onclick="watchBossAd()" style="display:none;width:100%;margin-top:4px;padding:10px;border-radius:9px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #2a4a2a;background:#061006;color:#60c060;touch-action:manipulation;">📺 Watch Ad — 2× damage for 90 sec</div>
+      <div id="btn-boss-ad" style="display:none;width:100%;margin-top:4px;padding:0;border-radius:9px;overflow:hidden;border:1px solid #2a4a2a;background:#061006;touch-action:none;user-select:none;position:relative;cursor:pointer;">
+        <div id="btn-boss-ad-fill" style="position:absolute;left:0;top:0;height:100%;width:0%;background:rgba(96,192,96,0.25);pointer-events:none;transition:none;"></div>
+        <div style="position:relative;padding:10px;text-align:center;font-size:12px;font-weight:600;color:#60c060;pointer-events:none;" id="btn-boss-ad-label">Hold to focus energy — 2× damage</div>
+      </div>
     </div>
     <div id="boss-result">
       <div id="boss-result-title"></div>
@@ -551,8 +554,10 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
     <div class="oavatar" id="lu-emoji">⬆️</div>
     <div class="otitle" id="lu-title">Level up!</div>
     <div class="osub" id="lu-sub"></div>
-    <div class="obody" style="font-size:var(--fs-sm);color:var(--t-txt3);">Watch a short ad for a 3-minute 2× tap boost — <strong style="color:var(--t-acc2);">stacks on top of your 3 active boosts.</strong></div>
-    <div class="obtn obtn-green" id="lu-watchbtn" onclick="watchAdFromLvlUp()">📺 Receive Vision — 2× tap (3 min)</div>
+    <div class="obody" style="font-size:var(--fs-sm);color:var(--t-txt3);">If you're enjoying Dark Ascendant, consider <span onclick="openTipJar('tip_coffee')" style="color:var(--t-acc2);cursor:pointer;text-decoration:underline;">buying me a coffee ☕</span> — hold below for a 2× tap boost!</div>
+    <div id="lu-watchbtn" style="width:100%;">
+      <div class="obtn obtn-green" id="lu-charge-btn" onclick="_luStartCharge()" style="margin:0;">✨ Click to charge — 2× tap boost</div>
+    </div>
     <div class="obtn" style="margin-top:-4px;" onclick="closeLvlUp()">Skip →</div>
   </div>
 </div>
@@ -752,7 +757,12 @@ if (localStorage.getItem('da_wizard_name')) document.body.classList.add('screens
     <div id="taphint">Tap to channel dark energy</div>
   </div>
   <div id="monetrow">
-    <div class="monbtn monbtn-ad" onclick="openAdMenu()"><div class="monbtn-icon">📺</div><div class="monbtn-title">Receive Vision</div><div class="monbtn-sub" id="ad-btn-sub">+1 of 5 boosts</div></div>
+    <div class="monbtn monbtn-ad" id="vision-btn" style="position:relative;overflow:hidden;touch-action:none;user-select:none;">
+      <div id="vision-fill" style="position:absolute;left:0;top:0;width:0%;height:100%;background:rgba(180,120,255,0.25);pointer-events:none;transition:none;"></div>
+      <div class="monbtn-icon" style="position:relative;">✨</div>
+      <div class="monbtn-title" style="position:relative;">Hold to charge</div>
+      <div class="monbtn-sub" id="ad-btn-sub" style="position:relative;">receive boost</div>
+    </div>
     <div class="monbtn" id="shop-btn" onclick="openShop()"><div class="monbtn-icon" id="mon-gem-icon">💎</div><div class="monbtn-title">Soul Gems</div><div class="monbtn-sub" id="gem-sub">50 gems</div></div>
     <div class="monbtn" id="theme-btn" onclick="openTheme()"><div class="monbtn-icon">🎨</div><div class="monbtn-title">Themes</div><div class="monbtn-sub" id="theme-sub">Shadow</div></div>
     <div class="monbtn monbtn-elem" id="elem-btn" onclick="openElemMenu()"><div class="monbtn-icon">⚗️</div><div class="monbtn-title">Elementals</div><div class="monbtn-sub" id="elem-btn-sub">Skill tree</div></div>
@@ -2097,9 +2107,9 @@ function updateBoostBar() {
     if (adOnCooldown) {
       // text is handled by game loop countdown — don't overwrite
     } else if (adFull) {
-      adBtn.textContent = 'Boosts full (5/5)';
+      adBtn.textContent = 'Boosts full';
     } else {
-      adBtn.textContent = '+1 of 5 boosts';
+      adBtn.textContent = 'receive boost';
     }
   }
 }
@@ -2373,6 +2383,7 @@ function _doLaunchGame() {
   // Set gem sprite on monetisation button
   var monGemIcon = document.getElementById('mon-gem-icon');
   if (monGemIcon && SPRITES['icon_gem']) monGemIcon.innerHTML = '<img src="' + SPRITES['icon_gem'] + '" style="width:20px;height:20px;image-rendering:pixelated;" draggable="false">';
+  _wireVisionBtn();
   // Hold-to-tap on main button is activated via the Hold to Tap ad button (openHoldAd)
   // or via dev toggle — not wired directly here
   if (_tutorialPending) {
@@ -2496,7 +2507,7 @@ function wireTapBtn() {
   tb.addEventListener('mousedown',   startHold);
   tb.addEventListener('touchstart',  startHold, {passive:false});
   tb.addEventListener('mouseup',     stopHold);
-  tb.addEventListener('mouseleave',  stopHold);
+  tb.addEventListener('mouseleave',  function(){ if (!_spaceHeld) stopHold(); });
   tb.addEventListener('touchend',    stopHold);
   tb.addEventListener('touchcancel', stopHold);
 }
@@ -2792,11 +2803,12 @@ function openBoss(boss) {
   document.getElementById('btn-revive').style.display = 'none';
   var bossAdBtn = document.getElementById('btn-boss-ad');
   if (bossAdBtn) {
-    bossAdBtn.style.display = settings.ads ? '' : 'none';
+    bossAdBtn.style.display = '';
     bossAdInProgress = false;
     bossAdCooldown = 0;
     bossAdBoostEnd = 0;
     _updateBossAdBtn();
+    _wireBossAdBtn();
   }
   var res = document.getElementById('boss-result'); res.className = ''; res.style.display = 'none';
   ['btn-attack','btn-spell','btn-drain','btn-ritual'].forEach(function(id){
@@ -3367,11 +3379,19 @@ function showLvlUp() {
   document.getElementById('lu-emoji').textContent = tier.emoji;
   document.getElementById('lu-title').textContent = 'Level ' + lv + ' reached!';
   document.getElementById('lu-sub').textContent = tier.name + ' · ' + tier.title;
-  document.getElementById('lu-watchbtn').style.display = settings.ads ? 'block' : 'none';
+  document.getElementById('lu-watchbtn').style.display = '';
   document.getElementById('lvlupoverlay').classList.add('show');
+  // Temporarily hide tutorial overlay so it doesn't block the lvlup buttons
+  var tutEl = document.getElementById('tut-overlay');
+  if (tutEl) tutEl.style.display = 'none';
 }
 function closeLvlUp() {
+  if (_luHoldStart) return; // don't interrupt a charge in progress
   document.getElementById('lvlupoverlay').classList.remove('show'); pendingLvlUp = false;
+  _luHoldEnd(false);
+  // Restore tutorial overlay if it was hidden
+  var tutEl = document.getElementById('tut-overlay');
+  if (tutEl) tutEl.style.display = '';
   setTimeout(function(){ eventDone(); }, 350);
 }
 function showAvatarStory() {
@@ -3810,17 +3830,176 @@ function updateHoldBtn() {
 
 // ── AD SYSTEM ─────────────────────────────────────────────────────────
 var AD_BOOST_MAX = 2; // max 2 stacking ad boost slots
-function openAdMenu() {
-  if (adCooldown > 0) return;
+// ── HOLD-TO-CHARGE: RECEIVE VISION ───────────────────────────────────
+var _visionHoldTimer = null;
+var _visionHoldStart = null;
+var VISION_CHARGE_MS = 5000;
+
+function _visionHoldBegin(e) {
+  if (e) e.preventDefault();
   var now = Date.now();
   var adCount = boostSlots.filter(function(b){ return b.endTime > now && b.source === 'ad'; }).length;
-  if (adCount >= AD_BOOST_MAX) return;
+  if (adCooldown > 0 || adCount >= AD_BOOST_MAX) return; // on cooldown or slots full
+  if (_visionHoldStart) return; // already charging
+  _visionHoldStart = now;
+  var fill = document.getElementById('vision-fill');
+  _visionHoldTimer = setInterval(function(){
+    var pct = Math.min(100, (Date.now() - _visionHoldStart) / VISION_CHARGE_MS * 100);
+    if (fill) fill.style.width = pct + '%';
+    if (pct >= 100) {
+      _visionHoldEnd(true);
+    }
+  }, 50);
+}
+function _visionHoldEnd(completed) {
+  clearInterval(_visionHoldTimer);
+  _visionHoldTimer = null;
+  _visionHoldStart = null;
+  var fill = document.getElementById('vision-fill');
+  if (fill) fill.style.width = '0%';
+  if (completed) { closeAd(); } // grant boost directly, skip fake ad overlay
+}
+function openAdMenu() {
+  // Legacy call — trigger hold mechanic directly
   startAd(false);
 }
-function watchAdFromLvlUp() {
-  document.getElementById('lvlupoverlay').classList.remove('show');
-  startAd(true);
+function _wireVisionBtn() {
+  var btn = document.getElementById('vision-btn');
+  if (!btn) return;
+  btn.addEventListener('mousedown', _visionHoldBegin);
+  btn.addEventListener('touchstart', _visionHoldBegin, {passive:false});
+  btn.addEventListener('mouseup', function(){ _visionHoldEnd(false); });
+  btn.addEventListener('mouseleave', function(e){ if (!btn.contains(e.relatedTarget)) _visionHoldEnd(false); });
+  btn.addEventListener('touchend', function(){ _visionHoldEnd(false); });
+  btn.addEventListener('touchcancel', function(){ _visionHoldEnd(false); });
 }
+
+// ── HOLD-TO-CHARGE: BOSS FOCUS ───────────────────────────────────────
+var _bossHoldTimer = null;
+var _bossHoldStart = null;
+var BOSS_CHARGE_MS = 5000;
+
+function _bossHoldBegin(e) {
+  if (e) e.preventDefault();
+  if (bossAdCooldown > 0 || bossAdInProgress || bossDefeated) return;
+  _bossHoldStart = Date.now();
+  var fill = document.getElementById('btn-boss-ad-fill');
+  _bossHoldTimer = setInterval(function(){
+    var pct = Math.min(100, (Date.now() - _bossHoldStart) / BOSS_CHARGE_MS * 100);
+    if (fill) fill.style.width = pct + '%';
+    if (pct >= 100) {
+      _bossHoldEnd(true);
+    }
+  }, 50);
+}
+function _bossHoldEnd(completed) {
+  clearInterval(_bossHoldTimer);
+  _bossHoldTimer = null;
+  _bossHoldStart = null;
+  var fill = document.getElementById('btn-boss-ad-fill');
+  if (fill) fill.style.width = '0%';
+  if (completed) { _grantBossBoost(); }
+}
+function _grantBossBoost() {
+  bossAdInProgress = false;
+  bossAdBoostEnd = Date.now() + 10*1000; // 10 sec boost
+  bossAdCooldown = 60; // 60 sec cooldown
+  combatLocked = false;
+  showBoostExtendedToast('⚔️ 2× boss damage for 10 sec!');
+  _updateBossAdBtn();
+  var cdIv = setInterval(function(){
+    bossAdCooldown--;
+    _updateBossAdBtn();
+    if (bossAdCooldown <= 0) { clearInterval(cdIv); }
+  }, 1000);
+}
+function watchBossAd() {
+  // Legacy — now wired via hold events
+}
+function _wireBossAdBtn() {
+  var btn = document.getElementById('btn-boss-ad');
+  if (!btn) return;
+  btn.addEventListener('mousedown', _bossHoldBegin);
+  btn.addEventListener('touchstart', _bossHoldBegin, {passive:false});
+  btn.addEventListener('mouseup', function(){ _bossHoldEnd(false); });
+  btn.addEventListener('mouseleave', function(e){ if (!btn.contains(e.relatedTarget)) _bossHoldEnd(false); });
+  btn.addEventListener('touchend', function(){ _bossHoldEnd(false); });
+  btn.addEventListener('touchcancel', function(){ _bossHoldEnd(false); });
+}
+
+// ── LEVEL-UP OVERLAY HOLD-TO-CHARGE ──────────────────────────────────
+var _luHoldTimer = null;
+var _luHoldStart = null;
+var LU_CHARGE_MS = 5000;
+
+function _luHoldBegin(e) {
+  if (e) e.preventDefault();
+  if (_luHoldStart) return;
+  _luHoldStart = Date.now();
+  var fill = document.getElementById('lu-charge-fill');
+  _luHoldTimer = setInterval(function(){
+    var pct = Math.min(100, (Date.now() - _luHoldStart) / LU_CHARGE_MS * 100);
+    if (fill) fill.style.width = pct + '%';
+    if (pct >= 100) { _luHoldEnd(true); }
+  }, 50);
+}
+function _luHoldEnd(completed) {
+  clearInterval(_luHoldTimer);
+  _luHoldTimer = null;
+  _luHoldStart = null;
+  var fill = document.getElementById('lu-charge-fill');
+  if (fill) fill.style.width = '0%';
+  if (completed) {
+    document.getElementById('lvlupoverlay').classList.remove('show');
+    adFromLvlUp = true;
+    closeAd(); // grant boost directly
+  }
+}
+function _wireLuBtn() {
+  var wrapper = document.getElementById('lu-watchbtn');
+  if (!wrapper) return;
+  // No release handlers needed — charge runs automatically to completion once started
+}
+function _luGrantBoost() {
+  clearInterval(_luHoldTimer); _luHoldTimer = null; _luHoldStart = null;
+  // Grant the boost directly without going through closeAd (which would call closeLvlUp again)
+  var now = Date.now();
+  var duration = infiniteTimers ? 999*60*1000 : 240*1000;
+  var existing = boostSlots.find(function(b){ return b.source === 'ad' && b.label === '2× Tap (Level-up)' && b.endTime > now; });
+  if (existing) {
+    existing.endTime += duration;
+    showBoostExtendedToast('+4 min ⚡ boost extended!');
+  } else {
+    boostSlots.push({type:'tap', mult:2, endTime: now + duration, label:'2× Tap (Level-up)', source:'ad'});
+    showBoostExtendedToast('+4 min ⚡ boost activated!');
+  }
+  updateBoostBar();
+  // Close the overlay
+  document.getElementById('lvlupoverlay').classList.remove('show');
+  pendingLvlUp = false;
+  var tutEl = document.getElementById('tut-overlay');
+  if (tutEl) tutEl.style.display = '';
+  setTimeout(function(){ eventDone(); }, 350);
+}
+function _luStartCharge() {
+  if (_luHoldStart) return;
+  var btn = document.getElementById('lu-charge-btn');
+  if (!btn) return;
+  btn.onclick = null;
+  btn.textContent = '⚡ Charging...';
+  _luHoldStart = Date.now();
+  _luHoldTimer = setInterval(function(){
+    var pct = Math.min(100, (Date.now() - _luHoldStart) / LU_CHARGE_MS * 100);
+    if (btn) btn.style.background = 'linear-gradient(to right, #2a7a10 ' + pct + '%, #0a1f06 ' + pct + '%)';
+    if (pct >= 100) {
+      clearInterval(_luHoldTimer);
+      _luHoldTimer = null;
+      _luHoldStart = null;
+      _luGrantBoost();
+    }
+  }, 50);
+}
+function watchAdFromLvlUp() { _luGrantBoost(); }
 function startAd(fromLvlUp) {
   adFromLvlUp = fromLvlUp;
   showFakeAdOverlay(closeAd);
@@ -3868,49 +4047,22 @@ function closeAd() {
   if (adFromLvlUp) { setTimeout(function(){ closeLvlUp(); }, 200); }
 }
 
-function watchBossAd() {
-  if (bossAdCooldown > 0 || bossAdInProgress || bossDefeated) return;
-  bossAdInProgress = true;
-  // Pause boss — disable all player buttons and freeze combat during the popup
-  combatLocked = true;
-  ['btn-attack','btn-spell','btn-drain','btn-ritual','btn-boss-ad'].forEach(function(id){
-    var el = document.getElementById(id); if (el) { el.style.opacity = '.4'; el.style.pointerEvents = 'none'; }
-  });
-  showFakeAdOverlay(function(){
-    bossAdInProgress = false;
-    bossAdBoostEnd = Date.now() + 90*1000; // 90 sec boost
-    bossAdCooldown = 90; // 90 sec cooldown
-    combatLocked = false;
-    // Re-enable buttons
-    ['btn-attack','btn-spell','btn-drain','btn-ritual'].forEach(function(id){
-      var el = document.getElementById(id); if (el) { el.style.opacity = '1'; el.style.pointerEvents = ''; }
-    });
-    // Update ad button to show cooldown
-    _updateBossAdBtn();
-    showBoostExtendedToast('⚔️ 2× boss damage for 90 sec!');
-    // Tick down bossAdCooldown
-    var cdIv = setInterval(function(){
-      bossAdCooldown--;
-      _updateBossAdBtn();
-      if (bossAdCooldown <= 0) { clearInterval(cdIv); }
-    }, 1000);
-  });
-}
 function _updateBossAdBtn() {
   var el = document.getElementById('btn-boss-ad'); if (!el) return;
   if (el.style.display === 'none') return;
-  if (bossAdCooldown > 0) {
-    var m = Math.floor(bossAdCooldown/60), s = bossAdCooldown%60;
-    el.textContent = '📺 2× damage active — ' + m + ':' + (s<10?'0':'') + s;
-    el.style.borderColor = '#4a8a4a'; el.style.color = '#40ff80';
-  } else if (bossAdBoostEnd > Date.now()) {
+  var label = document.getElementById('btn-boss-ad-label');
+  if (!label) return;
+  if (bossAdBoostEnd > Date.now()) {
     var rem = Math.ceil((bossAdBoostEnd - Date.now())/1000);
-    var rm = Math.floor(rem/60), rs = rem%60;
-    el.textContent = '📺 2× damage — ' + rm + ':' + (rs<10?'0':'') + rs + ' left';
-    el.style.borderColor = '#4a8a4a'; el.style.color = '#40ff80';
+    label.textContent = '⚔️ 2× damage — ' + rem + 's left';
+    el.style.borderColor = '#4a8a4a'; el.style.opacity = '0.7'; el.style.pointerEvents = 'none';
+  } else if (bossAdCooldown > 0) {
+    var m = Math.floor(bossAdCooldown/60), s = bossAdCooldown%60;
+    label.textContent = 'Focus recharging — ' + m + ':' + (s<10?'0':'') + s;
+    el.style.borderColor = '#2a4a2a'; el.style.opacity = '0.5'; el.style.pointerEvents = 'none';
   } else {
-    el.innerHTML = '📺 Watch Ad — 2× damage for 90 sec';
-    el.style.borderColor = '#2a4a2a'; el.style.color = '#60c060';
+    label.textContent = 'Hold to focus energy — 2× damage';
+    el.style.borderColor = '#2a4a2a'; el.style.opacity = '1'; el.style.pointerEvents = '';
   }
 }
 function allBaseMaxed() { return BASE_UPGRADES.every(function(u){ return (gameState ? gameState.lvls[u.id]||0 : 0) >= u.max; }); }
@@ -4568,27 +4720,38 @@ var _lastElementalNotifySig = '';
 function updateElementalNotify() {
   if (!gameState) return;
   var el = document.getElementById('elemental-notify');
-  if (!el) return;
+  var elemBtn = document.getElementById('elem-btn');
   var level = gameState.level;
-  // Find tier-1 spell tiers that are available but not yet unlocked
-  var available = SPELL_TIERS.filter(function(st) {
-    return st.minLevel > 0
-      && level >= st.minLevel
-      && (gameState.unlockedSpells||[]).indexOf(st.id) < 0;
+
+  // Find elemental skills whose spell tier is unlocked but skill not yet purchased
+  var available = (typeof ELEM_SKILLS !== 'undefined' ? ELEM_SKILLS : []).filter(function(sk) {
+    return (gameState.unlockedSpells || []).indexOf(sk.spellTier) >= 0
+      && (gameState.elemSkills || []).indexOf(sk.id) < 0;
   });
-  // Signature to avoid unnecessary DOM updates
-  var sig = available.map(function(st){ return st.id; }).join(',');
+
+  var sig = available.map(function(sk){ return sk.id; }).join(',');
   if (sig === _lastElementalNotifySig) return;
   _lastElementalNotifySig = sig;
+
   if (available.length === 0) {
-    el.style.display = 'none';
+    if (el) el.style.display = 'none';
+    if (elemBtn) { elemBtn.style.boxShadow = ''; elemBtn.style.borderColor = ''; elemBtn.style.animation = ''; }
     return;
   }
-  // Build message — show first available element in its color
-  // If multiple available, cycle or show the first unlockable
-  var canAfford = available.filter(function(st){ return gameState.mana >= st.unlockCost; });
+
+  // Pick the most relevant skill to show (affordable first)
+  var canAfford = available.filter(function(sk){ return gameState.mana >= sk.cost; });
   var show = canAfford.length ? canAfford[0] : available[0];
-  var affordable = gameState.mana >= show.unlockCost;
+  var affordable = canAfford.length > 0;
+
+  // Glow elem-btn in the element's color
+  if (elemBtn) {
+    elemBtn.style.boxShadow = '0 0 10px 3px ' + show.color + ', 0 0 20px 6px ' + show.color + '66';
+    elemBtn.style.borderColor = show.color;
+    elemBtn.style.animation = 'prestigePulse 2s ease-in-out infinite';
+  }
+
+  if (!el) return;
   el.style.display = 'block';
   el.style.cssText = 'display:block;margin:6px 0 8px 0;padding:7px 14px;border-radius:8px;'
     + 'text-align:center;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.3px;'
@@ -4597,9 +4760,9 @@ function updateElementalNotify() {
     + 'background:linear-gradient(to right,' + show.color + '18,transparent);'
     + 'border:1px solid ' + show.color + '44;';
   if (available.length === 1) {
-    el.textContent = (affordable ? '✦ ' : '🔒 ') + show.name + ' available' + (affordable ? ' — tap to scroll' : ' · ' + fmt(show.unlockCost) + ' 🌑 to unlock') + ' ▼';
+    el.textContent = (affordable ? '✦ ' : '🔒 ') + show.name + ' available' + (affordable ? ' — tap to unlock' : ' · ' + fmt(show.cost) + ' 🌑 to unlock') + ' ▼';
   } else {
-    el.textContent = (affordable ? '✦ ' : '🔒 ') + available.length + ' elemental grimoires available ▼';
+    el.textContent = (affordable ? '✦ ' : '🔒 ') + available.length + ' elemental skills available ▼';
   }
 }
 
@@ -5632,6 +5795,324 @@ function updateHomeWizard() {
   }
 }
 
+// ── ELEMENTAL SKILL SYSTEM ─────────────────────────────────────────────
+var ELEM_SKILLS = [
+  // ── FIRE 🔥 ─────────────────────────────────────────────────────────
+  {id:'elem_fire1', spellTier:'fire',  tier:1, elem:'fire',  icon:'🔥',
+   name:'Ember Rush',         color:'#e05020',
+   cost:5000,
+   effect:'Hold-to-tap fires at 35ms — a 4th speed tier beyond the base levels.',
+   effectShort:'Hold speed ×4 tier (35ms)'},
+  {id:'elem_fire2', spellTier:'fire2', tier:2, elem:'fire',  icon:'🔥',
+   name:'Infernal Charge',    color:'#ff7030',
+   cost:120000,
+   effect:'A 4th Hold Frenzy milestone unlocks at 60s — 2.0× tap multiplier with blazing aura.',
+   effectShort:'Hold Frenzy IV at 60s (2.0×)'},
+  {id:'elem_fire3', spellTier:'fire3', tier:3, elem:'fire',  icon:'🔥',
+   name:'Soulfire Ascension', color:'#ff9060',
+   cost:1500000,
+   effect:'Permanent +50% tap multiplier applied to all tap damage forever.',
+   effectShort:'+50% permanent tap power'},
+  // ── ICE ❄️ ──────────────────────────────────────────────────────────
+  {id:'elem_ice1',  spellTier:'frost',  tier:1, elem:'ice',  icon:'❄️',
+   name:'Frost Accumulation', color:'#3090c0',
+   cost:10000,
+   effect:'Passive income ticks twice as fast — same per-second rate, but paid out every 500ms.',
+   effectShort:'Passive tick rate ×2'},
+  {id:'elem_ice2',  spellTier:'frost2', tier:2, elem:'ice',  icon:'❄️',
+   name:'Glacial Reserves',   color:'#50c0ff',
+   cost:180000,
+   effect:'Offline earnings multiplied ×3, stacking with any prestige offline bonus.',
+   effectShort:'Offline earnings ×3'},
+  {id:'elem_ice3',  spellTier:'frost3', tier:3, elem:'ice',  icon:'❄️',
+   name:'Absolute Stillness', color:'#a0e8ff',
+   cost:2500000,
+   effect:'Permanent +100% passive multiplier — all passive income doubled forever.',
+   effectShort:'+100% permanent passive'},
+  // ── VOID 🌀 ─────────────────────────────────────────────────────────
+  {id:'elem_void1', spellTier:'void2',  tier:1, elem:'void', icon:'🌀',
+   name:'Void Conduit',       color:'#7040c0',
+   cost:20000,
+   effect:'A Void Charge bar appears in the main UI. Fills over 3 minutes. Tap it to Void Bomb — 3× all gains for 2 minutes.',
+   effectShort:'Void Bomb: 3× all gains 2min (3min charge)'},
+  {id:'elem_void2', spellTier:'void3',  tier:2, elem:'void', icon:'🌀',
+   name:'Twin Singularity',   color:'#a060ff',
+   cost:300000,
+   effect:'A second independent Void Charge bar. Two bombs can charge simultaneously.',
+   effectShort:'2nd Void Charge bar'},
+  {id:'elem_void3', spellTier:'void4',  tier:3, elem:'void', icon:'🌀',
+   name:'Dark Resonance',     color:'#c090ff',
+   cost:2000000,
+   effect:'Each Void Bomb detonation permanently adds +15% tap and +15% passive (stacks up to 10×).',
+   effectShort:'+15% tap & passive per Void Bomb (max 10×)'},
+  // ── STORM ⚡ ─────────────────────────────────────────────────────────
+  {id:'elem_storm1',spellTier:'storm',  tier:1, elem:'storm',icon:'⚡',
+   name:'Thunder Strike',     color:'#c0a020',
+   cost:40000,
+   effect:'Adds ⚡ Thunder boss action (2.5× Strike damage, 8s cooldown). Super effective vs Lv60 & Lv80.',
+   effectShort:'Boss: Thunder (2.5× dmg, 8s CD)'},
+  {id:'elem_storm2',spellTier:'storm2', tier:2, elem:'storm',icon:'⚡',
+   name:'Chain Lightning',    color:'#ffe040',
+   cost:500000,
+   effect:'Adds 🌩️ Paralyze boss action — always stuns for 3 turns. 20s cooldown.',
+   effectShort:'Boss: Paralyze (3-turn stun, 20s CD)'},
+  {id:'elem_storm3',spellTier:'storm3', tier:3, elem:'storm',icon:'⚡',
+   name:'Storm Sovereignty',  color:'#fff080',
+   cost:3000000,
+   effect:'Permanently increases your max active boost slots from 3 to 4.',
+   effectShort:'Max boost slots +1 (4 total)'},
+];
+
+
+function hasElemSkill(id) {
+  return gameState && gameState.elemSkills && gameState.elemSkills.indexOf(id) >= 0;
+}
+
+function elemTapMult() {
+  var m = 1;
+  if (hasElemSkill('elem_fire3')) m *= 1.5;  // Soulfire Ascension +50%
+  // Dark Resonance stacks +15% per bomb, up to 10 stacks
+  if (hasElemSkill('elem_void3') && gameState.darkResonanceStacks > 0)
+    m *= (1 + 0.15 * Math.min(10, gameState.darkResonanceStacks));
+  return m;
+}
+
+function elemPassMult() {
+  var m = 1;
+  if (hasElemSkill('elem_ice3')) m *= 2.0;   // Absolute Stillness +100%
+  // Dark Resonance stacks +15% per bomb, up to 10 stacks
+  if (hasElemSkill('elem_void3') && gameState.darkResonanceStacks > 0)
+    m *= (1 + 0.15 * Math.min(10, gameState.darkResonanceStacks));
+  return m;
+}
+
+function openElemMenu() {
+  buildElemOverlay();
+  document.getElementById('elemoverlay').classList.add('show');
+}
+
+function closeElemMenu() { document.getElementById('elemoverlay').classList.remove('show'); }
+
+function buildElemOverlay() {
+  var grid = document.getElementById('elem-skill-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  var ELEMS = [
+    {key:'fire',  label:'Fire',  icon:'🔥', color:'#e05020', glow:'rgba(224,80,32,0.4)'},
+    {key:'ice',   label:'Ice',   icon:'❄️', color:'#3090c0', glow:'rgba(48,144,192,0.4)'},
+    {key:'void',  label:'Void',  icon:'🌀', color:'#a060ff', glow:'rgba(112,64,192,0.4)'},
+    {key:'storm', label:'Storm', icon:'⚡', color:'#c0a020', glow:'rgba(192,160,32,0.4)'},
+  ];
+
+  // Group skills by element
+  var byElem = {};
+  ELEM_SKILLS.forEach(function(sk){ (byElem[sk.elem] = byElem[sk.elem]||[]).push(sk); });
+
+  ELEMS.forEach(function(el) {
+    var col = document.createElement('div');
+    col.className = 'elem-col';
+
+    var colHdr = document.createElement('div');
+    colHdr.className = 'elem-col-hdr';
+    colHdr.style.color = el.color;
+    colHdr.style.textShadow = '0 0 12px ' + el.glow;
+    colHdr.textContent = el.icon + ' ' + el.label;
+    col.appendChild(colHdr);
+
+    (byElem[el.key]||[]).forEach(function(sk, ti) {
+      var owned    = hasElemSkill(sk.id);
+      var spellOk  = gameState && (gameState.unlockedSpells||[]).indexOf(sk.spellTier) >= 0;
+      var canAfford = gameState && gameState.mana >= sk.cost;
+      var locked   = !spellOk;
+
+      var node = document.createElement('div');
+      node.className = 'elem-node' + (owned ? ' elem-owned' : locked ? ' elem-locked' : canAfford ? ' elem-ready' : '');
+      node.style.setProperty('--ecolor', el.color);
+      node.style.setProperty('--eglow', el.glow);
+
+      // Connector line between tiers
+      if (ti > 0) {
+        var conn = document.createElement('div');
+        conn.className = 'elem-connector' + (owned ? ' elem-connector-lit' : '');
+        conn.style.borderColor = owned ? el.color : 'var(--t-bdr)';
+        col.appendChild(conn);
+      }
+
+      var tierLbl = document.createElement('div');
+      tierLbl.className = 'elem-tier-lbl';
+      tierLbl.textContent = 'TIER ' + sk.tier;
+      tierLbl.style.color = owned ? el.color : locked ? 'var(--t-txt3)' : 'var(--t-txt2)';
+
+      var nodeIcon = document.createElement('div');
+      nodeIcon.className = 'elem-node-icon';
+      nodeIcon.textContent = owned ? sk.icon : locked ? '🔒' : sk.icon;
+
+      var nodeName = document.createElement('div');
+      nodeName.className = 'elem-node-name';
+      nodeName.textContent = sk.name;
+      nodeName.style.color = owned ? el.color : locked ? 'var(--t-txt3)' : 'var(--t-txt)';
+
+      var nodeEff = document.createElement('div');
+      nodeEff.className = 'elem-node-eff';
+      nodeEff.textContent = sk.effectShort;
+
+      var nodeBottom = document.createElement('div');
+      nodeBottom.className = 'elem-node-bottom';
+
+      if (owned) {
+        nodeBottom.innerHTML = '<span style="color:' + el.color + ';font-weight:600;">✓ Active</span>';
+      } else if (locked) {
+        // Find which spell tier name is needed
+        var spellDef = SPELL_TIERS.find(function(st){ return st.id === sk.spellTier; });
+        nodeBottom.textContent = '🔒 Requires Lv' + (spellDef ? spellDef.minLevel : '?') + ' spell tier';
+      } else {
+        var costEl = document.createElement('div');
+        costEl.className = 'elem-cost' + (canAfford ? ' elem-cost-ok' : '');
+        costEl.textContent = fmt(sk.cost) + ' 🌑 essence';
+        var buyBtn = document.createElement('div');
+        buyBtn.className = 'elem-buy-btn' + (canAfford ? ' elem-buy-ok' : ' elem-buy-poor');
+        buyBtn.textContent = canAfford ? 'Unlock' : 'Need ' + fmt(sk.cost - (gameState ? gameState.mana : 0)) + ' more';
+        if (canAfford) {
+          (function(sid){ buyBtn.addEventListener('click', function(){ buyElemSkill(sid); }); })(sk.id);
+        }
+        nodeBottom.appendChild(costEl);
+        nodeBottom.appendChild(buyBtn);
+      }
+
+      node.appendChild(tierLbl);
+      node.appendChild(nodeIcon);
+      node.appendChild(nodeName);
+      node.appendChild(nodeEff);
+      node.appendChild(nodeBottom);
+      col.appendChild(node);
+    });
+
+    grid.appendChild(col);
+  });
+
+  // Update Dark Resonance stack display
+  var drEl = document.getElementById('elem-resonance-display');
+  if (drEl) {
+    if (hasElemSkill('elem_void3')) {
+      var stacks = (gameState && gameState.darkResonanceStacks) || 0;
+      drEl.style.display = '';
+      drEl.innerHTML = '🌀 Dark Resonance: <span style="color:#c090ff;font-weight:600;">' + stacks + '/10 stacks</span> (+' + (stacks*15) + '% tap & passive)';
+    } else {
+      drEl.style.display = 'none';
+    }
+  }
+}
+
+function buyElemSkill(id) {
+  var sk = ELEM_SKILLS.find(function(s){ return s.id===id; });
+  if (!sk || !gameState) return;
+  if (hasElemSkill(id)) return;
+  if ((gameState.unlockedSpells||[]).indexOf(sk.spellTier) < 0) {
+    showTapPowerToast('\uD83D\uDD12 Unlock the ' + sk.elem + ' spell tier first');
+    return;
+  }
+  if (gameState.mana < sk.cost) {
+    showTapPowerToast('Not enough essence — need ' + fmt(sk.cost) + ' \uD83C\uDF11');
+    return;
+  }
+  gameState.mana -= sk.cost;
+  if (!gameState.elemSkills) gameState.elemSkills = [];
+  gameState.elemSkills.push(id);
+  if (id === 'elem_storm3') updateBoostBar();
+  recalc(); saveGame(); updateGameUI();
+  playColorBurst(window.innerWidth/2, window.innerHeight/2, sk.color, sk.icon);
+  showTapPowerToast(sk.icon + ' ' + sk.name + ' unlocked!');
+  buildElemOverlay();
+}
+
+function detonateVoidBomb(idx) {
+  if (!gameState || !hasElemSkill('elem_void1')) return;
+  if (!gameState.voidCharges || (gameState.voidCharges[idx]||0) < 1) return;
+  gameState.voidCharges[idx] = 0;
+  // Apply 3× all gains boost for 2 minutes
+  applyBoost('all', 3, VOID_BOMB_DUR, '🌀 Void Bomb', 'void');
+  // Dark Resonance: permanent stack
+  if (hasElemSkill('elem_void3')) {
+    var stacks = gameState.darkResonanceStacks || 0;
+    if (stacks < 10) {
+      gameState.darkResonanceStacks = stacks + 1;
+      showTapPowerToast('🌀 Dark Resonance — ' + gameState.darkResonanceStacks + '/10 stacks (+15% tap & passive)');
+    }
+  }
+  showTapPowerToast('🌀 Void Bomb detonated — 3× all gains for 2 minutes!');
+  playColorBurst(window.innerWidth/2, window.innerHeight/2, '#a060ff', '🌀');
+}
+
+function tickVoidCharges() {
+  if (!gameState || !hasElemSkill('elem_void1')) return;
+  var bars = hasElemSkill('elem_void2') ? 2 : 1;
+  if (!gameState.voidCharges || gameState.voidCharges.length < bars) {
+    gameState.voidCharges = [gameState.voidCharges ? (gameState.voidCharges[0]||0) : 0, 0];
+  }
+  for (var i = 0; i < bars; i++) {
+    if (gameState.voidCharges[i] < 1) {
+      gameState.voidCharges[i] = Math.min(1, (gameState.voidCharges[i]||0) + 1/VOID_CHARGE_FILL_TICKS);
+    }
+  }
+}
+
+function updateVoidChargeUI() {
+  var wrap = document.getElementById('void-charge-wrap');
+  if (!wrap) return;
+  if (!gameState || !hasElemSkill('elem_void1')) { wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  var bars = hasElemSkill('elem_void2') ? 2 : 1;
+  for (var i = 0; i < 2; i++) {
+    var bar = document.getElementById('void-bar-' + i);
+    var btn = document.getElementById('void-btn-' + i);
+    var lbl = document.getElementById('void-lbl-' + i);
+    if (!bar || !btn) continue;
+    if (i >= bars) { btn.style.display = 'none'; continue; }
+    btn.style.display = '';
+    var fill = Math.min(1, (gameState.voidCharges && gameState.voidCharges[i]) || 0);
+    bar.style.width = (fill * 100) + '%';
+    if (fill >= 1) {
+      btn.classList.add('void-ready');
+      lbl.textContent = '🌀 VOID BOMB — tap to detonate';
+    } else {
+      btn.classList.remove('void-ready');
+      var secsLeft = Math.ceil((1 - fill) * VOID_CHARGE_FILL_TICKS / 10);
+      var m = Math.floor(secsLeft/60), s = secsLeft%60;
+      lbl.textContent = '🌀 Void Charge ' + (bars > 1 ? (i+1) : '') + ' — ' + m + ':' + (s<10?'0':'') + s;
+    }
+  }
+}
+
+function playerParalyze() {
+  if (!hasElemSkill('elem_storm2') || paralyzeCooldown || combatLocked || bossDefeated || playerHP <= 0) return;
+  if (!doPlayerAction(1)) return;
+  bossStunTurns += 3; // always 3 turns, no randomness
+  addLog('player', '🌩️ Paralyze — boss stunned for 3 turns!');
+  spawnBossFloat('STUNNED');
+  updateBossUI();
+  paralyzeCooldown = true; setCooldown('btn-paralyze', 20, '🌩️ Paralyze'); setTimeout(function(){ paralyzeCooldown = false; }, 20000);
+  lockActions(200); setTimeout(bossCounterAttack, 200);
+}
+
+function playerThunder() {
+  if (!hasElemSkill('elem_storm1') || thunderCooldown || bossDefeated || playerHP <= 0) return;
+  if (!doPlayerAction(0, true)) return; // shares action slot with attack (no combatLocked check)
+  var dmg = Math.floor(calcPlayerDmg(0) * 2.5); // 2.5× Strike damage
+  bossHP = Math.max(0, bossHP - dmg);
+  // Super effective vs Lv60 and Lv80
+  var superMsg = (bossData.level === 60 || bossData.level === 80) ? ' ⚡ Super effective!' : '';
+  addLog('player', '⚡ Thunder Strike — ' + dmg + ' damage!' + superMsg);
+  if (superMsg) addLog('super', '⚡ Super effective!');
+  spawnBossFloat('-' + dmg);
+  var bossBar = document.getElementById('boss-hp-bar');
+  if (bossBar) { bossBar.classList.add('boss-hp-flash'); setTimeout(function(){ bossBar.classList.remove('boss-hp-flash'); }, 120); }
+  updateBossUI();
+  thunderCooldown = true; setCooldown('btn-thunder', 8, '⚡ Thunder'); setTimeout(function(){ thunderCooldown = false; }, 8000);
+  if (bossHP <= 0) { showBossVictory(); return; }
+  if (!_counterPending) { _counterPending = true; setTimeout(function(){ _counterPending = false; bossCounterAttack(); }, 350); }
+}
+
 // ── TUTORIAL SYSTEM ──────────────────────────────────────────────────
 // Fires on every new game and every ascension. Skippable at any time
 // via a 2-second hold bar. Tracks step state in a closure; no save
@@ -5975,6 +6456,8 @@ function _showTutFinal() {
           checkWizardNamePrompt(); // first-ever boot name picker, shown before home screen
           applyGemSprites(); // swap static 💎 placeholders for the custom soul gem sprite
           checkPendingPurchase(); // credit gems/remove-ads if returning from Stripe, and launch into shop
+          _wireVisionBtn(); // wire hold-to-charge on Receive Vision button
+          _wireLuBtn();    // wire hold-to-charge on level-up boost button
         }, 400);
       }, 100);
     }
