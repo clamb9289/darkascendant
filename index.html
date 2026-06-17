@@ -1836,65 +1836,6 @@ function closeLeaderboard() {
   if (el && el.parentNode) el.parentNode.removeChild(el);
 }
 
-function fetchLeaderboard() {
-  var list = document.getElementById('lb-list');
-  var status = document.getElementById('lb-status');
-  if (!list) return;
-  if (status) { status.textContent = 'Loading...'; status.style.display = 'block'; }
-  list.innerHTML = '';
-
-  fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE
-    + '?select=device_id,wizard_name,prestige,best_time_ms,best_time_fmt,level'
-    + '&limit=50', {
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-  })
-  .then(function(r) {
-    if (!r.ok) return r.text().then(function(t) { throw new Error('HTTP ' + r.status + ': ' + t); });
-    return r.json();
-  })
-  .then(function(rows) {
-    console.log('[LB] fetch got', rows.length, 'rows');
-    if (status) status.style.display = 'none';
-    if (!rows || rows.length === 0) {
-      list.innerHTML = '<div style="padding:40px;text-align:center;color:#3a1060;font-size:13px;">No entries yet -- be the first!</div>';
-      return;
-    }
-    var myDevice = getDeviceId();
-    rows.sort(function(a, b) {
-      if (b.prestige !== a.prestige) return b.prestige - a.prestige;
-      if ((b.level || 0) !== (a.level || 0)) return (b.level || 0) - (a.level || 0);
-      if (!a.best_time_ms) return 1;
-      if (!b.best_time_ms) return -1;
-      return a.best_time_ms - b.best_time_ms;
-    });
-    var html = '';
-    rows.forEach(function(e, i) {
-      var rank = i + 1;
-      var isMe = e.device_id === myDevice;
-      var rankColor = rank === 1 ? '#ffd700' : rank === 2 ? '#c0c0c0' : rank === 3 ? '#cd7f32' : '#6040a0';
-      var rankSize = rank <= 3 ? '16px' : '14px';
-      var rowBg = isMe ? 'background:rgba(120,60,200,0.18);border-left:3px solid #8040d0;' : 'border-left:3px solid transparent;';
-      var lvl = e.level || 1;
-      var lvlColor = lvl >= 100 ? '#ffd700' : lvl >= 50 ? '#c080ff' : '#8060c0';
-      var bc = e.prestige > 0 ? (BADGE_COLORS[Math.min(e.prestige, BADGE_COLORS.length)-1] || BADGE_COLORS[0]) : null;
-      var ascended = e.prestige > 0
-        ? '<span style="background:rgba(80,20,120,0.3);border-radius:12px;padding:2px 8px;font-size:12px;color:' + bc.color + ';font-weight:700;border:1px solid ' + bc.border + ';text-shadow:0 0 6px ' + bc.border + ';">' + e.prestige + 'x</span>'
-        : '<span style="color:#3a1060;font-size:12px;">—</span>';
-      html += '<div style="display:grid;grid-template-columns:10% 1fr 12% 12% 18%;padding:13px 4%;' + rowBg + 'border-bottom:1px solid #0e0520;align-items:center;">'
-        + '<div style="font-size:' + rankSize + ';font-weight:700;color:' + rankColor + ';">' + rank + '</div>'
-        + '<div style="font-size:14px;color:' + (isMe ? '#e8b0ff' : '#c080ff') + ';font-weight:' + (isMe ? '700' : '500') + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + e.wizard_name + '</div>'
-        + '<div style="text-align:center;font-size:13px;font-weight:700;color:' + lvlColor + ';">' + lvl + '</div>'
-        + '<div style="text-align:center;">' + ascended + '</div>'
-        + '<div style="text-align:right;font-size:11px;color:#6040a0;">' + (e.best_time_fmt || '<span style="color:#2a1050;">—</span>') + '</div>'
-        + '</div>';
-    });
-    list.innerHTML = html;
-  })
-  .catch(function(e) {
-    console.log('[LB] fetch error:', e);
-    if (status) { status.textContent = 'Error: ' + e.message; status.style.display = 'block'; status.style.color = '#ff5050'; status.style.fontSize = '10px'; }
-  });
-}
 // ── SOUND SYSTEM ─────────────────────────────────────────────────────
 var _audioCtx = null;
 function getAudioCtx() {
