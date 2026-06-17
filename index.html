@@ -1308,10 +1308,13 @@ function fetchLeaderboard() {
       return r.json();
     })
     .then(function(rows) {
+      console.log('[LB] page offset=' + offset + ' got ' + rows.length + ' rows');
       allRows = allRows.concat(rows);
       if (rows.length === 50) {
+        console.log('[LB] fetching next page at offset=' + (offset + 50));
         fetchPage(offset + 50); // got a full page, there may be more
       } else {
+        console.log('[LB] done, total=' + allRows.length);
         renderLeaderboard(allRows); // partial page = we have everything
       }
     })
